@@ -35,20 +35,15 @@ const CREATIVE_TLDS  = ['design','studio','art','media','photography','ink','gal
 
 const ADV_STATUSES = ['available','premium','aftermarket','taken','unknown']
 
-export function ResultsView({ keyword, primaryDomain, results, livePrices, loading, wave3Available, onLoadWave3, onLiveCheck }) {
+export function ResultsView({ keyword, primaryDomain, results, livePrices, loading, wave3Available, onLoadWave3, onLiveCheck, saved = [], onSave }) {
   const [mainTab,     setMainTab]     = useState('basic')
   const [quickFilter, setQuickFilter] = useState('all-tlds')
   const [sortId,      setSortId]      = useState('price-asc')
   const [sortOpen,    setSortOpen]    = useState(false)
   const [advFilters,  setAdvFilters]  = useState(new Set(ADV_STATUSES))
-  const [saved,       setSaved]       = useState(() => JSON.parse(localStorage.getItem('db-saved') || '[]'))
 
   function toggleSave(domain) {
-    setSaved(prev => {
-      const next = prev.includes(domain) ? prev.filter(d => d !== domain) : [...prev, domain]
-      localStorage.setItem('db-saved', JSON.stringify(next))
-      return next
-    })
+    onSave?.(domain)
   }
 
   const allEntries = useMemo(() => Object.entries(results).map(([domain, r]) => ({ domain, ...r })), [results])

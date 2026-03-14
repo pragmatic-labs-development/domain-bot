@@ -5,11 +5,16 @@
 import { useState, useEffect, useRef } from 'react'
 import { SearchBar }   from './components/SearchBar'
 import { ResultsView } from './components/ResultsView'
+import { SavedPanel }  from './components/SavedPanel'
 import { useSearch }   from './hooks/useSearch'
 import './App.css'
 
 export default function App() {
-  const [inputValue, setInputValue] = useState('')
+  const [inputValue,  setInputValue]  = useState('')
+  const [savedOpen,   setSavedOpen]   = useState(false)
+  const [saved,       setSaved]       = useState(() =>
+    JSON.parse(localStorage.getItem('db-saved') || '[]')
+  )
 
   const {
     keyword, primaryDomain, results, livePrices,
@@ -21,12 +26,27 @@ export default function App() {
     if (inputValue.trim()) triggerSearch(inputValue.trim())
   }
 
+  function toggleSave(domain) {
+    setSaved(prev => {
+      const next = prev.includes(domain)
+        ? prev.filter(d => d !== domain)
+        : [...prev, domain]
+      localStorage.setItem('db-saved', JSON.stringify(next))
+      return next
+    })
+  }
+
   const hasResults = keyword && Object.keys(results).length > 0
 
-  // Scroll to top instantly when a new search fires
   useEffect(() => {
     if (hasResults) window.scrollTo({ top: 0, behavior: 'instant' })
   }, [keyword])
+
+  // Lock body scroll when panel is open
+  useEffect(() => {
+    document.body.style.overflow = savedOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [savedOpen])
 
   return (
     <div className="app">
@@ -53,7 +73,17 @@ export default function App() {
             </svg>
             <span>Private Search</span>
           </span>
-          <button className="icon-btn" aria-label="Saved domains">★</button>
+
+          <button
+            className={`icon-btn saved-nav-btn ${saved.length > 0 ? 'has-saved' : ''}`}
+            aria-label="Saved domains"
+            onClick={() => setSavedOpen(true)}
+          >
+            ★
+            {saved.length > 0 && (
+              <span className="saved-nav-count">{saved.length}</span>
+            )}
+          </button>
         </div>
       </nav>
 
@@ -110,8 +140,19 @@ export default function App() {
             wave3Available={wave3Available}
             onLoadWave3={loadWave3}
             onLiveCheck={checkLive}
+            saved={saved}
+            onSave={toggleSave}
           />
         </div>
+      )}
+
+      {savedOpen && (
+        <SavedPanel
+          saved={saved}
+          onUnsave={toggleSave}
+          onClose={() => setSavedOpen(false)}
+          livePrices={livePrices}
+        />
       )}
     </div>
   )
