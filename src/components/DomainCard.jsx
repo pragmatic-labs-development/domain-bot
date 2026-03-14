@@ -42,9 +42,13 @@ export function DomainCard({ domain, result, livePrices = {}, saved, onSave }) {
             ))}
           </span>
         )}
-        <span className="card-seo" style={{ color: seoClr }}>{seo} SEO</span>
+        <span className="card-seo">
+          <span className="card-seo-num" style={{ color: seoClr }}>{seo}</span>
+          <span className="card-seo-label">SEO</span>
+        </span>
       </div>
 
+      <div className="card-divider" />
       <div className="card-actions">
         <span className={`card-dot ${isPremium ? 'premium' : 'available'}`} />
         <div className="card-btns">
