@@ -1,23 +1,31 @@
 /**
  * src/components/ResultsView.jsx
- * Primary domain card + Basic/Advanced tabs with filters.
+ * Primary domain card + Basic/Advanced tabs with filters + sort.
  */
 
 import { useState, useMemo } from 'react'
 import { PrimaryDomainCard } from './PrimaryDomainCard'
 import { DomainCard }        from './DomainCard'
 import { DomainRow }         from './DomainRow'
-import { botScore, getLowestPrice } from '../lib/pricing'
+import { botScore, getLowestPrice, seoScore } from '../lib/pricing'
 
 const QUICK_FILTERS = [
-  { id: 'all-tlds', label: 'All' },
-  { id: 'popular',  label: 'Popular' },
-  { id: 'business', label: 'Business' },
-  { id: 'tech',     label: 'Tech' },
-  { id: 'startup',  label: 'Startup' },
-  { id: 'creative', label: 'Creative' },
-  { id: 'short',    label: 'Short' },
-  { id: 'cheap',    label: 'Cheap' },
+  { id: 'all-tlds', label: 'All',      icon: <GlobeIcon /> },
+  { id: 'popular',  label: 'Popular',  icon: <StarIcon /> },
+  { id: 'business', label: 'Business', icon: <BriefcaseIcon /> },
+  { id: 'tech',     label: 'Tech',     icon: <CodeIcon /> },
+  { id: 'startup',  label: 'Startup',  icon: <LightningIcon /> },
+  { id: 'creative', label: 'Creative', icon: <PencilIcon /> },
+  { id: 'short',    label: 'Short',    icon: <ArrowIcon /> },
+  { id: 'cheap',    label: 'Cheap',    icon: <DollarIcon /> },
+]
+
+const SORT_OPTIONS = [
+  { id: 'price-asc',  label: 'Price: Low–High' },
+  { id: 'price-desc', label: 'Price: High–Low' },
+  { id: 'seo-desc',   label: 'SEO Score' },
+  { id: 'bot-desc',   label: 'Bot Score' },
+  { id: 'alpha',      label: 'Alphabetical' },
 ]
 
 const BUSINESS_TLDS  = ['com','net','org','co','biz','inc','ltd','company','business','services','consulting','agency']
@@ -28,10 +36,12 @@ const CREATIVE_TLDS  = ['design','studio','art','media','photography','ink','gal
 const ADV_STATUSES = ['available','premium','aftermarket','taken','unknown']
 
 export function ResultsView({ keyword, primaryDomain, results, livePrices, loading, wave3Available, onLoadWave3, onLiveCheck }) {
-  const [mainTab,      setMainTab]      = useState('basic')
-  const [quickFilter,  setQuickFilter]  = useState('all-tlds')
-  const [advFilters,   setAdvFilters]   = useState(new Set(ADV_STATUSES))
-  const [saved,        setSaved]        = useState(() => JSON.parse(localStorage.getItem('db-saved') || '[]'))
+  const [mainTab,     setMainTab]     = useState('basic')
+  const [quickFilter, setQuickFilter] = useState('all-tlds')
+  const [sortId,      setSortId]      = useState('price-asc')
+  const [sortOpen,    setSortOpen]    = useState(false)
+  const [advFilters,  setAdvFilters]  = useState(new Set(ADV_STATUSES))
+  const [saved,       setSaved]       = useState(() => JSON.parse(localStorage.getItem('db-saved') || '[]'))
 
   function toggleSave(domain) {
     setSaved(prev => {
@@ -41,37 +51,48 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
     })
   }
 
-  // Convert results object to arrays
   const allEntries = useMemo(() => Object.entries(results).map(([domain, r]) => ({ domain, ...r })), [results])
-
   const primaryResult = results[primaryDomain]
 
-  // Basic tab: available + premium domains, apply quick filter
+  // Sort function
+  function applySort(items) {
+    const sorted = [...items]
+    switch (sortId) {
+      case 'price-asc':  return sorted.sort((a, b) => getLowestPrice(a.domain, livePrices) - getLowestPrice(b.domain, livePrices))
+      case 'price-desc': return sorted.sort((a, b) => getLowestPrice(b.domain, livePrices) - getLowestPrice(a.domain, livePrices))
+      case 'seo-desc':   return sorted.sort((a, b) => seoScore(b.domain) - seoScore(a.domain))
+      case 'bot-desc':   return sorted.sort((a, b) => botScore(b.domain, livePrices) - botScore(a.domain, livePrices))
+      case 'alpha':      return sorted.sort((a, b) => a.domain.localeCompare(b.domain))
+      default:           return sorted
+    }
+  }
+
+  // Basic tab: available + premium, filtered + sorted
   const availableEntries = useMemo(() =>
     allEntries.filter(e => e.status === 'available' || e.status === 'premium'),
     [allEntries]
   )
 
   const basicItems = useMemo(() => {
-    let items = availableEntries
     const tld = d => d.domain.split('.').slice(1).join('.')
     const kw  = d => d.domain.split('.')[0]
+    let items = availableEntries
     switch (quickFilter) {
-      case 'popular':   return [...items].sort((a, b) => botScore(b.domain, livePrices) - botScore(a.domain, livePrices)).slice(0, 18)
-      case 'business':  return items.filter(d => BUSINESS_TLDS.includes(tld(d)))
-      case 'tech':      return items.filter(d => TECH_TLDS.includes(tld(d)))
-      case 'startup':   return items.filter(d => STARTUP_TLDS.includes(tld(d)) || kw(d).length <= 7)
-      case 'creative':  return items.filter(d => CREATIVE_TLDS.includes(tld(d)))
-      case 'short':     return items.filter(d => kw(d).length <= 6)
-      case 'cheap':     return [...items].sort((a, b) => getLowestPrice(a.domain, livePrices) - getLowestPrice(b.domain, livePrices))
-      default:          return items
+      case 'popular':  items = [...items].sort((a, b) => botScore(b.domain, livePrices) - botScore(a.domain, livePrices)).slice(0, 18); break
+      case 'business': items = items.filter(d => BUSINESS_TLDS.includes(tld(d))); break
+      case 'tech':     items = items.filter(d => TECH_TLDS.includes(tld(d))); break
+      case 'startup':  items = items.filter(d => STARTUP_TLDS.includes(tld(d)) || kw(d).length <= 7); break
+      case 'creative': items = items.filter(d => CREATIVE_TLDS.includes(tld(d))); break
+      case 'short':    items = items.filter(d => kw(d).length <= 6); break
+      case 'cheap':    break // sort handles it
     }
-  }, [availableEntries, quickFilter, livePrices])
+    return quickFilter === 'popular' ? items : applySort(items)
+  }, [availableEntries, quickFilter, sortId, livePrices])
 
-  // Advanced tab: all statuses, apply filter checkboxes
+  // Advanced tab: all statuses, filtered + sorted
   const advItems = useMemo(() =>
-    allEntries.filter(e => advFilters.has(e.status)),
-    [allEntries, advFilters]
+    applySort(allEntries.filter(e => advFilters.has(e.status))),
+    [allEntries, advFilters, sortId, livePrices]
   )
 
   function toggleAdvFilter(status) {
@@ -86,6 +107,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
   const checkingCount  = allEntries.filter(e => e.status === 'checking').length
   const availableCount = availableEntries.length
   const advCount       = advItems.length
+  const currentSort    = SORT_OPTIONS.find(s => s.id === sortId)
 
   if (!keyword) return null
 
@@ -100,24 +122,48 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
 
       {/* Main tab bar */}
       <div className="main-tab-bar">
-        <button
-          className={`main-tab ${mainTab === 'basic' ? 'active' : ''}`}
-          onClick={() => setMainTab('basic')}
-        >
-          Basic <span className="main-tab-count">{availableCount}</span>
-        </button>
-        <button
-          className={`main-tab ${mainTab === 'advanced' ? 'active' : ''}`}
-          onClick={() => setMainTab('advanced')}
-        >
-          Advanced <span className="main-tab-count">{advCount}</span>
-        </button>
-        {loading && checkingCount > 0 && (
-          <span className="tab-checking-hint">
-            <span className="dns-spinner" style={{ width: 10, height: 10, borderWidth: 2 }} />
-            Checking {checkingCount} more…
-          </span>
-        )}
+        <div className="main-tabs">
+          <button
+            className={`main-tab ${mainTab === 'basic' ? 'active' : ''}`}
+            onClick={() => setMainTab('basic')}
+          >
+            Basic <span className="tab-count">{availableCount}</span>
+          </button>
+          <button
+            className={`main-tab ${mainTab === 'advanced' ? 'active' : ''}`}
+            onClick={() => setMainTab('advanced')}
+          >
+            Advanced <span className="tab-count">{advCount}</span>
+          </button>
+          {loading && checkingCount > 0 && (
+            <span className="tab-checking-hint">
+              <span className="dns-spinner" style={{ width: 10, height: 10, borderWidth: 2 }} />
+              Checking {checkingCount} more…
+            </span>
+          )}
+        </div>
+
+        {/* Sort dropdown */}
+        <div className="sort-wrap">
+          <button className="sort-btn" onClick={() => setSortOpen(o => !o)}>
+            <SortIcon />
+            Sort <span className="sort-label">{currentSort?.label}</span>
+            <ChevronIcon />
+          </button>
+          {sortOpen && (
+            <div className="sort-dropdown">
+              {SORT_OPTIONS.map(opt => (
+                <button
+                  key={opt.id}
+                  className={`sort-option ${sortId === opt.id ? 'active' : ''}`}
+                  onClick={() => { setSortId(opt.id); setSortOpen(false) }}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Basic panel */}
@@ -130,7 +176,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
                 className={`qf-pill ${quickFilter === f.id ? 'active' : ''}`}
                 onClick={() => setQuickFilter(f.id)}
               >
-                {f.label}
+                {f.icon}{f.label}
               </button>
             ))}
           </div>
@@ -140,7 +186,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
           )}
           {basicItems.length === 0 && loading && (
             <div className="cards-grid">
-              {Array.from({ length: 8 }).map((_, i) => <div key={i} className="ghost-card" />)}
+              {Array.from({ length: 9 }).map((_, i) => <div key={i} className="ghost-card" />)}
             </div>
           )}
           {basicItems.length > 0 && (
@@ -162,7 +208,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
           {wave3Available && (
             <div className="load-more-wrap">
               <button className="load-more-btn" onClick={onLoadWave3}>
-                <PlusIcon /> Load more TLDs
+                <PlusCircleIcon /> Load more TLDs
               </button>
             </div>
           )}
@@ -173,7 +219,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
       {mainTab === 'advanced' && (
         <div className="advanced-panel">
           <div className="adv-filter-bar">
-            <span className="adv-filter-label">Show:</span>
+            <span className="adv-filter-label">SHOW:</span>
             {[
               { id: 'available',   label: 'Available',   color: 'var(--green)' },
               { id: 'premium',     label: 'Premium',     color: 'var(--yellow)' },
@@ -215,7 +261,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
           {wave3Available && (
             <div className="load-more-wrap">
               <button className="load-more-btn" onClick={onLoadWave3}>
-                <PlusIcon /> Load more TLDs
+                <PlusCircleIcon /> Load more TLDs
               </button>
             </div>
           )}
@@ -223,23 +269,22 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
       )}
 
       <p className="dns-note">
-        <InfoIcon /> Availability data via DNS lookup · Click <strong>Live check</strong> on any domain for authoritative data + real pricing.
+        <InfoIcon /> Availability via DNS lookup · Click <strong>Live check</strong> on any domain for authoritative data + real pricing.
       </p>
     </div>
   )
 }
 
-function PlusIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>
-    </svg>
-  )
-}
-function InfoIcon() {
-  return (
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
-    </svg>
-  )
-}
+/* ── Icons ── */
+function GlobeIcon()     { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> }
+function StarIcon()      { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> }
+function BriefcaseIcon() { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg> }
+function CodeIcon()      { return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> }
+function LightningIcon() { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> }
+function PencilIcon()    { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> }
+function ArrowIcon()     { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg> }
+function DollarIcon()    { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> }
+function SortIcon()      { return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/></svg> }
+function ChevronIcon()   { return <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6"/></svg> }
+function PlusCircleIcon(){ return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> }
+function InfoIcon()      { return <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> }

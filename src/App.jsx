@@ -2,7 +2,7 @@
  * src/App.jsx
  */
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { SearchBar }   from './components/SearchBar'
 import { ResultsView } from './components/ResultsView'
 import { useSearch }   from './hooks/useSearch'
@@ -23,12 +23,28 @@ export default function App() {
 
   const hasResults = keyword && Object.keys(results).length > 0
 
+  // Scroll to top instantly when a new search fires
+  useEffect(() => {
+    if (hasResults) window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [keyword])
+
   return (
     <div className="app">
-      <nav className="app-header">
-        <a className="nav-logo" href="#">
+      <nav className={`app-header ${hasResults ? 'header-results' : ''}`}>
+        <a className="nav-logo" href="/" aria-label="Domain Bot home">
           <img src="/Domain-Bot-Logo.svg" width="44" height="37" alt="Domain Bot" />
         </a>
+
+        {hasResults && (
+          <SearchBar
+            value={inputValue}
+            onChange={setInputValue}
+            onSearch={handleSearch}
+            loading={loading}
+            variant="nav"
+          />
+        )}
+
         <div className="nav-right">
           <span className="api-status-dot api-dns">
             <svg width="9" height="9" viewBox="0 0 12 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
@@ -41,45 +57,47 @@ export default function App() {
         </div>
       </nav>
 
-      <section id="hero">
-        <p className="hero-eyebrow">Domain Availability Search</p>
-        <h1>Check domain availability<br/>without being tracked</h1>
+      {!hasResults && (
+        <section id="hero">
+          <p className="hero-eyebrow">Domain Availability Search</p>
+          <h1>Check domain availability<br/>without being tracked</h1>
 
-        <div className="hero-search-group">
-          <SearchBar
-            value={inputValue}
-            onChange={setInputValue}
-            onSearch={handleSearch}
-            loading={loading}
-          />
+          <div className="hero-search-group">
+            <SearchBar
+              value={inputValue}
+              onChange={setInputValue}
+              onSearch={handleSearch}
+              loading={loading}
+            />
 
-          <div className="trust-banner">
-            <div className="trust-banner-header">HOW WE PROTECT YOUR IDEAS</div>
-            <div className="trust-banner-items">
-              <div className="trust-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                </svg>
-                Never buys or reserves domains
-              </div>
-              <div className="trust-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <rect x="3" y="11" width="18" height="11" rx="2"/>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                </svg>
-                Your searches stay private
-              </div>
-              <div className="trust-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                  <circle cx="12" cy="12" r="3"/>
-                </svg>
-                No tracking, no ad targeting
+            <div className="trust-banner">
+              <div className="trust-banner-header">HOW WE PROTECT YOUR IDEAS</div>
+              <div className="trust-banner-items">
+                <div className="trust-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                  </svg>
+                  Never buys or reserves domains
+                </div>
+                <div className="trust-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <rect x="3" y="11" width="18" height="11" rx="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                  </svg>
+                  Your searches stay private
+                </div>
+                <div className="trust-item">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                  No tracking, no ad targeting
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {hasResults && (
         <div className="results-wrapper">

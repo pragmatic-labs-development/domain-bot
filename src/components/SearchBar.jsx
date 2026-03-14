@@ -1,18 +1,46 @@
 /**
  * src/components/SearchBar.jsx
- * Search is triggered explicitly via Enter or the Search button.
- * Prefetches top 3 TLDs while user is typing (400ms debounce).
+ * Supports variant="hero" (default) and variant="nav" (results page).
  */
 
 import { useEffect, useRef } from 'react'
 
-export function SearchBar({ value, onChange, onSearch, loading }) {
-  const inputRef   = useRef(null)
+export function SearchBar({ value, onChange, onSearch, loading, variant = 'hero' }) {
+  const inputRef = useRef(null)
 
   useEffect(() => { inputRef.current?.focus() }, [])
 
   function handleKeyDown(e) {
     if (e.key === 'Enter' && value.trim()) onSearch()
+    if (e.key === 'Escape') onChange('')
+  }
+
+  if (variant === 'nav') {
+    return (
+      <div className="nav-search-wrap">
+        <NavSearchIcon />
+        <input
+          ref={inputRef}
+          className="nav-search-input"
+          type="text"
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Search domains…"
+          spellCheck={false}
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+        />
+        <div className="nav-search-hints">
+          {loading
+            ? <NavSpinner />
+            : <span className="esc-hint">Esc</span>
+          }
+          <NavShieldIcon />
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -58,6 +86,29 @@ function SearchIcon() {
   )
 }
 
+function NavSearchIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+      style={{ flexShrink: 0, color: 'var(--text-muted)' }}>
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+  )
+}
+
+function NavShieldIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+      style={{ flexShrink: 0, color: 'var(--accent)', opacity: 0.8 }}>
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+  )
+}
+
 function Spinner() {
   return <div className="search-spinner" aria-label="Loading" />
+}
+
+function NavSpinner() {
+  return <div className="dns-spinner" style={{ width: 12, height: 12, borderWidth: 2 }} />
 }

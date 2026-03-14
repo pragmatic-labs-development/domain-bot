@@ -8,25 +8,27 @@ import { getLowestPrice, seoScore, botScore, scoreColor, getRegistrarPrices } fr
 export function DomainRow({ domain, result, livePrices = {}, saved, onSave, onLiveCheck, index = 0 }) {
   const { status, tier } = result
 
-  const isChecking  = status === 'checking'
-  const isAvailable = status === 'available'
-  const isTaken     = status === 'taken'
+  const isChecking    = status === 'checking'
+  const isAvailable   = status === 'available'
+  const isTaken       = status === 'taken'
   const isAftermarket = status === 'aftermarket'
+  const isUnknown     = status === 'unknown'
 
   const [name, ...tldParts] = domain.split('.')
   const tld = '.' + tldParts.join('.')
 
-  const seo  = seoScore(domain)
-  const bot  = botScore(domain, livePrices)
-  const price = getLowestPrice(domain, livePrices)
-  const registrars = isAvailable ? getRegistrarPrices(domain, livePrices) : []
-  const cheapest = registrars[0]
-
-  const rowClass = isChecking ? 'domain-row row-checking'
-    : isAftermarket ? 'domain-row row-aftermarket'
-    : `domain-row row-${status}`
+  const seo      = seoScore(domain)
+  const bot      = botScore(domain, livePrices)
+  const price    = getLowestPrice(domain, livePrices)
+  const cheapest = isAvailable ? getRegistrarPrices(domain, livePrices)[0] : null
 
   const isVerified = tier === 'verified' || tier === 'godaddy'
+
+  const statusColor = isAvailable   ? 'var(--green)'
+    : isTaken       ? 'var(--red)'
+    : isAftermarket ? 'var(--blue)'
+    : isUnknown     ? 'var(--text-dim)'
+    : 'var(--border)'
 
   if (isChecking) {
     return (
@@ -39,7 +41,10 @@ export function DomainRow({ domain, result, livePrices = {}, saved, onSave, onLi
   }
 
   return (
-    <div className={rowClass} style={{ animationDelay: `${index * 35}ms` }}>
+    <div
+      className={`domain-row row-${isAftermarket ? 'aftermarket' : status}`}
+      style={{ '--row-accent': statusColor, animationDelay: `${index * 35}ms` }}
+    >
       <div className={`status-dot ${isVerified ? 'verified' : status}`} />
 
       <div className={`domain-label ${isTaken ? 'taken-label' : ''}`}>
@@ -48,50 +53,66 @@ export function DomainRow({ domain, result, livePrices = {}, saved, onSave, onLi
         {tier === 'dns' && <span className="data-tier-badge tier-dns">DNS</span>}
       </div>
 
-      <div className="row-actions">
-        {isAvailable && cheapest && (
-          <span className="domain-price" style={{ color: 'var(--accent)', fontSize: '0.75rem', fontWeight: 500 }}>
-            ${cheapest.price.toFixed(2)}/yr
-          </span>
-        )}
+      {isAvailable && cheapest && (
+        <span className="row-starting-price">
+          Starting at <strong>${cheapest.price.toFixed(2)}/yr</strong>
+        </span>
+      )}
 
+      <div className="row-actions">
         <ScoreRing score={seo} color={scoreColor(seo, 'seo')} label="SEO" />
         <ScoreRing score={bot} color={scoreColor(bot, 'bot')} label="Bot" />
 
         <button
-          className={`save-btn ${saved ? 'saved' : ''}`}
+          className={`card-icon-btn ${saved ? 'saved' : ''}`}
           onClick={e => { e.stopPropagation(); onSave(domain) }}
           title={saved ? 'Saved!' : 'Save domain'}
         >
           {saved ? '★' : '☆'}
         </button>
 
-        {!isVerified && (isAvailable || isTaken || status === 'unknown') && (
+        {!isVerified && (isAvailable || isTaken || isUnknown) && (
           <button
-            className="lock-btn"
+            className="row-action-btn"
             onClick={e => { e.stopPropagation(); onLiveCheck(domain) }}
-            title="Get authoritative availability + live price from GoDaddy"
+            title="Get authoritative availability + live price"
           >
             <LockIcon /> {isTaken ? 'Check status' : 'Live check'}
           </button>
         )}
         {isVerified && <span className="verified-badge">Verified</span>}
 
-        {isAvailable && cheapest && (
-          <button className="row-btn continue" onClick={() => window.open(cheapest.url(domain), '_blank')}>
-            Register →
-          </button>
-        )}
         {isTaken && (
-          <button className="row-btn lookup" onClick={() => window.open(`https://lookup.icann.org/en/lookup?name=${domain}`, '_blank')}>
+          <button
+            className="row-action-btn"
+            onClick={() => window.open(`https://lookup.icann.org/en/lookup?name=${domain}`, '_blank')}
+          >
             WHOIS
           </button>
         )}
+
         {isAftermarket && (
-          <button className="row-btn offer" onClick={() => window.open(`https://www.godaddy.com/domainsearch/find?domainToCheck=${domain}`, '_blank')}>
+          <button
+            className="row-action-btn"
+            onClick={() => window.open(`https://www.godaddy.com/domainsearch/find?domainToCheck=${domain}`, '_blank')}
+          >
             Make offer
           </button>
         )}
+
+        <button
+          className="row-action-btn row-details-btn"
+          onClick={() => {
+            const url = isAvailable && cheapest
+              ? cheapest.url(domain)
+              : isTaken
+                ? `https://lookup.icann.org/en/lookup?name=${domain}`
+                : `https://www.godaddy.com/domainsearch/find?domainToCheck=${domain}`
+            window.open(url, '_blank')
+          }}
+        >
+          View Details
+        </button>
       </div>
     </div>
   )
