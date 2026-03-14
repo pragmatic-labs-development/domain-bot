@@ -14,12 +14,12 @@ export function DomainCard({ domain, result, livePrices = {}, saved, onSave, onD
   const seo      = seoScore(domain)
   const seoClr   = scoreColor(seo, 'seo')
 
-  // Dollar tier
-  let dollarTier = 0, dollarColor = 'var(--text-dim)'
-  if      (price <= 5)   { dollarTier = 1; dollarColor = 'var(--accent)' }
-  else if (price <= 15)  { dollarTier = 2; dollarColor = '#84cc16' }
-  else if (price <= 40)  { dollarTier = 3; dollarColor = '#f59e0b' }
-  else if (price < 9999) { dollarTier = 4; dollarColor = '#ef4444' }
+  // Dollar tier — always teal, count shows relative cost
+  let dollarTier = 0
+  if      (price <= 5)   dollarTier = 1
+  else if (price <= 15)  dollarTier = 2
+  else if (price <= 40)  dollarTier = 3
+  else if (price < 9999) dollarTier = 4
 
   const isPremium = status === 'premium'
 
@@ -36,7 +36,7 @@ export function DomainCard({ domain, result, livePrices = {}, saved, onSave, onD
           <span className="card-price-tier" title={`~$${price.toFixed(2)}/yr`}>
             {[1, 2, 3, 4].map(i => (
               <span key={i} style={{
-                color:   i <= dollarTier ? dollarColor : 'var(--text-dim)',
+                color:   i <= dollarTier ? 'var(--accent)' : 'var(--text-dim)',
                 opacity: i <= dollarTier ? 1 : 0.25,
               }}>$</span>
             ))}
