@@ -1,6 +1,6 @@
 # Domain Bot — React + Vite
 
-Rebuilt from the single-file vanilla version into a proper local-dev React project.
+Rebuilt from the single-file vanilla version into a proper local-dev React project. Has UX and UI improvements.
 
 ## Stack
 
