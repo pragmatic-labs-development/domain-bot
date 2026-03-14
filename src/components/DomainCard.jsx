@@ -5,7 +5,7 @@
 
 import { getLowestPrice, seoScore, scoreColor, getRegistrarPrices } from '../lib/pricing'
 
-export function DomainCard({ domain, result, livePrices = {}, saved, onSave }) {
+export function DomainCard({ domain, result, livePrices = {}, saved, onSave, onDetail }) {
   const { status } = result
   const [name, ...tldParts] = domain.split('.')
   const tld = '.' + tldParts.join('.')
@@ -59,15 +59,13 @@ export function DomainCard({ domain, result, livePrices = {}, saved, onSave }) {
           >
             {saved ? '★' : '☆'}
           </button>
-          {cheapest && (
-            <button
-              className="card-icon-btn card-register"
-              onClick={() => window.open(cheapest.url(domain), '_blank')}
-              title={`Register at ${cheapest.name} — $${cheapest.price.toFixed(2)}/yr`}
-            >
-              →
-            </button>
-          )}
+          <button
+            className="card-icon-btn card-register"
+            onClick={() => onDetail?.(domain)}
+            title="View details"
+          >
+            →
+          </button>
         </div>
       </div>
     </div>

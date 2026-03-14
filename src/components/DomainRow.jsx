@@ -5,7 +5,7 @@
 
 import { getLowestPrice, seoScore, botScore, scoreColor, getRegistrarPrices } from '../lib/pricing'
 
-export function DomainRow({ domain, result, livePrices = {}, saved, onSave, onLiveCheck, index = 0 }) {
+export function DomainRow({ domain, result, livePrices = {}, saved, onSave, onLiveCheck, onDetail, index = 0 }) {
   const { status, tier } = result
 
   const isChecking    = status === 'checking'
@@ -102,14 +102,7 @@ export function DomainRow({ domain, result, livePrices = {}, saved, onSave, onLi
 
         <button
           className="row-action-btn row-details-btn"
-          onClick={() => {
-            const url = isAvailable && cheapest
-              ? cheapest.url(domain)
-              : isTaken
-                ? `https://lookup.icann.org/en/lookup?name=${domain}`
-                : `https://www.godaddy.com/domainsearch/find?domainToCheck=${domain}`
-            window.open(url, '_blank')
-          }}
+          onClick={() => onDetail?.(domain)}
         >
           View Details
         </button>

@@ -7,6 +7,7 @@ import { useState, useMemo } from 'react'
 import { PrimaryDomainCard } from './PrimaryDomainCard'
 import { DomainCard }        from './DomainCard'
 import { DomainRow }         from './DomainRow'
+import { DomainModal }       from './DomainModal'
 import { botScore, getLowestPrice, seoScore } from '../lib/pricing'
 
 const QUICK_FILTERS = [
@@ -36,11 +37,12 @@ const CREATIVE_TLDS  = ['design','studio','art','media','photography','ink','gal
 const ADV_STATUSES = ['available','premium','aftermarket','taken','unknown']
 
 export function ResultsView({ keyword, primaryDomain, results, livePrices, loading, wave3Available, onLoadWave3, onLiveCheck, saved = [], onSave }) {
-  const [mainTab,     setMainTab]     = useState('basic')
-  const [quickFilter, setQuickFilter] = useState('all-tlds')
-  const [sortId,      setSortId]      = useState('price-asc')
-  const [sortOpen,    setSortOpen]    = useState(false)
-  const [advFilters,  setAdvFilters]  = useState(new Set(ADV_STATUSES))
+  const [mainTab,      setMainTab]      = useState('basic')
+  const [quickFilter,  setQuickFilter]  = useState('all-tlds')
+  const [sortId,       setSortId]       = useState('price-asc')
+  const [sortOpen,     setSortOpen]     = useState(false)
+  const [advFilters,   setAdvFilters]   = useState(new Set(ADV_STATUSES))
+  const [detailDomain, setDetailDomain] = useState(null)
 
   function toggleSave(domain) {
     onSave?.(domain)
@@ -194,6 +196,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
                   livePrices={livePrices}
                   saved={saved.includes(e.domain)}
                   onSave={toggleSave}
+                  onDetail={setDetailDomain}
                   index={i}
                 />
               ))}
@@ -248,6 +251,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
                 saved={saved.includes(e.domain)}
                 onSave={toggleSave}
                 onLiveCheck={onLiveCheck}
+                onDetail={setDetailDomain}
                 index={i}
               />
             ))}
@@ -266,6 +270,17 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
       <p className="dns-note">
         <InfoIcon /> Availability via DNS lookup · Click <strong>Live check</strong> on any domain for authoritative data + real pricing.
       </p>
+
+      {detailDomain && (
+        <DomainModal
+          domain={detailDomain}
+          result={results[detailDomain]}
+          livePrices={livePrices}
+          saved={saved.includes(detailDomain)}
+          onSave={toggleSave}
+          onClose={() => setDetailDomain(null)}
+        />
+      )}
     </div>
   )
 }
