@@ -3,7 +3,8 @@
  * Row used in the Advanced tab — shows all domains with status, scores, actions.
  */
 
-import { getLowestPrice, seoScore, botScore, scoreColor, getRegistrarPrices } from '../lib/pricing'
+import { getLowestPrice, seoScore, scoreColor, getRegistrarPrices } from '../lib/pricing'
+// import { botScore } from '../lib/pricing'  // Bot score hidden for now
 
 export function DomainRow({ domain, result, livePrices = {}, saved, onSave, onLiveCheck, onDetail, index = 0 }) {
   const { status, tier } = result
@@ -18,7 +19,7 @@ export function DomainRow({ domain, result, livePrices = {}, saved, onSave, onLi
   const tld = '.' + tldParts.join('.')
 
   const seo      = seoScore(domain)
-  const bot      = botScore(domain, livePrices)
+  // const bot      = botScore(domain, livePrices)
   const price    = getLowestPrice(domain, livePrices)
   const cheapest = isAvailable ? getRegistrarPrices(domain, livePrices)[0] : null
 
@@ -61,7 +62,7 @@ export function DomainRow({ domain, result, livePrices = {}, saved, onSave, onLi
 
       <div className="row-actions">
         <ScoreRing score={seo} color={scoreColor(seo, 'seo')} label="SEO" />
-        <ScoreRing score={bot} color={scoreColor(bot, 'bot')} label="Bot" />
+        {/* <ScoreRing score={bot} color={scoreColor(bot, 'bot')} label="Bot" /> */}
 
         <button
           className={`card-icon-btn ${saved ? 'saved' : ''}`}

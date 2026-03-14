@@ -8,7 +8,8 @@ import { PrimaryDomainCard } from './PrimaryDomainCard'
 import { DomainCard }        from './DomainCard'
 import { DomainRow }         from './DomainRow'
 import { DomainModal }       from './DomainModal'
-import { botScore, getLowestPrice, seoScore } from '../lib/pricing'
+import { getLowestPrice, seoScore } from '../lib/pricing'
+// import { botScore } from '../lib/pricing'  // Bot score hidden for now
 
 const QUICK_FILTERS = [
   { id: 'all-tlds', label: 'All',      icon: <GlobeIcon /> },
@@ -23,7 +24,7 @@ const QUICK_FILTERS = [
 
 const SORT_OPTIONS = [
   { id: 'seo-desc',   label: 'SEO Score' },
-  { id: 'bot-desc',   label: 'Bot Score' },
+  // { id: 'bot-desc',   label: 'Bot Score' },
   { id: 'price-asc',  label: 'Price: Low–High' },
   { id: 'price-desc', label: 'Price: High–Low' },
   { id: 'alpha',      label: 'Alphabetical' },
@@ -64,7 +65,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
       case 'price-asc':  return sorted.sort((a, b) => getLowestPrice(a.domain, livePrices) - getLowestPrice(b.domain, livePrices))
       case 'price-desc': return sorted.sort((a, b) => getLowestPrice(b.domain, livePrices) - getLowestPrice(a.domain, livePrices))
       case 'seo-desc':   return sorted.sort((a, b) => seoScore(b.domain) - seoScore(a.domain))
-      case 'bot-desc':   return sorted.sort((a, b) => botScore(b.domain, livePrices) - botScore(a.domain, livePrices))
+      // case 'bot-desc':   return sorted.sort((a, b) => botScore(b.domain, livePrices) - botScore(a.domain, livePrices))
       case 'alpha':      return sorted.sort((a, b) => a.domain.localeCompare(b.domain))
       default:           return sorted
     }
@@ -81,7 +82,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
     const kw  = d => d.domain.split('.')[0]
     let items = availableEntries
     switch (quickFilter) {
-      case 'popular':  items = [...items].sort((a, b) => botScore(b.domain, livePrices) - botScore(a.domain, livePrices)).slice(0, 18); break
+      case 'popular':  items = [...items].sort((a, b) => seoScore(b.domain) - seoScore(a.domain)).slice(0, 18); break
       case 'business': items = items.filter(d => BUSINESS_TLDS.includes(tld(d))); break
       case 'tech':     items = items.filter(d => TECH_TLDS.includes(tld(d))); break
       case 'startup':  items = items.filter(d => STARTUP_TLDS.includes(tld(d)) || kw(d).length <= 7); break
