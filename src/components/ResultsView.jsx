@@ -22,10 +22,10 @@ const QUICK_FILTERS = [
 ]
 
 const SORT_OPTIONS = [
-  { id: 'price-asc',  label: 'Price: Low–High' },
-  { id: 'price-desc', label: 'Price: High–Low' },
   { id: 'seo-desc',   label: 'SEO Score' },
   { id: 'bot-desc',   label: 'Bot Score' },
+  { id: 'price-asc',  label: 'Price: Low–High' },
+  { id: 'price-desc', label: 'Price: High–Low' },
   { id: 'alpha',      label: 'Alphabetical' },
 ]
 
@@ -39,7 +39,7 @@ const ADV_STATUSES = ['available','premium','aftermarket','taken','unknown']
 export function ResultsView({ keyword, primaryDomain, results, livePrices, loading, wave3Available, onLoadWave3, onLiveCheck, saved = [], onSave }) {
   const [mainTab,      setMainTab]      = useState('basic')
   const [quickFilter,  setQuickFilter]  = useState('all-tlds')
-  const [sortId,       setSortId]       = useState('price-asc')
+  const [sortId,       setSortId]       = useState('seo-desc')
   const [sortOpen,     setSortOpen]     = useState(false)
   const [advFilters,   setAdvFilters]   = useState(new Set(ADV_STATUSES))
   const [detailDomain, setDetailDomain] = useState(null)
