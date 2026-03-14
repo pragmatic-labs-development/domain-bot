@@ -898,52 +898,20 @@ body::before {
 .card-keyword { color: var(--text); }
 .card-tld { color: var(--accent); }
 
-.card-meta {
+.card-bottom-row {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
-  padding-bottom: 0.9rem;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: auto;
 }
 .card-price-tier {
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   line-height: 1;
-}
-.card-seo {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  font-weight: 600;
-  display: flex;
-  align-items: baseline;
-  gap: 0.2em;
-}
-.card-seo-num { color: var(--accent); }
-.card-seo-label {
-  color: var(--text-dim);
-  font-size: 0.7rem;
-  font-weight: 500;
-}
-
-.card-divider {
-  height: 1px;
-  background: var(--border-bright);
-  margin-bottom: 0.9rem;
-  opacity: 0.6;
-}
-
-.card-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.card-dot {
-  width: 9px; height: 9px;
-  border-radius: 50%;
   flex-shrink: 0;
 }
-.card-dot.available { background: var(--green); box-shadow: 0 0 8px rgba(16,217,138,0.6); }
-.card-dot.premium   { background: var(--yellow); box-shadow: 0 0 8px rgba(245,166,35,0.6); }
 
 .card-btns {
   display: flex;
@@ -971,6 +939,15 @@ body::before {
   background: rgba(0,229,200,0.06);
 }
 .card-icon-btn.saved { color: var(--yellow); border-color: rgba(245,166,35,0.35); background: rgba(245,166,35,0.05); }
+.card-seo-btn {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: default;
+  letter-spacing: -0.02em;
+}
+.card-seo-btn:hover { transform: none; background: var(--surface3); }
+
 .card-register { font-size: 0.95rem; font-weight: 700; }
 .card-register:hover {
   background: rgba(0,229,200,0.1);

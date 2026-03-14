@@ -13,7 +13,6 @@ export function DomainCard({ domain, result, livePrices = {}, saved, onSave, onD
   const price    = getLowestPrice(domain, livePrices)
   const seo      = seoScore(domain)
   const seoClr   = scoreColor(seo, 'seo')
-  const cheapest = getRegistrarPrices(domain, livePrices)[0]
 
   // Dollar tier
   let dollarTier = 0, dollarColor = 'var(--text-dim)'
@@ -31,27 +30,27 @@ export function DomainCard({ domain, result, livePrices = {}, saved, onSave, onD
         <span className="card-tld">{tld}</span>
       </div>
 
-      <div className="card-meta">
+      {/* Single bottom row: price tier | spacer | [seo] [save] [detail] */}
+      <div className="card-bottom-row">
         {dollarTier > 0 && (
           <span className="card-price-tier" title={`~$${price.toFixed(2)}/yr`}>
             {[1, 2, 3, 4].map(i => (
               <span key={i} style={{
-                color: i <= dollarTier ? dollarColor : 'var(--text-dim)',
+                color:   i <= dollarTier ? dollarColor : 'var(--text-dim)',
                 opacity: i <= dollarTier ? 1 : 0.25,
               }}>$</span>
             ))}
           </span>
         )}
-        <span className="card-seo">
-          <span className="card-seo-num" style={{ color: seoClr }}>{seo}</span>
-          <span className="card-seo-label">SEO</span>
-        </span>
-      </div>
 
-      <div className="card-divider" />
-      <div className="card-actions">
-        <span className={`card-dot ${isPremium ? 'premium' : 'available'}`} />
         <div className="card-btns">
+          <div
+            className="card-icon-btn card-seo-btn"
+            style={{ color: seoClr, borderColor: `${seoClr}44` }}
+            title={`SEO Score: ${seo}/99`}
+          >
+            {seo}
+          </div>
           <button
             className={`card-icon-btn ${saved ? 'saved' : ''}`}
             onClick={e => { e.stopPropagation(); onSave(domain) }}
