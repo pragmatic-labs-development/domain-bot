@@ -3,7 +3,7 @@
  * Primary domain card + Basic/Advanced tabs with filters + sort.
  */
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { PrimaryDomainCard } from './PrimaryDomainCard'
 import { DomainCard }        from './DomainCard'
 import { DomainRow }         from './DomainRow'
@@ -43,6 +43,12 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
   const [sortOpen,     setSortOpen]     = useState(false)
   const [advFilters,   setAdvFilters]   = useState(new Set(ADV_STATUSES))
   const [detailDomain, setDetailDomain] = useState(null)
+  const [visibleCount, setVisibleCount] = useState(30)
+
+  // Reset pagination whenever filter or sort changes
+  useEffect(() => { setVisibleCount(30) }, [quickFilter, sortId])
+  // Also reset when new search fires
+  useEffect(() => { setVisibleCount(30) }, [keyword])
 
   function toggleSave(domain) {
     onSave?.(domain)
@@ -183,33 +189,51 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
           )}
           {basicItems.length === 0 && loading && (
             <div className="cards-grid">
-              {Array.from({ length: 9 }).map((_, i) => <div key={i} className="ghost-card" />)}
+              {Array.from({ length: 30 }).map((_, i) => <div key={i} className="ghost-card" />)}
             </div>
           )}
-          {basicItems.length > 0 && (
-            <div className="cards-grid">
-              {basicItems.map((e, i) => (
-                <DomainCard
-                  key={e.domain}
-                  domain={e.domain}
-                  result={e}
-                  livePrices={livePrices}
-                  saved={saved.includes(e.domain)}
-                  onSave={toggleSave}
-                  onDetail={setDetailDomain}
-                  index={i}
-                />
-              ))}
-            </div>
-          )}
+          {basicItems.length > 0 && (() => {
+            const visible   = basicItems.slice(0, visibleCount)
+            const remaining = basicItems.length - visibleCount
+            const nextBatch = Math.min(remaining, 30)
+            return (
+              <>
+                <div className="cards-grid">
+                  {visible.map((e, i) => (
+                    <DomainCard
+                      key={e.domain}
+                      domain={e.domain}
+                      result={e}
+                      livePrices={livePrices}
+                      saved={saved.includes(e.domain)}
+                      onSave={toggleSave}
+                      onDetail={setDetailDomain}
+                      index={i}
+                    />
+                  ))}
+                </div>
 
-          {wave3Available && (
-            <div className="load-more-wrap">
-              <button className="load-more-btn" onClick={onLoadWave3}>
-                <PlusCircleIcon /> Load more TLDs
-              </button>
-            </div>
-          )}
+                {(remaining > 0 || wave3Available) && (
+                  <div className="load-more-wrap">
+                    {remaining > 0 && (
+                      <button
+                        className="load-more-btn"
+                        onClick={() => setVisibleCount(v => v + 30)}
+                      >
+                        <PlusCircleIcon /> Show {nextBatch} more
+                        <span className="load-more-total">{remaining} remaining</span>
+                      </button>
+                    )}
+                    {remaining === 0 && wave3Available && (
+                      <button className="load-more-btn" onClick={onLoadWave3}>
+                        <PlusCircleIcon /> Load more TLDs
+                      </button>
+                    )}
+                  </div>
+                )}
+              </>
+            )
+          })()}
         </div>
       )}
 
