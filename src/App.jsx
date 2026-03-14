@@ -2,14 +2,26 @@
  * src/App.jsx
  */
 
+import { useState } from 'react'
 import { SearchBar }   from './components/SearchBar'
-import { ResultsList } from './components/ResultsList'
+import { ResultsView } from './components/ResultsView'
 import { useSearch }   from './hooks/useSearch'
 import './App.css'
 
 export default function App() {
-  const { query, setQuery, available, taken, loading, error } = useSearch()
-  const hasResults = available.length > 0 || taken.length > 0 || loading
+  const [inputValue, setInputValue] = useState('')
+
+  const {
+    keyword, primaryDomain, results, livePrices,
+    loading, wave3Available,
+    triggerSearch, loadWave3, checkLive,
+  } = useSearch()
+
+  function handleSearch() {
+    if (inputValue.trim()) triggerSearch(inputValue.trim())
+  }
+
+  const hasResults = keyword && Object.keys(results).length > 0
 
   return (
     <div className="app">
@@ -17,7 +29,6 @@ export default function App() {
         <a className="nav-logo" href="#">
           <img src="/Domain-Bot-Logo.svg" width="44" height="37" alt="Domain Bot" />
         </a>
-
         <div className="nav-right">
           <span className="api-status-dot api-dns">
             <svg width="9" height="9" viewBox="0 0 12 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
@@ -35,7 +46,12 @@ export default function App() {
         <h1>Check domain availability<br/>without being tracked</h1>
 
         <div className="hero-search-group">
-          <SearchBar value={query} onChange={setQuery} loading={loading} />
+          <SearchBar
+            value={inputValue}
+            onChange={setInputValue}
+            onSearch={handleSearch}
+            loading={loading}
+          />
 
           <div className="trust-banner">
             <div className="trust-banner-header">HOW WE PROTECT YOUR IDEAS</div>
@@ -67,12 +83,15 @@ export default function App() {
 
       {hasResults && (
         <div className="results-wrapper">
-          <ResultsList
-            available={available}
-            taken={taken}
+          <ResultsView
+            keyword={keyword}
+            primaryDomain={primaryDomain}
+            results={results}
+            livePrices={livePrices}
             loading={loading}
-            query={query}
-            error={error}
+            wave3Available={wave3Available}
+            onLoadWave3={loadWave3}
+            onLiveCheck={checkLive}
           />
         </div>
       )}

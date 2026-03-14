@@ -1,43 +1,54 @@
 /**
  * src/components/DomainCard.jsx
+ * Card used in the Basic tab for available/premium domains.
  */
 
-import { formatPrice } from '../lib/api'
+import { getLowestPrice, seoScore, scoreColor } from '../lib/pricing'
 
-export function DomainCard({ result }) {
-  const { domain, available, price, currency } = result
+export function DomainCard({ domain, result, livePrices = {}, saved, onSave }) {
+  const { status } = result
   const [name, ...tldParts] = domain.split('.')
   const tld = '.' + tldParts.join('.')
-  const formattedPrice = formatPrice(price, currency)
 
-  const registrarUrl = `https://www.godaddy.com/domainsearch/find?domainToCheck=${encodeURIComponent(domain)}`
+  const price = getLowestPrice(domain, livePrices)
+  const seo   = seoScore(domain)
+  const seoClr = scoreColor(seo, 'seo')
+
+  // Dollar tier
+  let dollarTier = 0, dollarColor = 'var(--text-dim)'
+  if      (price <= 5)   { dollarTier = 1; dollarColor = '#10d98a' }
+  else if (price <= 15)  { dollarTier = 2; dollarColor = '#84cc16' }
+  else if (price <= 40)  { dollarTier = 3; dollarColor = '#f59e0b' }
+  else if (price < 9999) { dollarTier = 4; dollarColor = '#ef4444' }
+
+  const isPremium = status === 'premium'
+  const cardClass = isPremium ? 'domain-card card-premium' : 'domain-card card-available'
 
   return (
-    <div className={`domain-card ${available ? 'available' : 'taken'}`}>
-      <div className="domain-name">
-        <span className="name-part">{name}</span>
-        <span className="tld-part">{tld}</span>
+    <div className={cardClass}>
+      <div className="card-name">
+        <span>{name}</span>
+        <span className="card-tld">{tld}</span>
       </div>
-
-      <div className="domain-meta">
-        {available ? (
-          <>
-            <span className="badge badge-available">Available</span>
-            {formattedPrice && (
-              <span className="price">{formattedPrice}/yr</span>
-            )}
-            <a
-              href={registrarUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="buy-btn"
-            >
-              Register →
-            </a>
-          </>
-        ) : (
-          <span className="badge badge-taken">Taken</span>
+      <div className="card-meta">
+        {dollarTier > 0 && (
+          <span className="card-price-tier" title={`~$${price.toFixed(2)}/yr`}>
+            {[1,2,3,4].map(i => (
+              <span key={i} style={{ opacity: i <= dollarTier ? 1 : 0.2, color: i <= dollarTier ? dollarColor : 'var(--text-dim)' }}>$</span>
+            ))}
+          </span>
         )}
+        <span className="card-seo" style={{ color: seoClr }} title="SEO Score">{seo} SEO</span>
+      </div>
+      <div className="card-actions">
+        <span className={`card-dot ${isPremium ? 'premium' : 'available'}`} />
+        <button
+          className={`card-save-btn ${saved ? 'saved' : ''}`}
+          onClick={e => { e.stopPropagation(); onSave(domain) }}
+          title={saved ? 'Saved!' : 'Save'}
+        >
+          {saved ? '★' : '☆'}
+        </button>
       </div>
     </div>
   )
