@@ -37,19 +37,45 @@ const CREATIVE_TLDS  = ['design','studio','art','media','photography','ink','gal
 
 const ADV_STATUSES = ['available','premium','aftermarket','taken','unknown']
 
+const PRICE_MAX = 200
+
+function nameLengthBucket(domain) {
+  const len = domain.split('.')[0].length
+  return len <= 5 ? 'short' : len <= 10 ? 'medium' : 'long'
+}
+
+function advActiveCount(advFilters, advPriceRange, advTldCats, advMinSeo, advNameLength) {
+  let n = 0
+  if (advFilters.size !== ADV_STATUSES.length) n++
+  if (advPriceRange[0] > 0 || advPriceRange[1] < PRICE_MAX) n++
+  if (advTldCats.size > 0) n++
+  if (advMinSeo > 0) n++
+  if (advNameLength.size < 3) n++
+  return n
+}
+
 export function ResultsView({ keyword, primaryDomain, results, livePrices, loading, wave3Available, onLoadWave3, onLiveCheck, saved = [], onSave }) {
   const [mainTab,      setMainTab]      = useState('basic')
   const [quickFilter,  setQuickFilter]  = useState('all-tlds')
   const [sortId,       setSortId]       = useState('seo-desc')
   const [sortOpen,     setSortOpen]     = useState(false)
-  const [advFilters,   setAdvFilters]   = useState(new Set(ADV_STATUSES))
-  const [detailDomain, setDetailDomain] = useState(null)
+  const [advFilters,    setAdvFilters]    = useState(new Set(ADV_STATUSES))
+  const [advPriceRange, setAdvPriceRange] = useState([0, 200])
+  const [advTldCats,    setAdvTldCats]    = useState(new Set())
+  const [advMinSeo,     setAdvMinSeo]     = useState(0)
+  const [advNameLength, setAdvNameLength] = useState(new Set(['short','medium','long']))
+  const [advDrawerOpen, setAdvDrawerOpen] = useState(false)
+  const [detailDomain,  setDetailDomain]  = useState(null)
   const [visibleCount, setVisibleCount] = useState(30)
 
   // Reset pagination whenever filter or sort changes
   useEffect(() => { setVisibleCount(30) }, [quickFilter, sortId])
   // Also reset when new search fires
-  useEffect(() => { setVisibleCount(30) }, [keyword])
+  useEffect(() => {
+    setVisibleCount(30)
+    setAdvPriceRange([0, 200]); setAdvTldCats(new Set()); setAdvMinSeo(0)
+    setAdvNameLength(new Set(['short','medium','long']))
+  }, [keyword])
 
   function toggleSave(domain) {
     onSave?.(domain)
@@ -94,10 +120,33 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
   }, [availableEntries, quickFilter, sortId, livePrices])
 
   // Advanced tab: all statuses, filtered + sorted
-  const advItems = useMemo(() =>
-    applySort(allEntries.filter(e => advFilters.has(e.status))),
-    [allEntries, advFilters, sortId, livePrices]
-  )
+  const advItems = useMemo(() => {
+    const tld = d => d.domain.split('.').slice(1).join('.')
+    const kw  = d => d.domain.split('.')[0]
+    let items = allEntries.filter(e => {
+      if (!advFilters.has(e.status)) return false
+      if (advNameLength.size < 3 && !advNameLength.has(nameLengthBucket(e.domain))) return false
+      const price = getLowestPrice(e.domain, livePrices)
+      if (price < 9999 && (price < advPriceRange[0] || price > advPriceRange[1])) return false
+      if (advMinSeo > 0 && seoScore(e.domain) < advMinSeo) return false
+      if (advTldCats.size > 0) {
+        const ext = tld(e); const kwLen = kw(e).length
+        const match = [...advTldCats].some(c => {
+          if (c === 'popular')  return ['com','net','org','io','ai','co','app','dev'].includes(ext)
+          if (c === 'business') return BUSINESS_TLDS.includes(ext)
+          if (c === 'tech')     return TECH_TLDS.includes(ext)
+          if (c === 'startup')  return STARTUP_TLDS.includes(ext) || kwLen <= 7
+          if (c === 'creative') return CREATIVE_TLDS.includes(ext)
+          if (c === 'short')    return kwLen <= 6
+          if (c === 'cheap')    return price <= 5
+          return false
+        })
+        if (!match) return false
+      }
+      return true
+    })
+    return applySort(items)
+  }, [allEntries, advFilters, advPriceRange, advTldCats, advMinSeo, advNameLength, sortId, livePrices])
 
   function toggleAdvFilter(status) {
     setAdvFilters(prev => {
@@ -106,6 +155,19 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
       else next.add(status)
       return next
     })
+  }
+
+  function toggleAdvTldCat(id) {
+    setAdvTldCats(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s })
+  }
+
+  function toggleAdvNameLength(b) {
+    setAdvNameLength(prev => { const s = new Set(prev); s.has(b) ? s.delete(b) : s.add(b); return s })
+  }
+
+  function clearAdvFilters() {
+    setAdvFilters(new Set(ADV_STATUSES)); setAdvPriceRange([0, PRICE_MAX])
+    setAdvTldCats(new Set()); setAdvMinSeo(0); setAdvNameLength(new Set(['short','medium','long']))
   }
 
   const checkingCount  = allEntries.filter(e => e.status === 'checking').length
@@ -239,58 +301,80 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
       )}
 
       {/* Advanced panel */}
-      {mainTab === 'advanced' && (
-        <div className="advanced-panel">
-          <div className="adv-filter-bar">
-            <span className="adv-filter-label">SHOW:</span>
-            {[
-              { id: 'available',   label: 'Available',   color: 'var(--green)' },
-              { id: 'premium',     label: 'Premium',     color: 'var(--yellow)' },
-              { id: 'aftermarket', label: 'Aftermarket', color: 'var(--blue)' },
-              { id: 'taken',       label: 'Taken',       color: 'var(--red)' },
-              { id: 'unknown',     label: 'Unknown',     color: 'var(--text-muted)' },
-            ].map(f => (
-              <button
-                key={f.id}
-                className={`adv-check-pill ${advFilters.has(f.id) ? 'checked' : ''}`}
-                style={{ '--adv-color': f.color }}
-                onClick={() => toggleAdvFilter(f.id)}
-              >
-                <span className="adv-check-icon">{advFilters.has(f.id) ? '✓' : ''}</span>
-                <span className="adv-dot" style={{ background: f.color }} />
-                {f.label}
+      {mainTab === 'advanced' && (() => {
+        const activeCount = advActiveCount(advFilters, advPriceRange, advTldCats, advMinSeo, advNameLength)
+        const sidebarProps = {
+          advFilters, toggleAdvFilter,
+          advPriceRange, setAdvPriceRange,
+          advTldCats, toggleAdvTldCat,
+          advMinSeo, setAdvMinSeo,
+          advNameLength, toggleAdvNameLength,
+          activeCount, onClear: clearAdvFilters,
+        }
+        return (
+          <div className="advanced-panel">
+            {/* Mobile top bar */}
+            <div className="adv-mobile-bar">
+              <button className="adv-filter-trigger" onClick={() => setAdvDrawerOpen(true)}>
+                <FilterIcon />
+                Filters
+                {activeCount > 0 && <span className="adv-trigger-badge">{activeCount}</span>}
               </button>
-            ))}
-          </div>
-
-          {advItems.length === 0 && (
-            <div className="tab-empty">No results match the selected filters.</div>
-          )}
-          <div className="rows-list">
-            {advItems.map((e, i) => (
-              <DomainRow
-                key={e.domain}
-                domain={e.domain}
-                result={e}
-                livePrices={livePrices}
-                saved={saved.includes(e.domain)}
-                onSave={toggleSave}
-                onLiveCheck={onLiveCheck}
-                onDetail={setDetailDomain}
-                index={i}
-              />
-            ))}
-          </div>
-
-          {wave3Available && (
-            <div className="load-more-wrap">
-              <button className="load-more-btn" onClick={onLoadWave3}>
-                <PlusCircleIcon /> Load more TLDs
-              </button>
+              <span className="adv-result-count">{advItems.length} results</span>
             </div>
-          )}
-        </div>
-      )}
+
+            <div className="adv-layout">
+              <aside className="adv-sidebar">
+                <AdvSidebarContent {...sidebarProps} />
+              </aside>
+              <div className="adv-results">
+                {advItems.length === 0 && (
+                  <div className="tab-empty">No results match the selected filters.</div>
+                )}
+                <div className="rows-list">
+                  {advItems.map((e, i) => (
+                    <DomainRow
+                      key={e.domain}
+                      domain={e.domain}
+                      result={e}
+                      livePrices={livePrices}
+                      saved={saved.includes(e.domain)}
+                      onSave={toggleSave}
+                      onLiveCheck={onLiveCheck}
+                      onDetail={setDetailDomain}
+                      index={i}
+                    />
+                  ))}
+                </div>
+                {wave3Available && (
+                  <div className="load-more-wrap">
+                    <button className="load-more-btn" onClick={onLoadWave3}>
+                      <PlusCircleIcon /> Load more TLDs
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Mobile drawer */}
+            {advDrawerOpen && (
+              <>
+                <div className="adv-drawer-backdrop" onClick={() => setAdvDrawerOpen(false)} />
+                <div className="adv-drawer">
+                  <div className="adv-drawer-handle" />
+                  <div className="adv-drawer-header">
+                    <span className="adv-drawer-title">Filters</span>
+                    <button className="adv-drawer-close" onClick={() => setAdvDrawerOpen(false)}>Done</button>
+                  </div>
+                  <div className="adv-drawer-body">
+                    <AdvSidebarContent {...sidebarProps} />
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        )
+      })()}
 
       <p className="dns-note">
         <InfoIcon /> Availability via DNS lookup · Click <strong>Live check</strong> on any domain for authoritative data + real pricing.
@@ -323,3 +407,137 @@ function SortIcon()      { return <svg width="13" height="13" viewBox="0 0 24 24
 function ChevronIcon()   { return <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6"/></svg> }
 function PlusCircleIcon(){ return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> }
 function InfoIcon()      { return <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> }
+function FilterIcon()    { return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> }
+
+/* ── Advanced Sidebar ── */
+const STATUS_OPTS = [
+  { id: 'available',   label: 'Available',   color: 'var(--green)' },
+  { id: 'premium',     label: 'Premium',     color: 'var(--yellow)' },
+  { id: 'aftermarket', label: 'Aftermarket', color: 'var(--blue)' },
+  { id: 'taken',       label: 'Taken',       color: 'var(--red)' },
+  { id: 'unknown',     label: 'Unknown',     color: 'var(--text-muted)' },
+]
+
+const TLD_CATS = [
+  { id: 'popular',  label: 'Popular' },
+  { id: 'business', label: 'Business' },
+  { id: 'tech',     label: 'Tech' },
+  { id: 'startup',  label: 'Startup' },
+  { id: 'creative', label: 'Creative' },
+  { id: 'short',    label: 'Short ≤6' },
+  { id: 'cheap',    label: 'Cheap <$5' },
+]
+
+function AdvSidebarContent({ advFilters, toggleAdvFilter, advPriceRange, setAdvPriceRange, advTldCats, toggleAdvTldCat, advMinSeo, setAdvMinSeo, advNameLength, toggleAdvNameLength, activeCount, onClear }) {
+  const priceLabel = advPriceRange[0] === 0 && advPriceRange[1] >= PRICE_MAX
+    ? 'Any'
+    : `$${advPriceRange[0]}–${advPriceRange[1] >= PRICE_MAX ? '$200+' : '$' + advPriceRange[1]}`
+
+  return (
+    <div className="adv-sidebar-inner">
+      <div className="adv-section">
+        {activeCount > 0
+          ? <button className="adv-clear-btn" onClick={onClear}>Clear all filters</button>
+          : <span className="adv-sidebar-title">Filters</span>
+        }
+      </div>
+
+      {/* Status */}
+      <div className="adv-section">
+        <div className="adv-section-label">Status</div>
+        {STATUS_OPTS.map(s => (
+          <label key={s.id} className="adv-checkbox-row" onClick={() => toggleAdvFilter(s.id)}>
+            <span className={`adv-checkbox ${advFilters.has(s.id) ? 'checked' : ''}`} />
+            <span className="adv-dot-sm" style={{ background: s.color }} />
+            <span className="adv-checkbox-label">{s.label}</span>
+          </label>
+        ))}
+      </div>
+      <div className="adv-section-divider" />
+
+      {/* Price */}
+      <div className="adv-section">
+        <div className="adv-section-label">Price / yr</div>
+        <div className="adv-range-display">{priceLabel}</div>
+        <div className="adv-slider-row">
+          <span className="adv-slider-bound">$0</span>
+          <div style={{ flex: 1, position: 'relative', height: 20, display: 'flex', alignItems: 'center' }}>
+            <input
+              type="range" min={0} max={PRICE_MAX} step={5}
+              value={advPriceRange[0]}
+              className="adv-slider"
+              style={{ position: 'absolute', width: '100%' }}
+              onChange={e => {
+                const v = Number(e.target.value)
+                setAdvPriceRange([Math.min(v, advPriceRange[1] - 5), advPriceRange[1]])
+              }}
+            />
+            <input
+              type="range" min={0} max={PRICE_MAX} step={5}
+              value={advPriceRange[1]}
+              className="adv-slider adv-slider-full"
+              onChange={e => {
+                const v = Number(e.target.value)
+                setAdvPriceRange([advPriceRange[0], Math.max(v, advPriceRange[0] + 5)])
+              }}
+            />
+          </div>
+          <span className="adv-slider-bound">$200+</span>
+        </div>
+      </div>
+      <div className="adv-section-divider" />
+
+      {/* TLD Category */}
+      <div className="adv-section">
+        <div className="adv-section-label">TLD Category</div>
+        <div className="adv-chip-group">
+          {TLD_CATS.map(c => (
+            <button
+              key={c.id}
+              className={`adv-chip ${advTldCats.has(c.id) ? 'active' : ''}`}
+              onClick={() => toggleAdvTldCat(c.id)}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="adv-section-divider" />
+
+      {/* SEO Score */}
+      <div className="adv-section">
+        <div className="adv-section-label">Min SEO Score</div>
+        <div className="adv-range-display">{advMinSeo === 0 ? 'Any' : advMinSeo}</div>
+        <div className="adv-slider-row">
+          <span className="adv-slider-bound">0</span>
+          <input
+            type="range" min={0} max={90} step={5}
+            value={advMinSeo}
+            className="adv-slider"
+            style={{ flex: 1 }}
+            onChange={e => setAdvMinSeo(Number(e.target.value))}
+          />
+          <span className="adv-slider-bound">90</span>
+        </div>
+      </div>
+      <div className="adv-section-divider" />
+
+      {/* Name Length */}
+      <div className="adv-section">
+        <div className="adv-section-label">Name Length</div>
+        {[
+          { id: 'short',  label: 'Short',  sub: '≤5 chars' },
+          { id: 'medium', label: 'Medium', sub: '6–10 chars' },
+          { id: 'long',   label: 'Long',   sub: '11+ chars' },
+        ].map(b => (
+          <label key={b.id} className="adv-checkbox-row" onClick={() => toggleAdvNameLength(b.id)}>
+            <span className={`adv-checkbox ${advNameLength.has(b.id) ? 'checked' : ''}`} />
+            <span className="adv-checkbox-label">
+              {b.label} <span className="adv-checkbox-sub">{b.sub}</span>
+            </span>
+          </label>
+        ))}
+      </div>
+    </div>
+  )
+}
