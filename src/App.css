@@ -1841,7 +1841,7 @@ body::before {
   .header-results .nav-logo { margin-right: 0.65rem; padding-right: 0.65rem; }
   .nav-search-wrap { flex: 1; min-width: 0; max-width: unset; padding: 0.45rem 0.75rem; }
   .esc-hint { display: none; }
-  .saved-nav-btn { width: 40px; height: 40px; border-radius: 10px; }
+  .saved-nav-btn { width: 40px; height: 40px; border-radius: 10px; margin-left: 0.5rem; }
 
   /* 4 ── Primary domain card ── */
   .primary-domain { padding: 1rem 1rem 0.85rem; border-radius: 12px; }
@@ -1925,7 +1925,7 @@ body::before {
   .domain-modal {
     width: 100%;
     max-width: 100%;
-    max-height: 88vh;
+    max-height: 90vh;
     top: auto;
     bottom: 0;
     left: 0;
@@ -1947,14 +1947,30 @@ body::before {
     from { transform: translateY(40px); opacity: 0; }
     to   { transform: translateY(0);    opacity: 1; }
   }
-  .modal-header { padding: 0.75rem 1rem 0.6rem; }
-  .modal-name { font-size: 1.15rem; }
-  .modal-section { padding: 0.7rem 1rem; }
-  .modal-section-label { font-size: 0.6rem; letter-spacing: 0.1em; }
-  .modal-score-label { font-size: 0.72rem; min-width: 88px; }
-  .modal-registrar-row { padding: 0.65rem 0.85rem; min-height: 52px; }
-  .modal-footer { padding: 0.6rem 1rem; }
-  .modal-primary-action { min-height: 48px; font-size: 0.88rem; }
+  /* Header */
+  .modal-header { padding: 0.6rem 1rem 0.5rem; }
+  .modal-title { font-size: 1.3rem; }
+  .modal-save-btn,
+  .modal-close-btn { width: 40px; height: 40px; }
+  /* Sections */
+  .modal-section { padding: 0.65rem 1rem; }
+  .modal-section-label { font-size: 0.6rem; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
+  /* Grade block — tighter to save vertical space */
+  .modal-grade-block { padding: 0.65rem 0.85rem; margin-bottom: 0.65rem; gap: 0.75rem; }
+  .modal-grade-letter { font-size: 1.6rem; width: 30px; }
+  .modal-grade-title { font-size: 0.82rem; }
+  .modal-grade-desc { font-size: 0.72rem; }
+  /* Score bars — narrower label so track gets more room */
+  .modal-score-label { font-size: 0.72rem; width: 72px; min-width: unset; flex-shrink: 0; }
+  .modal-score-num { font-size: 0.72rem; }
+  /* Registrar rows — slightly more gap for tap separation */
+  .modal-registrar-list { gap: 0.55rem; }
+  .modal-registrar-row { padding: 0.6rem 0.85rem; min-height: 52px; }
+  /* Action button — full width on mobile */
+  .modal-action-section { display: block; }
+  .modal-primary-action { width: 100%; min-height: 50px; font-size: 0.9rem; border-radius: 12px; }
+  /* Footer — low-value data source info, hide on mobile */
+  .modal-footer { display: none; }
 
   /* 12 ── Saved panel — slides up from bottom ── */
   .saved-panel {
