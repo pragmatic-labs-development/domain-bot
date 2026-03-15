@@ -1822,10 +1822,16 @@ body::before {
   .hero-search-btn { padding: 0.5rem 1rem; font-size: 0.82rem; }
 
   /* Nav */
-  .app-header { padding: 0 0.75rem; gap: 0.5rem; }
-  .api-status-dot span:last-child { display: none; } /* hide "Private Search" text, keep dot only */
-  .api-status-dot { padding: 0.28rem 0.45rem; gap: 0; min-width: unset; }
-  .nav-logo { font-size: 1rem; padding-right: 0.6rem; margin-right: 0.4rem; }
+  .app-header { padding: 0 0.85rem; gap: 0; height: 58px; }
+  /* Hide entire Private Search pill on mobile */
+  .api-status-dot { display: none; }
+  /* Logo — tighter separator in results mode */
+  .nav-logo img { width: 36px; height: 30px; }
+  .header-results .nav-logo { margin-right: 0.75rem; padding-right: 0.75rem; }
+  /* Search bar fills all remaining space between logo and star */
+  .nav-search-wrap { flex: 1; min-width: 0; max-width: unset; }
+  /* Hide ESC hint chip on mobile to save space in search bar */
+  .esc-hint { display: none; }
 
   /* Results wrapper — equal padding both sides so cards don't clip */
   .results-wrapper { padding: 1rem 0.85rem 3rem; }
