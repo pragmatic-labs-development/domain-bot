@@ -1821,20 +1821,26 @@ body::before {
   .hero-input { font-size: 1rem; }
   .hero-search-btn { padding: 0.5rem 1rem; font-size: 0.82rem; }
 
+  /* Contain ALL horizontal overflow at the root — prevents iOS from shifting
+     the layout right and then clipping the logo + left card column */
+  .app { overflow-x: hidden; width: 100%; max-width: 100vw; }
+  .results-wrapper { overflow-x: hidden; }
+
   /* Nav */
-  .app-header { padding: 0 0.85rem; gap: 0; height: 58px; }
+  .app-header { padding: 0 1rem; gap: 0; height: 58px; width: 100%; box-sizing: border-box; }
   /* Hide entire Private Search pill on mobile */
   .api-status-dot { display: none; }
-  /* Logo — tighter separator in results mode */
-  .nav-logo img { width: 36px; height: 30px; }
+  /* Logo — keep it fully visible, tighter separator in results mode */
+  .nav-logo { flex-shrink: 0; overflow: visible; }
+  .nav-logo img { width: 34px; height: 29px; display: block; }
   .header-results .nav-logo { margin-right: 0.75rem; padding-right: 0.75rem; }
   /* Search bar fills all remaining space between logo and star */
   .nav-search-wrap { flex: 1; min-width: 0; max-width: unset; }
   /* Hide ESC hint chip on mobile to save space in search bar */
   .esc-hint { display: none; }
 
-  /* Results wrapper — equal padding both sides so cards don't clip */
-  .results-wrapper { padding: 1rem 0.85rem 3rem; }
+  /* Results wrapper */
+  .results-wrapper { padding: 1rem 1rem 3rem; }
 
   /* Primary domain card */
   .primary-domain { padding: 1rem 1rem 0.9rem; }
@@ -1845,8 +1851,8 @@ body::before {
   .primary-price-block { flex-direction: row; align-items: center; gap: 0.5rem; }
   .primary-domain-name { font-size: clamp(1.4rem, 6vw, 2rem); }
 
-  /* Card grid — 2 columns on mobile */
-  .cards-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+  /* Card grid — 2 columns on mobile, no overflow */
+  .cards-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; width: 100%; }
   .domain-card { padding: 0.9rem 0.75rem 0.75rem; min-height: unset; }
   .card-keyword { font-size: 0.9rem; }
   .card-tld { font-size: 0.7rem; }
