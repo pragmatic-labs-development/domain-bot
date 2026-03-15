@@ -1827,8 +1827,8 @@ body::before {
   .api-status-dot { padding: 0.28rem 0.45rem; gap: 0; min-width: unset; }
   .nav-logo { font-size: 1rem; padding-right: 0.6rem; margin-right: 0.4rem; }
 
-  /* Results wrapper */
-  .results-wrapper { padding: 1rem 0.75rem 3rem; }
+  /* Results wrapper — equal padding both sides so cards don't clip */
+  .results-wrapper { padding: 1rem 0.85rem 3rem; }
 
   /* Primary domain card */
   .primary-domain { padding: 1rem 1rem 0.9rem; }
@@ -1840,11 +1840,21 @@ body::before {
   .primary-domain-name { font-size: clamp(1.4rem, 6vw, 2rem); }
 
   /* Card grid — 2 columns on mobile */
-  .cards-grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 0.6rem; }
-  .domain-card { padding: 0.9rem 0.85rem 0.75rem; min-height: unset; }
-  .card-keyword { font-size: 0.95rem; }
-  .card-tld { font-size: 0.72rem; }
+  .cards-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+  .domain-card { padding: 0.9rem 0.75rem 0.75rem; min-height: unset; }
+  .card-keyword { font-size: 0.9rem; }
+  .card-tld { font-size: 0.7rem; }
   .card-name { margin-bottom: 0.6rem; }
+  /* Shrink price tier + buttons so they fit in narrow 2-col cards */
+  .card-price-tier { font-size: 0.78rem; letter-spacing: 0.02em; }
+  .card-icon-btn { width: 27px; height: 27px; font-size: 0.72rem; }
+
+  /* Tab bar — hide "Checking X more" text on mobile to prevent overflow */
+  .tab-checking-hint { display: none; }
+  .main-tab { padding: 0.75rem 0.85rem; font-size: 0.82rem; }
+
+  /* DNS note footer — allow wrapping */
+  .dns-note { align-items: flex-start; flex-wrap: wrap; font-size: 0.7rem; }
 
   /* Quick filters — horizontal scroll, no wrap */
   .quick-filters {
