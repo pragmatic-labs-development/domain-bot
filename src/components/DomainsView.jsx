@@ -1,14 +1,13 @@
 /**
  * src/components/DomainsView.jsx
  * TLD availability grid organized by category.
- * Color-coded tiles: green=available, red=taken, yellow=premium,
- * blue=aftermarket, gray=checking/unknown.
+ * Layout mirrors instantdomainsearch.com Extensions tab.
  */
 
 const TLD_CATEGORIES = [
   {
     label: 'Popular',
-    tlds: ['com','net','org','io','ai','co','app','dev','xyz','me','us','tv','info','biz','cc','gg','one','top','pro','vip','club','lol','fun','cool','mobi','today'],
+    tlds: ['com','net','org','ai','io','xyz','app','shop','info','co','store','site','online','dev','tech','pro','live','lol','club','vip','link','top','me','tv','blog','cloud','design','studio','art','fun','one','world','digital','global','space','plus','media','email','host','page','ltd','biz','agency','social','stream','zone','team','work','life','love','best','cool','today','guru','care','fit','marketing','luxury','solutions'],
   },
   {
     label: 'Technology',
@@ -48,7 +47,7 @@ const TLD_CATEGORIES = [
   },
   {
     label: 'Travel & Transport',
-    tlds: ['tours','travel','flights','taxi','car','cars','auto','ski','surf','golf'],
+    tlds: ['tours','travel','flights','taxi','car','cars','auto'],
   },
   {
     label: 'Sports & Fitness',
@@ -56,7 +55,7 @@ const TLD_CATEGORIES = [
   },
   {
     label: 'Events & Entertainment',
-    tlds: ['events','tickets','party','wedding','games','game','esports','bet','casino','poker','music','band','video','film','movie'],
+    tlds: ['events','tickets','party','wedding','games','game','esports','bet','casino','poker'],
   },
   {
     label: 'Lifestyle',
@@ -67,42 +66,39 @@ const TLD_CATEGORIES = [
     tlds: ['community','charity','ngo','gives','church','bible','faith'],
   },
   {
-    label: 'Country & Regional',
-    tlds: ['us','co','me','tv','fm','pm','vc','gg','cc'],
-  },
-  {
     label: 'Fun & Misc',
-    tlds: ['ninja','rocks','buzz','wtf','lol','fun','cool','zone','guru','black','blue','green','red','pink','gold','silver','diamond','luxury'],
+    tlds: ['ninja','rocks','buzz','wtf','lol','fun','cool','zone','guru','black','blue','green','red','pink','gold','silver','diamond','luxury','vc','fm','pm','cc','gg'],
   },
 ]
 
-const STATUS_COLOR = {
+const STATUS_BG = {
   available:   '#16a34a',
-  premium:     '#ca8a04',
+  premium:     '#b45309',
   aftermarket: '#1d4ed8',
   taken:       '#dc2626',
-  checking:    '#374151',
-  unknown:     '#374151',
-}
-
-const STATUS_TEXT_COLOR = {
-  available:   '#fff',
-  premium:     '#fff',
-  aftermarket: '#fff',
-  taken:       '#fff',
-  checking:    '#9ca3af',
-  unknown:     '#9ca3af',
+  checking:    '#1f2937',
+  unknown:     '#1f2937',
 }
 
 export function DomainsView({ keyword, results }) {
   if (!keyword) return null
 
+  const allTiles = Object.entries(results).map(([domain, r]) => r.status)
+  const totalAvailable = allTiles.filter(s => s === 'available').length
+
   return (
     <div className="domains-view">
+      {/* Legend */}
+      <div className="domains-legend">
+        <span className="dv-legend-item available">● Available</span>
+        <span className="dv-legend-item premium">● Premium</span>
+        <span className="dv-legend-item aftermarket">● Aftermarket</span>
+        <span className="dv-legend-item taken">● Taken</span>
+      </div>
+
       {TLD_CATEGORIES.map(cat => {
-        // Only show TLDs we actually checked
         const tiles = cat.tlds
-          .filter((tld, i, arr) => arr.indexOf(tld) === i) // dedupe
+          .filter((tld, i, arr) => arr.indexOf(tld) === i)
           .map(tld => {
             const domain = `${keyword}.${tld}`
             const r = results[domain]
@@ -113,39 +109,44 @@ export function DomainsView({ keyword, results }) {
 
         if (tiles.length === 0) return null
 
+        const taken     = tiles.filter(t => t.status === 'taken').length
         const available = tiles.filter(t => t.status === 'available').length
+        const subtitle  = available > 0
+          ? `${available} available`
+          : taken === tiles.length
+          ? `${taken} taken`
+          : `${taken} taken`
 
         return (
-          <div key={cat.label} className="domains-category">
-            <div className="domains-category-header">
-              <span className="domains-category-label">{cat.label}</span>
-              {available > 0 && (
-                <span className="domains-category-count">{available} available</span>
-              )}
+          <div key={cat.label} className="dv-category">
+            <div className="dv-cat-label-col">
+              <span className="dv-cat-name">{cat.label}</span>
+              <span className="dv-cat-sub">{subtitle}</span>
             </div>
-            <div className="domains-tile-grid">
-              {tiles.map(({ tld, domain, status }) => (
-                <a
-                  key={tld}
-                  className="domains-tile"
-                  style={{
-                    background: STATUS_COLOR[status] ?? STATUS_COLOR.unknown,
-                    color: STATUS_TEXT_COLOR[status] ?? '#9ca3af',
-                  }}
-                  href={
-                    status === 'taken'
-                      ? `https://lookup.icann.org/en/lookup?name=${domain}`
-                      : status === 'available'
-                      ? `https://www.godaddy.com/domainsearch/find?checkAvail=1&tmskey=&domainToCheck=${domain}`
-                      : undefined
-                  }
-                  target={status === 'taken' || status === 'available' ? '_blank' : undefined}
-                  rel="noreferrer"
-                  title={domain}
-                >
-                  .{tld}
-                </a>
-              ))}
+            <div className="dv-tile-grid">
+              {tiles.map(({ tld, domain, status }) => {
+                const bg = STATUS_BG[status] ?? STATUS_BG.unknown
+                const href = status === 'taken'
+                  ? `https://lookup.icann.org/en/lookup?name=${domain}`
+                  : status === 'available' || status === 'premium'
+                  ? `https://www.godaddy.com/domainsearch/find?checkAvail=1&domainToCheck=${domain}`
+                  : null
+                return (
+                  <a
+                    key={tld}
+                    className={`dv-tile status-${status}`}
+                    style={{ background: bg }}
+                    href={href ?? undefined}
+                    target={href ? '_blank' : undefined}
+                    rel="noreferrer"
+                    title={domain}
+                  >
+                    <span className="dv-tile-dots">•••</span>
+                    <span className="dv-tile-ext">.{tld}</span>
+                    <span className="dv-tile-chevron">∨</span>
+                  </a>
+                )
+              })}
             </div>
           </div>
         )
