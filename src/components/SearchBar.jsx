@@ -122,9 +122,10 @@ function NavSearchIcon() {
 
 function NavShieldIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
-      style={{ flexShrink: 0, color: 'var(--accent)', opacity: 0.8 }}>
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none"
+      style={{ flexShrink: 0, color: 'var(--accent)', opacity: 0.9 }}>
+      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+      <path d="M10.5 14.5l-2.5-2.5 1.06-1.06 1.44 1.44 3.44-3.44 1.06 1.06z" fill="var(--bg)" stroke="none"/>
     </svg>
   )
 }
