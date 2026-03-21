@@ -58,42 +58,58 @@ export default function App() {
   return (
     <div className="app">
       <nav className={`app-header ${hasResults ? 'header-results' : ''}`}>
-        <a className="nav-logo" href="/" aria-label="Domain Bot home">
-          <img src="/Domain-Bot-Logo.svg" width="44" height="37" alt="Domain Bot" />
-        </a>
+        <div className="nav-top-row">
+          <a className="nav-logo" href="/" aria-label="Domain Bot home">
+            <img src="/Domain-Bot-Logo.svg" width="44" height="37" alt="Domain Bot" />
+          </a>
+
+          {hasResults && (
+            <SearchBar
+              value={inputValue}
+              onChange={setInputValue}
+              onSearch={handleSearch}
+              loading={loading}
+              variant="nav"
+              primaryDomain={primaryDomain}
+              primaryResult={results[primaryDomain]}
+            />
+          )}
+
+          <div className="nav-right">
+            <span className="api-status-dot api-dns">
+              <svg width="9" height="9" viewBox="0 0 12 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                <rect x="1.5" y="6" width="9" height="7" rx="1.5"/>
+                <path d="M3.5 6V4a2.5 2.5 0 015 0v2"/>
+              </svg>
+              <span>Private Search</span>
+            </span>
+
+            <button
+              className={`icon-btn saved-nav-btn ${saved.length > 0 ? 'has-saved' : ''}`}
+              aria-label="Saved domains"
+              onClick={() => setSavedOpen(true)}
+            >
+              ★
+              {saved.length > 0 && (
+                <span className="saved-nav-count">{saved.length}</span>
+              )}
+            </button>
+          </div>
+        </div>
 
         {hasResults && (
-          <SearchBar
-            value={inputValue}
-            onChange={setInputValue}
-            onSearch={handleSearch}
-            loading={loading}
-            variant="nav"
-            primaryDomain={primaryDomain}
-            primaryResult={results[primaryDomain]}
-          />
+          <div className="mode-tab-bar">
+            {MODE_TABS.map(t => (
+              <button
+                key={t.id}
+                className={`mode-tab ${topTab === t.id ? 'active' : ''}`}
+                onClick={() => setTopTab(t.id)}
+              >
+                {t.icon}{t.label}
+              </button>
+            ))}
+          </div>
         )}
-
-        <div className="nav-right">
-          <span className="api-status-dot api-dns">
-            <svg width="9" height="9" viewBox="0 0 12 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-              <rect x="1.5" y="6" width="9" height="7" rx="1.5"/>
-              <path d="M3.5 6V4a2.5 2.5 0 015 0v2"/>
-            </svg>
-            <span>Private Search</span>
-          </span>
-
-          <button
-            className={`icon-btn saved-nav-btn ${saved.length > 0 ? 'has-saved' : ''}`}
-            aria-label="Saved domains"
-            onClick={() => setSavedOpen(true)}
-          >
-            ★
-            {saved.length > 0 && (
-              <span className="saved-nav-count">{saved.length}</span>
-            )}
-          </button>
-        </div>
       </nav>
 
       {!hasResults && (
@@ -136,20 +152,6 @@ export default function App() {
             </div>
           </div>
         </section>
-      )}
-
-      {hasResults && (
-        <div className="mode-tab-bar">
-          {MODE_TABS.map(t => (
-            <button
-              key={t.id}
-              className={`mode-tab ${topTab === t.id ? 'active' : ''}`}
-              onClick={() => setTopTab(t.id)}
-            >
-              {t.icon}{t.label}
-            </button>
-          ))}
-        </div>
       )}
 
       {hasResults && topTab === 'search' && (
