@@ -503,6 +503,46 @@ body::before {
   letter-spacing: 0.03em;
 }
 
+/* ── Mode tab bar ── */
+.mode-tab-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 2rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface1);
+}
+.mode-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1.1rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.mode-tab:hover { color: var(--text); }
+.mode-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+.mode-tab svg { opacity: 0.8; }
+.mode-tab.active svg { opacity: 1; }
+
+.placeholder-panel {
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
 /* ── Results wrapper ── */
 .results-wrapper {
   width: 100%;
@@ -2044,6 +2084,8 @@ body::before {
   /* 1 ── Root overflow containment ── */
   .app { overflow-x: hidden; width: 100%; max-width: 100vw; }
   .results-wrapper { overflow-x: hidden; padding: 1rem 1rem 4rem; }
+  .mode-tab-bar { padding: 0 0.75rem; gap: 0; overflow-x: auto; }
+  .mode-tab { padding: 0.65rem 0.85rem; font-size: 0.8rem; }
 
   /* 2 ── Hero ── */
   #hero { padding: 7vh 1.25rem 1.5rem; }

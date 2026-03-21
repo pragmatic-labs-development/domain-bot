@@ -9,9 +9,16 @@ import { SavedPanel }  from './components/SavedPanel'
 import { useSearch }   from './hooks/useSearch'
 import './App.css'
 
+const MODE_TABS = [
+  { id: 'search',   label: 'Search',  icon: <SearchTabIcon /> },
+  { id: 'domains',  label: 'Domains', icon: <DomainsTabIcon /> },
+  { id: 'generate', label: 'Generate',icon: <GenerateTabIcon /> },
+]
+
 export default function App() {
   const [inputValue,  setInputValue]  = useState('')
   const [savedOpen,   setSavedOpen]   = useState(false)
+  const [topTab,      setTopTab]      = useState('search')
   const [saved,       setSaved]       = useState(() =>
     JSON.parse(localStorage.getItem('db-saved') || '[]')
   )
@@ -132,6 +139,20 @@ export default function App() {
       )}
 
       {hasResults && (
+        <div className="mode-tab-bar">
+          {MODE_TABS.map(t => (
+            <button
+              key={t.id}
+              className={`mode-tab ${topTab === t.id ? 'active' : ''}`}
+              onClick={() => setTopTab(t.id)}
+            >
+              {t.icon}{t.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {hasResults && topTab === 'search' && (
         <div className="results-wrapper">
           <ResultsView
             keyword={keyword}
@@ -148,6 +169,18 @@ export default function App() {
         </div>
       )}
 
+      {hasResults && topTab === 'domains' && (
+        <div className="placeholder-panel">
+          <p>Domains view coming soon.</p>
+        </div>
+      )}
+
+      {hasResults && topTab === 'generate' && (
+        <div className="placeholder-panel">
+          <p>Generate view coming soon.</p>
+        </div>
+      )}
+
       {savedOpen && (
         <SavedPanel
           saved={saved}
@@ -157,5 +190,28 @@ export default function App() {
         />
       )}
     </div>
+  )
+}
+
+function SearchTabIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+  )
+}
+function DomainsTabIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+    </svg>
+  )
+}
+function GenerateTabIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+    </svg>
   )
 }
