@@ -66,17 +66,22 @@ export function OtherIdeasView({ keyword }) {
   const currentKw  = useRef('')
   const currentKey = useRef(1)
 
-  const run = useCallback((kw, key) => {
+  const run = useCallback(async (kw, key) => {
     currentKw.current  = kw
     currentKey.current = key
     const domains = generateDomains(kw, key * 999983)
-    setResults(Object.fromEntries(domains.map(d => [d, { status: 'checking' }])))
+    setResults({})
     setLoading(true)
-    fetchBatch(domains).then(fresh => {
-      if (currentKw.current !== kw || currentKey.current !== key) return
-      setResults(fresh)
-      setLoading(false)
-    })
+
+    // Enforce a minimum 800ms so ghost rows never flash and disappear
+    const [fresh] = await Promise.all([
+      fetchBatch(domains).catch(() => ({})),
+      new Promise(r => setTimeout(r, 800)),
+    ])
+
+    if (currentKw.current !== kw || currentKey.current !== key) return
+    setResults(fresh)
+    setLoading(false)
   }, [])
 
   useEffect(() => {
