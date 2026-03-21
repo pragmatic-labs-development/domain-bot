@@ -659,7 +659,85 @@ body::before {
 
 /* ── Other Ideas view ── */
 .ideas-view {
-  padding: var(--sp-6) var(--sp-8) var(--sp-16);
+  padding: 0 var(--sp-8) var(--sp-16);
+  position: relative;
+}
+
+/* Progress bar */
+.ideas-progress-bar {
+  height: 2px;
+  width: 100%;
+  background: var(--border);
+  margin-bottom: var(--sp-6);
+  border-radius: 2px;
+  overflow: hidden;
+  transition: opacity 0.3s;
+}
+.ideas-progress-bar::after {
+  content: '';
+  display: block;
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  border-radius: 2px;
+  animation: none;
+  opacity: 0;
+}
+.ideas-progress-bar.active::after {
+  opacity: 1;
+  animation: progressSlide 1.2s ease-in-out infinite;
+}
+@keyframes progressSlide {
+  0%   { transform: translateX(-150%); }
+  100% { transform: translateX(350%); }
+}
+
+/* Ghost skeleton rows */
+.ideas-ghost-row {
+  pointer-events: none;
+}
+.ideas-ghost-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--surface3);
+  flex-shrink: 0;
+  animation: ideasShimmer 1.4s ease-in-out infinite;
+}
+.ideas-ghost-text {
+  height: 11px;
+  border-radius: 6px;
+  background: var(--surface3);
+  animation: ideasShimmer 1.4s ease-in-out infinite;
+}
+.ideas-ghost-btn {
+  width: 68px;
+  height: 22px;
+  border-radius: 6px;
+  background: var(--surface3);
+  flex-shrink: 0;
+  animation: ideasShimmer 1.4s ease-in-out infinite;
+}
+@keyframes ideasShimmer {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.9; }
+}
+
+/* Stagger shimmer slightly per row */
+.ideas-ghost-row:nth-child(odd)  .ideas-ghost-text,
+.ideas-ghost-row:nth-child(odd)  .ideas-ghost-dot,
+.ideas-ghost-row:nth-child(odd)  .ideas-ghost-btn  { animation-delay: 0.2s; }
+.ideas-ghost-row:nth-child(3n)   .ideas-ghost-text,
+.ideas-ghost-row:nth-child(3n)   .ideas-ghost-dot,
+.ideas-ghost-row:nth-child(3n)   .ideas-ghost-btn  { animation-delay: 0.4s; }
+
+/* Fade-in for loaded results */
+.ideas-grid-loaded .ideas-row {
+  animation: ideasFadeIn 0.25s ease both;
+}
+@keyframes ideasFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .ideas-header {
   display: flex;

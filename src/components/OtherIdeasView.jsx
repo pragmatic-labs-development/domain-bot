@@ -99,6 +99,9 @@ export function OtherIdeasView({ keyword }) {
 
   return (
     <div className="ideas-view">
+      {/* Progress bar */}
+      <div className={`ideas-progress-bar ${loading ? 'active' : ''}`} />
+
       <div className="ideas-header">
         <span className="ideas-title">
           Available name ideas for <strong>{keyword}</strong>
@@ -125,16 +128,33 @@ export function OtherIdeasView({ keyword }) {
         </div>
       </div>
 
+      {/* Ghost rows while loading */}
+      {loading && (
+        <div className="ideas-grid">
+          {[0, 1, 2].map(ci => (
+            <div key={ci} className="ideas-col">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="ideas-row ideas-ghost-row">
+                  <span className="ideas-ghost-dot" />
+                  <span className="ideas-ghost-text" style={{ width: `${55 + ((ci * 7 + i * 13) % 30)}%` }} />
+                  <span className="ideas-ghost-btn" />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+
       {!loading && available.length === 0 && (
         <div className="tab-empty">No available ideas this time — try refreshing for more.</div>
       )}
 
-      {available.length > 0 && (
-        <div className="ideas-grid">
+      {!loading && available.length > 0 && (
+        <div className="ideas-grid ideas-grid-loaded">
           {cols.map((col, ci) => (
             <div key={ci} className="ideas-col">
-              {col.map(({ domain, status, price }) => (
-                <div key={domain} className="ideas-row">
+              {col.map(({ domain, status, price }, i) => (
+                <div key={domain} className="ideas-row" style={{ animationDelay: `${i * 30}ms` }}>
                   <span
                     className="ideas-dot"
                     style={{ background: STATUS_DOT[status] ?? STATUS_DOT.unknown }}
