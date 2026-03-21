@@ -7,6 +7,17 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { fetchBatch } from '../lib/availability'
 
+function useCopyToClipboard() {
+  const [copied, setCopied] = useState(false)
+  const copy = useCallback((text) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }, [])
+  return [copied, copy]
+}
+
 const PREFIXES_POOL = [
   'get', 'my', 'the', 'go', 'try', 'use', 'hey', 'join', 'we', 'meet',
   're', 'in', 'new', 'pro', 'web', 'find', 'love', 'be', 'on', 'its',
@@ -66,6 +77,7 @@ export function OtherIdeasView({ keyword }) {
   const [results,    setResults]    = useState({})
   const [loading,    setLoading]    = useState(true)
   const [refreshKey, setRefreshKey] = useState(1)
+  const [copied,     copy]          = useCopyToClipboard()
   const currentKw  = useRef('')
   const currentKey = useRef(1)
 
@@ -111,9 +123,6 @@ export function OtherIdeasView({ keyword }) {
       <div className="ideas-header">
         <span className="ideas-title">
           Available name ideas for <strong>{keyword}</strong>
-          {!loading && available.length > 0 && (
-            <span className="ideas-count">{available.length}</span>
-          )}
         </span>
         <div className="ideas-header-actions">
           {loading && (
@@ -122,14 +131,24 @@ export function OtherIdeasView({ keyword }) {
               Checking…
             </span>
           )}
+          {!loading && available.length > 0 && (
+            <button
+              className="ideas-copy-btn"
+              onClick={() => copy(available.map(d => d.domain).join('\n'))}
+              title="Copy all domains to clipboard"
+            >
+              {copied ? <CheckIcon /> : <CopyIcon />}
+              {copied ? 'Copied!' : 'Copy all'}
+            </button>
+          )}
           <button
             className="ideas-refresh-btn"
             onClick={handleRefresh}
             disabled={loading}
-            title="Generate new ideas"
+            title="Generate more ideas"
           >
             <RefreshIcon spinning={loading} />
-            New ideas
+            Generate More Ideas
           </button>
         </div>
       </div>
@@ -181,6 +200,22 @@ export function OtherIdeasView({ keyword }) {
         </div>
       )}
     </div>
+  )
+}
+
+function CopyIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+    </svg>
+  )
+}
+
+function CheckIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 6 9 17l-5-5"/>
+    </svg>
   )
 }
 
