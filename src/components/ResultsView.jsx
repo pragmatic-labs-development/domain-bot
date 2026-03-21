@@ -54,7 +54,7 @@ function advActiveCount(advFilters, advPriceRange, advTldCats, advMinSeo, advNam
 }
 
 export function ResultsView({ keyword, primaryDomain, results, livePrices, loading, wave3Available, onLoadWave3, onLiveCheck, saved = [], onSave }) {
-  const [mainTab,      setMainTab]      = useState('basic')
+  const [mainTab,      setMainTab]      = useState('search')
   const [quickFilter,  setQuickFilter]  = useState('all-tlds')
   const [sortId,       setSortId]       = useState('seo-desc')
   const [sortOpen,     setSortOpen]     = useState(false)
@@ -182,10 +182,22 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
       <div className="main-tab-bar">
         <div className="main-tabs">
           <button
-            className={`main-tab ${mainTab === 'basic' ? 'active' : ''}`}
-            onClick={() => setMainTab('basic')}
+            className={`main-tab ${mainTab === 'search' ? 'active' : ''}`}
+            onClick={() => setMainTab('search')}
           >
-            Basic <span className="tab-count">{availableCount}</span>
+            Search <span className="tab-count">{availableCount}</span>
+          </button>
+          <button
+            className={`main-tab ${mainTab === 'domains' ? 'active' : ''}`}
+            onClick={() => setMainTab('domains')}
+          >
+            Domains
+          </button>
+          <button
+            className={`main-tab ${mainTab === 'other-ideas' ? 'active' : ''}`}
+            onClick={() => setMainTab('other-ideas')}
+          >
+            Other Ideas
           </button>
           <button
             className={`main-tab ${mainTab === 'advanced' ? 'active' : ''}`}
@@ -224,8 +236,22 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
         </div>
       </div>
 
-      {/* Basic panel */}
-      {mainTab === 'basic' && (
+      {/* Domains panel */}
+      {mainTab === 'domains' && (
+        <div className="placeholder-panel">
+          <p>Domains view coming soon.</p>
+        </div>
+      )}
+
+      {/* Other Ideas panel */}
+      {mainTab === 'other-ideas' && (
+        <div className="placeholder-panel">
+          <p>Other Ideas coming soon.</p>
+        </div>
+      )}
+
+      {/* Search panel */}
+      {mainTab === 'search' && (
         <div className="basic-panel">
           <div className="quick-filters">
             {QUICK_FILTERS.map(f => (
