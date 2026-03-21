@@ -43,7 +43,7 @@ const STATUS_DOT = {
 
 export function OtherIdeasView({ keyword }) {
   const [results,  setResults]  = useState({})
-  const [loading,  setLoading]  = useState(false)
+  const [loading,  setLoading]  = useState(true)
   const currentKw = useRef('')
 
   useEffect(() => {
