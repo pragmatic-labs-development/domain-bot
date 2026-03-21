@@ -657,6 +657,81 @@ body::before {
 .dv-tile.status-checking .dv-tile-ext,
 .dv-tile.status-unknown .dv-tile-ext { color: rgba(255,255,255,0.45); }
 
+/* ── Domain tooltip ── */
+.dv-tooltip {
+  position: fixed;
+  transform: translateY(calc(-100% - 12px));
+  background: var(--surface2);
+  border: 1px solid var(--border-bright);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04);
+  z-index: 500;
+  pointer-events: auto;
+  animation: tooltipIn 0.12s ease both;
+}
+@keyframes tooltipIn {
+  from { opacity: 0; transform: translateY(calc(-100% - 6px)); }
+  to   { opacity: 1; transform: translateY(calc(-100% - 12px)); }
+}
+.dv-tt-domain {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.4rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dv-tt-status {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+.dv-tt-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dv-tt-price {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+.dv-tt-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  margin: 0 0 0.7rem;
+}
+.dv-tt-action {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  transition: opacity 0.15s;
+}
+.dv-tt-action:hover { opacity: 0.85; }
+.dv-tt-action.available {
+  background: rgba(13,138,87,0.2);
+  color: var(--green);
+  border: 1px solid rgba(13,138,87,0.35);
+}
+.dv-tt-action.taken {
+  background: var(--surface3);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
 /* ── Other Ideas view ── */
 .ideas-view {
   padding: var(--sp-6) var(--sp-8) var(--sp-16);
