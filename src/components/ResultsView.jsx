@@ -216,7 +216,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
 
         {/* Sort dropdown */}
         <div className="sort-wrap">
-          <button className="sort-btn" onClick={() => setSortOpen(o => !o)}>
+          <button className="sort-btn" onClick={() => setSortOpen(o => !o)} disabled={mainTab === 'domains'}>
             <SortIcon />
             Sort <span className="sort-label">{currentSort?.label}</span>
             <ChevronIcon />

@@ -881,7 +881,8 @@ body::before {
   transition: all 0.12s;
   white-space: nowrap;
 }
-.sort-btn:hover { color: var(--text); border-color: var(--border-hover); }
+.sort-btn:hover:not(:disabled) { color: var(--text); border-color: var(--border-hover); }
+.sort-btn:disabled { opacity: 0.35; cursor: default; }
 .sort-label {
   color: var(--accent);
   font-weight: 600;
