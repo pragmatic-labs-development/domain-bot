@@ -3100,16 +3100,22 @@ body::before {
 
 
   /* 2 ── Hero ── */
-  #hero { padding: 7vh 1.25rem 1.5rem; }
-  #hero h1 { font-size: clamp(1.6rem, 7.5vw, 2.4rem); margin-bottom: 1.5rem; line-height: 1.25; }
+  #hero {
+    padding: 6vh 1.25rem 2.5rem;
+    height: auto;                     /* don't clip trust banner on short phones */
+    min-height: calc(100dvh - 54px);  /* still fills the screen */
+    overflow: visible;
+  }
+  #hero h1 { font-size: clamp(1.5rem, 7.5vw, 2.4rem); margin-bottom: 1.25rem; line-height: 1.22; }
   .hero-eyebrow { font-size: 0.65rem; letter-spacing: 0.12em; }
   .hero-search-group { max-width: 100%; }
   .hero-search-wrap { padding: 0.5rem 0.65rem; border-radius: 14px; }
   .hero-input { font-size: 1rem; }
   .hero-search-btn { padding: 0.6rem 1.1rem; font-size: 0.85rem; min-height: 44px; }
   /* Stack trust banner vertically — 3 columns is too cramped on mobile */
+  .trust-banner { margin-top: 1.25rem; border-radius: 14px; }
   .trust-banner-items { flex-direction: column; gap: 0; }
-  .trust-item { flex-direction: row; justify-content: flex-start; text-align: left; padding: 0.75rem 1rem; gap: 0.75rem; font-size: 0.8rem; }
+  .trust-item { flex-direction: row; justify-content: flex-start; text-align: left; padding: 0.8rem 1rem; gap: 0.8rem; font-size: 0.8rem; }
   .trust-item + .trust-item { border-left: none; border-top: 1px solid rgba(0,229,200,0.1); }
   .trust-item svg { width: 18px; height: 18px; flex-shrink: 0; margin-bottom: 0; }
 
@@ -3123,7 +3129,7 @@ body::before {
   .nav-search-wrap { flex: 1; min-width: 0; max-width: unset; padding: 0.45rem 0.75rem; border-radius: 12px; }
   .nav-status-line { display: none; }
   .esc-hint { display: none; }
-  .saved-nav-btn { width: 38px; height: 38px; border-radius: 10px; margin-left: 0.5rem; }
+  .saved-nav-btn { width: 40px; height: 40px; border-radius: 10px; margin-left: 0.5rem; }
 
   /* 4 ── Primary domain card ── */
   .primary-domain { padding: 1rem 1rem 0.85rem; border-radius: 12px; }
@@ -3135,13 +3141,15 @@ body::before {
   .primary-price-label { font-size: 0.7rem; opacity: 0.7; }
   .primary-price-main { font-size: 1.25rem; }
   .register-wrap { width: 100%; display: flex; }
-  .register-main { flex: 1; justify-content: center; font-size: 0.88rem; min-height: 46px; border-radius: 10px 0 0 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .register-caret { min-height: 46px; padding: 0 0.9rem; border-radius: 0 10px 10px 0; }
+  .register-main { flex: 1; justify-content: center; font-size: 0.88rem; min-height: 48px; border-radius: 10px 0 0 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .register-caret { min-height: 48px; padding: 0 1rem; border-radius: 0 10px 10px 0; }
   .primary-footer { font-size: 0.72rem; padding-top: 0.6rem; }
 
   /* 5 ── Tab bar ── */
   .main-tab-bar { margin-bottom: 0.85rem; }
-  .main-tab { padding: 0.7rem 0.9rem; font-size: 0.83rem; }
+  .main-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .main-tabs::-webkit-scrollbar { display: none; }
+  .main-tab { padding: 0.75rem 0.9rem; font-size: 0.82rem; white-space: nowrap; }
   .tab-checking-hint { display: none; }
   .tab-bar-legend { display: none; }
   .sort-label { display: none; }
@@ -3158,45 +3166,46 @@ body::before {
     padding-bottom: 0.1rem;
   }
   .quick-filters::-webkit-scrollbar { display: none; }
-  .qf-pill { flex-shrink: 0; font-size: 0.76rem; padding: 0.38rem 0.8rem; min-height: 34px; }
+  .qf-pill { flex-shrink: 0; font-size: 0.76rem; padding: 0.42rem 0.85rem; min-height: 36px; }
 
   /* 7 ── Cards — single column, horizontal strip layout ── */
   .cards-grid { grid-template-columns: 1fr; gap: 0.4rem; width: 100%; }
 
   /* Mobile: horizontal strip — name on left, actions on right */
   .domain-card {
-    padding: 0.65rem 0.85rem;
+    padding: 0.75rem 1rem;
     min-height: unset;
     flex-direction: row;
     align-items: center;
     gap: 0.5rem;
     border-radius: var(--radius-card);
   }
-  /* Swap top accent → left accent bar for horizontal layout */
+  /* Left accent bar replaces top accent in horizontal layout */
   .card-available {
     border-top: 1px solid var(--border);
-    border-left: 2.5px solid var(--accent);
+    border-left: 3px solid var(--accent);
   }
   .card-premium {
     border-top: 1px solid var(--border);
-    border-left: 2.5px solid var(--yellow);
+    border-left: 3px solid var(--yellow);
   }
-  /* Unlocked: full outline on mobile too */
+  /* Unlocked: full teal outline */
   .card-unlocked {
     border-color: var(--accent) !important;
     box-shadow: 0 0 0 1px var(--accent) !important;
   }
+  /* No hover lift on touch — don't strip unlocked outline */
   .card-available:hover,
-  .card-premium:hover,
-  .card-unlocked:hover { transform: none; box-shadow: none !important; }
+  .card-premium:hover { transform: none; box-shadow: none; }
+  .card-unlocked:hover { transform: none; }
 
-  /* Header fills horizontal space */
+  /* Domain name fills available space, ellipsis if too long */
   .card-header { flex: 1; min-width: 0; padding-bottom: 0; align-items: center; }
-  .card-name { font-size: 0.98rem; }
+  .card-name { font-size: 0.98rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .card-keyword { font-size: inherit; font-weight: 700; }
-  .card-tld { font-size: 0.8em; }
+  .card-tld { font-size: 0.82em; }
 
-  /* Live strip collapses to dot + price only on mobile */
+  /* Live strip — dot only on mobile */
   .card-live-strip {
     flex-shrink: 0;
     padding: 0;
@@ -3205,29 +3214,44 @@ body::before {
     gap: 0.25rem;
   }
   .card-live-label { display: none; }
-  .card-live-price { font-size: 0.7rem; }
+  .card-live-price { display: none; }
 
-  /* Bottom row → right-side action cluster */
+  /* Action cluster — right side, no top border */
   .card-bottom-row {
     width: auto;
     margin-top: 0;
     padding-top: 0;
     border-top: none;
     flex-shrink: 0;
-    gap: 0.22rem;
+    gap: 0.28rem;
+    align-items: center;
   }
+
+  /* Price in horizontal layout would overflow — hide it */
+  .card-est-price { display: none; }
   .card-price-tier { display: none; }
-  .card-seo-badge { display: none; }
 
-  /* Larger touch targets on mobile — 40px */
+  /* SEO badge — keep visible as compact quality signal */
+  .card-seo-badge {
+    display: flex;
+    width: 26px;
+    height: 26px;
+    font-size: 0.62rem;
+    border-radius: 5px;
+  }
+
+  /* 44px touch targets */
   .card-btn-detail,
-  .card-btn-lock { width: 40px; height: 40px; border-radius: 9px; }
+  .card-btn-lock { width: 44px; height: 44px; border-radius: 10px; }
 
-  /* Bookmark — always slightly visible on mobile (no hover state available) */
-  .card-bookmark { opacity: 0.3; width: 30px; height: 30px; }
+  /* Bookmark — 45% opacity always visible (no hover on mobile), snaps to full when saved */
+  .card-bookmark { opacity: 0.45; width: 32px; height: 32px; }
   .card-bookmark.saved { opacity: 1; }
 
-  .ghost-card { height: 56px; border-radius: var(--radius-card); }
+  .ghost-card { height: 62px; border-radius: var(--radius-card); }
+
+  /* Load more — full width, easy to tap */
+  .load-more-btn { width: 100%; justify-content: center; min-height: 50px; }
 
   /* 8 ── DNS note footer ── */
   .dns-note { align-items: flex-start; flex-wrap: wrap; font-size: 0.7rem; gap: 0.25rem; }
@@ -3250,9 +3274,9 @@ body::before {
     background: var(--surface);
     border: 1px solid var(--border-bright);
     border-radius: var(--radius-pill);
-    padding: 0.45rem 1rem;
+    padding: 0.5rem 1rem;
     cursor: pointer;
-    min-height: 38px;
+    min-height: 42px;
     transition: all 0.15s;
   }
   .adv-filter-trigger:hover {
@@ -3299,20 +3323,21 @@ body::before {
     left: 0;
     right: 0;
     background: var(--surface);
-    border-radius: 22px 22px 0 0;
+    border-radius: 24px 24px 0 0;
     max-height: 85vh;
     z-index: 351;
     display: flex;
     flex-direction: column;
     animation: savedSlideUp 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   .adv-drawer-handle {
-    width: 36px;
+    width: 40px;
     height: 4px;
     background: var(--border-hover);
     border-radius: 2px;
-    margin: 12px auto 4px;
+    margin: 14px auto 4px;
     flex-shrink: 0;
   }
 
@@ -3328,13 +3353,16 @@ body::before {
   .adv-drawer-title { font-size: 1rem; font-weight: 700; }
 
   .adv-drawer-close {
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: 0.9rem;
+    font-weight: 700;
     color: var(--accent);
     background: transparent;
     border: none;
     cursor: pointer;
     padding: 0.25rem 0;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
   }
 
   .adv-drawer-body {
@@ -3356,78 +3384,84 @@ body::before {
   }
   .adv-filter-bar::-webkit-scrollbar { display: none; }
   .adv-filter-label { flex-shrink: 0; font-size: 0.68rem; }
-  .adv-check-pill { flex-shrink: 0; min-height: 32px; }
+  .adv-check-pill { flex-shrink: 0; min-height: 36px; }
 
   /* 10 ── Advanced tab rows ── */
-  .domain-row { flex-wrap: wrap; padding: 0.7rem 0.9rem; gap: 0.4rem 0.5rem; }
-  .domain-label { flex: 1; min-width: 0; font-size: 0.88rem; }
+  .domain-row { flex-wrap: wrap; padding: 0.8rem 0.9rem; gap: 0.4rem 0.5rem; }
+  .domain-label { flex: 1; min-width: 0; font-size: 0.9rem; }
   .row-starting-price { display: none; }
-  .row-actions { width: 100%; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
+  .row-actions { width: 100%; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-top: 0.1rem; }
   .score-ring { width: 30px !important; height: 30px !important; }
   .score-ring svg { width: 30px !important; height: 30px !important; }
   .score-ring-num { font-size: 0.6rem !important; }
-  .row-action-btn { font-size: 0.73rem; padding: 0.3rem 0.6rem; min-height: 30px; }
-  .card-icon-btn { width: 34px; height: 34px; }
+  .row-action-btn { font-size: 0.76rem; padding: 0.42rem 0.75rem; min-height: 38px; }
+  .card-icon-btn { width: 38px; height: 38px; }
   .row-details-btn { margin-left: auto; }
 
   /* 11 ── Domain modal — bottom sheet ── */
   .domain-modal {
     width: 100%;
     max-width: 100%;
-    max-height: 90vh;
+    max-height: 92vh;
     top: auto;
     bottom: 0;
     left: 0;
     right: 0;
     transform: none;
-    border-radius: 22px 22px 0 0;
+    border-radius: 24px 24px 0 0;
     animation: modalInMobile 0.3s cubic-bezier(0.16,1,0.3,1);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   .domain-modal::before {
     content: '';
     display: block;
-    width: 36px;
+    width: 40px;
     height: 4px;
     background: var(--border-hover);
     border-radius: 2px;
-    margin: 12px auto 2px;
+    margin: 14px auto 0;
   }
   @keyframes modalInMobile {
-    from { transform: translateY(40px); opacity: 0; }
+    from { transform: translateY(50px); opacity: 0; }
     to   { transform: translateY(0);    opacity: 1; }
   }
-  /* Header */
-  .modal-header { padding: 0.6rem 1rem 0.5rem; }
-  .modal-title { font-size: 1.3rem; }
+  /* Header — two-row layout: domain name top, actions bottom */
+  .modal-header { padding: 0.6rem 1rem 0.5rem; flex-wrap: wrap; gap: 0.35rem 0; }
+  .modal-title { font-size: 1.5rem; width: 100%; line-height: 1.1; }
+  .modal-header-actions { width: 100%; justify-content: flex-end; gap: 0.3rem; }
+  /* Position counter takes space without helping — hide on mobile */
+  .modal-position { display: none; }
+  .modal-nav-btn { width: 40px; height: 40px; }
   .modal-save-btn,
   .modal-close-btn { width: 40px; height: 40px; }
   /* Sections */
   .modal-section { padding: 0.65rem 1rem; }
   .modal-section-label { font-size: 0.6rem; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
-  /* Grade block — tighter to save vertical space */
+  /* Grade block */
   .modal-grade-block { padding: 0.65rem 0.85rem; margin-bottom: 0.65rem; gap: 0.75rem; }
   .modal-grade-letter { font-size: 1.6rem; width: 30px; }
   .modal-grade-title { font-size: 0.82rem; }
   .modal-grade-desc { font-size: 0.72rem; }
-  /* Score bars — narrower label so track gets more room */
-  .modal-score-label { font-size: 0.72rem; width: 72px; min-width: unset; flex-shrink: 0; }
+  /* Score bars — wider label so text isn't truncated */
+  .modal-score-label { font-size: 0.72rem; width: 80px; min-width: unset; flex-shrink: 0; }
   .modal-score-num { font-size: 0.72rem; }
-  /* Registrar rows — slightly more gap for tap separation */
-  .modal-registrar-list { gap: 0.55rem; }
-  .modal-registrar-row { padding: 0.6rem 0.85rem; min-height: 52px; }
-  /* Action button — full width on mobile */
+  /* Registrar rows — generous touch target */
+  .modal-registrar-list { gap: 0.5rem; }
+  .modal-registrar-row { padding: 0.75rem 0.85rem; min-height: 58px; }
+  /* Primary action — full width */
   .modal-action-section { display: block; }
-  .modal-primary-action { width: 100%; min-height: 50px; font-size: 0.9rem; border-radius: 12px; }
-  /* Footer — low-value data source info, hide on mobile */
+  .modal-primary-action { width: 100%; min-height: 52px; font-size: 0.9rem; border-radius: 12px; }
+  /* Footer — hide on mobile */
   .modal-footer { display: none; }
 
-  /* 12 ── Saved panel — slides up from bottom ── */
+  /* 12 ── Saved panel — bottom sheet ── */
   .saved-panel {
     width: 100%;
     border-left: none;
     border-top: 1px solid var(--border-bright);
-    border-radius: 22px 22px 0 0;
+    border-radius: 24px 24px 0 0;
     animation: savedSlideUp 0.26s cubic-bezier(0.16,1,0.3,1);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   @keyframes savedSlideUp {
     from { transform: translateY(100%); opacity: 0.6; }
@@ -3436,34 +3470,41 @@ body::before {
   .saved-panel::before {
     content: '';
     display: block;
-    width: 36px;
+    width: 40px;
     height: 4px;
     background: var(--border-hover);
     border-radius: 2px;
-    margin: 12px auto 4px;
+    margin: 14px auto 4px;
   }
   .saved-panel-header { padding: 0.5rem 1.1rem 0.85rem; }
-  .saved-item { padding: 0.75rem 1.1rem; min-height: 50px; }
-  .saved-item-btn { min-height: 36px; padding: 0 0.75rem; }
+  .saved-item { padding: 0.75rem 1.1rem; min-height: 54px; }
+  .saved-item-btn { min-height: 40px; padding: 0 0.85rem; }
 
   /* 13 ── Other Ideas — single column on mobile ── */
-  .ideas-view { padding: 1rem 1rem 3rem; }
+  .ideas-view { padding: 0.85rem 1rem 3rem; }
+  /* Header stacks to two rows: title on top, actions full-width below */
+  .ideas-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding-bottom: 0.85rem;
+    margin-bottom: 0.85rem;
+  }
+  .ideas-header-actions { width: 100%; margin-left: 0; justify-content: space-between; }
+  .ideas-title { font-size: 0.83rem; }
   .ideas-grid { grid-template-columns: 1fr; gap: 0; }
   .ideas-col:not(:first-child) .ideas-row:first-child { border-top: 1px solid var(--border); }
+  /* Taller rows for comfortable touch */
+  .ideas-row { padding: 0.65rem 0; min-height: 44px; }
+  .ideas-domain { font-size: 0.85rem; }
+  .ideas-action { min-height: 34px; display: flex; align-items: center; padding: 0.2rem 0.65rem; }
 
-  /* 14 ── All Domains view ── */
+  /* 14 ── All Domains — accessible tile size ── */
   .domains-view { padding: 0 1rem 3rem; }
   .dv-category { grid-template-columns: 1fr; gap: 0.5rem; }
-  .dv-tile-grid { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 0.3rem; }
-  .dv-tile { height: 36px; }
-  .dv-tile-ext { font-size: 0.75rem; }
-
-  /* 15 ── Results wrapper ── */
-  .results-wrapper { padding: 0.75rem 0.75rem 3rem; }
-
-  /* 16 ── Tab bar scrollable on very small screens ── */
-  .main-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-  .main-tabs::-webkit-scrollbar { display: none; }
-  .main-tab { padding: 0.75rem 0.85rem; font-size: 0.82rem; }
+  .dv-tile-grid { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 0.35rem; }
+  /* 44px minimum touch target */
+  .dv-tile { min-height: 44px; height: auto; padding: 0.35rem 0.5rem; }
+  .dv-tile-ext { font-size: 0.78rem; }
 
 }
