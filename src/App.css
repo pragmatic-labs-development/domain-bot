@@ -2543,10 +2543,17 @@ body::before {
 
 .modal-header {
   display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: var(--sp-5) var(--sp-6) var(--sp-4);
+}
+
+/* Row 1: domain name + save + close */
+.modal-name-row {
+  display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: var(--sp-6) var(--sp-6) var(--sp-4);
-  gap: var(--sp-4);
+  gap: var(--sp-3);
 }
 .modal-title {
   font-family: var(--font-display);
@@ -2554,16 +2561,39 @@ body::before {
   font-weight: 800;
   letter-spacing: -0.045em;
   line-height: 1;
+  flex: 1;
+  min-width: 0;
 }
 .modal-name  { color: var(--text); }
 .modal-tld   { color: var(--accent); }
 
+.modal-name-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  padding-top: 0.2rem;
+}
+
+/* Row 2: status badge + nav cluster */
+.modal-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+.modal-nav-cluster {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Legacy — keep for any stray references */
 .modal-header-actions {
   display: flex;
   align-items: center;
   gap: 0.45rem;
   flex-shrink: 0;
-  padding-top: 0.25rem;
 }
 .modal-save-btn {
   width: 34px; height: 34px;
@@ -2614,7 +2644,7 @@ body::before {
   padding: 0 0.15rem;
 }
 
-/* Status row */
+/* Status badge (in meta-row) */
 .modal-status-row { padding-bottom: 0.5rem !important; }
 .modal-status-badge {
   font-family: var(--font-mono);
@@ -3452,13 +3482,19 @@ body::before {
     to   { transform: translateY(0);    opacity: 1; }
   }
   /* Header — single row: domain name truncates, buttons compact on right */
-  .modal-header { padding: 0.75rem 1rem 0.5rem; flex-wrap: nowrap; gap: 0.5rem; align-items: center; }
-  .modal-title { font-size: 1.15rem; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .modal-header-actions { flex-shrink: 0; gap: 0.25rem; }
-  .modal-position { display: none; }
-  .modal-nav-btn { width: 36px; height: 36px; }
+  /* Modal header — clean two-row layout on mobile */
+  .modal-header { padding: 1rem 1rem 0.65rem; gap: 0.6rem; }
+  /* Row 1: domain name big and bold, save+close compact on right */
+  .modal-name-row { gap: 0.5rem; align-items: flex-start; }
+  .modal-title { font-size: 1.45rem; }
+  .modal-name-actions { gap: 0.3rem; padding-top: 0.15rem; }
+  /* Row 2: status badge left, nav arrows right */
+  .modal-meta-row { flex-wrap: wrap; gap: 0.4rem; }
+  .modal-nav-cluster { gap: 0.25rem; }
+  .modal-position { font-size: 0.65rem; padding: 0 0.2rem; }
+  .modal-nav-btn { width: 38px; height: 38px; }
   .modal-save-btn,
-  .modal-close-btn { width: 36px; height: 36px; }
+  .modal-close-btn { width: 38px; height: 38px; }
   /* Sections */
   .modal-section { padding: 0.65rem 1rem; }
   .modal-section-label { font-size: 0.6rem; letter-spacing: 0.1em; margin-bottom: 0.5rem; }

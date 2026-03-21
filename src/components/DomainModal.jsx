@@ -129,48 +129,57 @@ export function DomainModal({ domain, result, livePrices = {}, saved, onSave, on
       <div className="modal-backdrop" onClick={onClose} />
       <div className="domain-modal" role="dialog" aria-modal="true">
 
-        {/* Header */}
+        {/* Header — two semantic rows */}
         <div className="modal-header">
-          <div className="modal-title">
-            <span className="modal-name">{name}</span>
-            <span className="modal-tld">{tld}</span>
-          </div>
-          <div className="modal-header-actions">
-            {position && <span className="modal-position">{position}</span>}
-            <button
-              className="modal-nav-btn"
-              onClick={onPrev}
-              disabled={!onPrev}
-              aria-label="Previous domain"
-              title="Previous (←)"
-            >
-              <ChevronLeftIcon />
-            </button>
-            <button
-              className="modal-nav-btn"
-              onClick={onNext}
-              disabled={!onNext}
-              aria-label="Next domain"
-              title="Next (→)"
-            >
-              <ChevronRightIcon />
-            </button>
-            <button
-              className={`modal-save-btn ${saved ? 'saved' : ''}`}
-              onClick={() => onSave(domain)}
-              title={saved ? 'Remove from saved' : 'Save domain'}
-            >
-              <BookmarkIcon filled={saved} />
-            </button>
-            <button className="modal-close-btn" onClick={onClose} aria-label="Close">
-              <CloseIcon />
-            </button>
-          </div>
-        </div>
 
-        {/* Status badge */}
-        <div className="modal-section modal-status-row">
-          <span className={`modal-status-badge ${statusClass}`}>{statusLabel}</span>
+          {/* Row 1: domain name + save + close */}
+          <div className="modal-name-row">
+            <div className="modal-title">
+              <span className="modal-name">{name}</span>
+              <span className="modal-tld">{tld}</span>
+            </div>
+            <div className="modal-name-actions">
+              <button
+                className={`modal-save-btn ${saved ? 'saved' : ''}`}
+                onClick={() => onSave(domain)}
+                title={saved ? 'Remove from saved' : 'Save domain'}
+              >
+                <BookmarkIcon filled={saved} />
+              </button>
+              <button className="modal-close-btn" onClick={onClose} aria-label="Close">
+                <CloseIcon />
+              </button>
+            </div>
+          </div>
+
+          {/* Row 2: status badge + nav arrows */}
+          <div className="modal-meta-row">
+            <span className={`modal-status-badge ${statusClass}`}>{statusLabel}</span>
+            {(onPrev || onNext || position) && (
+              <div className="modal-nav-cluster">
+                <button
+                  className="modal-nav-btn"
+                  onClick={onPrev}
+                  disabled={!onPrev}
+                  aria-label="Previous domain"
+                  title="Previous (←)"
+                >
+                  <ChevronLeftIcon />
+                </button>
+                {position && <span className="modal-position">{position}</span>}
+                <button
+                  className="modal-nav-btn"
+                  onClick={onNext}
+                  disabled={!onNext}
+                  aria-label="Next domain"
+                  title="Next (→)"
+                >
+                  <ChevronRightIcon />
+                </button>
+              </div>
+            )}
+          </div>
+
         </div>
 
         {/* Domain Quality Score */}
