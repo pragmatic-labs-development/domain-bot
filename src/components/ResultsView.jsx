@@ -465,7 +465,7 @@ function CopyAllButton({ visibleDomains, allDomains }) {
       {open && (
         <div className="copy-all-dropdown">
           <button className="copy-all-opt" onClick={() => copy(visibleDomains, 'visible')}>
-            <CopyIconSm /> Copy on screen <span className="copy-all-count">{visibleDomains.length}</span>
+            <CopyIconSm /> Copy all on screen <span className="copy-all-count">{visibleDomains.length}</span>
           </button>
           <button className="copy-all-opt" onClick={() => copy(allDomains, 'all')}>
             <CopyIconSm /> Copy all results <span className="copy-all-count">{allDomains.length}</span>
