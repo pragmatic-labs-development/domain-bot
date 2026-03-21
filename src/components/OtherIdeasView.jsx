@@ -64,19 +64,24 @@ export function OtherIdeasView({ keyword }) {
 
   if (!keyword) return null
 
-  const entries = Object.entries(results)
-  if (entries.length === 0) return null
+  // Only show available/premium domains — filter out taken/unknown
+  const available = Object.entries(results)
+    .filter(([, r]) => r.status === 'available' || r.status === 'premium')
+    .map(([domain, r]) => ({ domain, ...r }))
 
   // Split into 3 columns, filling column-first
   const cols = [[], [], []]
-  entries.forEach(([domain, r], i) => {
-    cols[i % 3].push({ domain, ...r })
-  })
+  available.forEach((item, i) => { cols[i % 3].push(item) })
 
   return (
     <div className="ideas-view">
       <div className="ideas-header">
-        <span className="ideas-title">Name ideas for <strong>{keyword}.com</strong></span>
+        <span className="ideas-title">
+          Available name ideas for <strong>{keyword}</strong>
+          {!loading && available.length > 0 && (
+            <span className="ideas-count">{available.length}</span>
+          )}
+        </span>
         {loading && (
           <span className="ideas-checking">
             <span className="dns-spinner" style={{ width: 10, height: 10, borderWidth: 2 }} />
@@ -85,14 +90,15 @@ export function OtherIdeasView({ keyword }) {
         )}
       </div>
 
-      <div className="ideas-grid">
-        {cols.map((col, ci) => (
-          <div key={ci} className="ideas-col">
-            {col.map(({ domain, status, price }) => {
-              const isAvailable = status === 'available' || status === 'premium'
-              const isTaken     = status === 'taken' || status === 'aftermarket'
+      {!loading && available.length === 0 && (
+        <div className="tab-empty">No available name ideas found. Try a different keyword.</div>
+      )}
 
-              return (
+      {available.length > 0 && (
+        <div className="ideas-grid">
+          {cols.map((col, ci) => (
+            <div key={ci} className="ideas-col">
+              {col.map(({ domain, status, price }) => (
                 <div key={domain} className="ideas-row">
                   <span
                     className="ideas-dot"
@@ -101,29 +107,18 @@ export function OtherIdeasView({ keyword }) {
                   <span className="ideas-domain">{domain}</span>
                   <a
                     className={`ideas-action ${status}`}
-                    href={
-                      isAvailable
-                        ? `https://www.godaddy.com/domainsearch/find?domainToCheck=${domain}`
-                        : isTaken
-                        ? `https://lookup.icann.org/en/lookup?name=${domain}`
-                        : undefined
-                    }
-                    target={isAvailable || isTaken ? '_blank' : undefined}
+                    href={`https://www.godaddy.com/domainsearch/find?domainToCheck=${domain}`}
+                    target="_blank"
                     rel="noreferrer"
                   >
-                    {status === 'checking' ? '…' :
-                     status === 'available' ? (price ? `$${price.toFixed(0)}/yr` : 'Register →') :
-                     status === 'premium'   ? `$${price?.toFixed(0) ?? '?'}` :
-                     status === 'taken'     ? 'Taken' :
-                     status === 'aftermarket' ? 'Aftermarket' :
-                     'Unknown'}
+                    {status === 'premium' && price ? `$${price.toFixed(0)}` : 'Register →'}
                   </a>
                 </div>
-              )
-            })}
-          </div>
-        ))}
-      </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

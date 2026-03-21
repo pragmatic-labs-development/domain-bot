@@ -215,6 +215,14 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
           )}
         </div>
 
+        {/* Status legend */}
+        <div className="tab-bar-legend">
+          <span className="tbl-item available">Available</span>
+          <span className="tbl-item premium">Premium</span>
+          <span className="tbl-item aftermarket">Aftermarket</span>
+          <span className="tbl-item taken">Taken</span>
+        </div>
+
         {/* Sort dropdown */}
         <div className="sort-wrap">
           <button className="sort-btn" onClick={() => setSortOpen(o => !o)} disabled={mainTab === 'domains'}>

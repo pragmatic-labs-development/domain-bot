@@ -88,14 +88,6 @@ export function DomainsView({ keyword, results }) {
 
   return (
     <div className="domains-view">
-      {/* Legend */}
-      <div className="domains-legend">
-        <span className="dv-legend-item available">Available</span>
-        <span className="dv-legend-item premium">Premium</span>
-        <span className="dv-legend-item aftermarket">Aftermarket</span>
-        <span className="dv-legend-item taken">Taken</span>
-      </div>
-
       {TLD_CATEGORIES.map(cat => {
         const tiles = cat.tlds
           .filter((tld, i, arr) => arr.indexOf(tld) === i)

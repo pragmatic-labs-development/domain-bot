@@ -1078,6 +1078,55 @@ body::before {
   padding: 0 var(--sp-3);
 }
 
+/* Status legend in tab bar */
+.tab-bar-legend {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: auto;
+  margin-right: 0.75rem;
+}
+.tbl-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.tbl-item::before {
+  content: '';
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.tbl-item.available   { color: var(--green); }
+.tbl-item.available::before   { background: var(--green); box-shadow: 0 0 5px rgba(16,217,138,0.6); }
+.tbl-item.premium     { color: var(--yellow); }
+.tbl-item.premium::before     { background: var(--yellow); }
+.tbl-item.aftermarket { color: var(--blue); }
+.tbl-item.aftermarket::before { background: var(--blue); }
+.tbl-item.taken       { color: var(--red); }
+.tbl-item.taken::before       { background: var(--red); opacity: 0.8; }
+
+/* ideas count badge */
+.ideas-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.5rem;
+  padding: 0 0.45rem;
+  height: 18px;
+  background: rgba(0,229,200,0.12);
+  color: var(--accent);
+  border-radius: var(--radius-pill);
+  font-size: 0.7rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
 /* Sort dropdown */
 .sort-wrap {
   position: relative;
@@ -2489,6 +2538,7 @@ body::before {
   .main-tab-bar { margin-bottom: 0.85rem; }
   .main-tab { padding: 0.7rem 0.9rem; font-size: 0.83rem; }
   .tab-checking-hint { display: none; }
+  .tab-bar-legend { display: none; }
   .sort-label { display: none; }
 
   /* 6 ── Quick filter pills — horizontal scroll ── */
