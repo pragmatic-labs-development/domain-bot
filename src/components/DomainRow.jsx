@@ -69,7 +69,7 @@ export function DomainRow({ domain, result, livePrices = {}, saved, onSave, onLi
           onClick={e => { e.stopPropagation(); onSave(domain) }}
           title={saved ? 'Saved!' : 'Save domain'}
         >
-          {saved ? '★' : '☆'}
+          <BookmarkIcon filled={saved} />
         </button>
 
         {!isVerified && (isAvailable || isTaken || isUnknown) && (
@@ -86,7 +86,7 @@ export function DomainRow({ domain, result, livePrices = {}, saved, onSave, onLi
         {isTaken && (
           <button
             className="row-action-btn"
-            onClick={() => window.open(`https://lookup.icann.org/en/lookup?name=${domain}`, '_blank')}
+            onClick={() => window.open(`https://who.is/whois/${domain}`, '_blank')}
           >
             WHOIS
           </button>
@@ -133,6 +133,13 @@ function ScoreRing({ score, color, label }) {
   )
 }
 
+function BookmarkIcon({ filled }) {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+    </svg>
+  )
+}
 function LockIcon() {
   return (
     <svg width="9" height="9" viewBox="0 0 12 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">

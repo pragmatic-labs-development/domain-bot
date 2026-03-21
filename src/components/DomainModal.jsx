@@ -59,18 +59,18 @@ function computeScores(domain) {
 }
 
 function getGrade(avg) {
-  if (avg >= 85) return { letter: 'A', color: '#10d98a', title: 'Excellent domain',  desc: 'Strong across all quality metrics' }
-  if (avg >= 72) return { letter: 'B', color: '#84cc16', title: 'Good domain',       desc: 'Solid choice with minor trade-offs' }
-  if (avg >= 58) return { letter: 'C', color: '#f5a623', title: 'Average domain',    desc: 'Works well but has some limitations' }
-  if (avg >= 44) return { letter: 'D', color: '#f97316', title: 'Weak domain',       desc: 'Notable quality concerns' }
-  return           { letter: 'F', color: '#f05060', title: 'Poor domain',        desc: 'Not recommended for branding' }
+  if (avg >= 85) return { letter: 'A', color: 'var(--accent)',    title: 'Excellent domain',  desc: 'Strong across all quality metrics' }
+  if (avg >= 72) return { letter: 'B', color: 'var(--green)',     title: 'Good domain',       desc: 'Solid choice with minor trade-offs' }
+  if (avg >= 58) return { letter: 'C', color: 'var(--text)',      title: 'Average domain',    desc: 'Works well but has some limitations' }
+  if (avg >= 44) return { letter: 'D', color: 'var(--text-muted)',title: 'Weak domain',       desc: 'Notable quality concerns' }
+  return           { letter: 'F', color: 'var(--red)',       title: 'Poor domain',       desc: 'Not recommended for branding' }
 }
 
 function scoreBarColor(score) {
-  if (score >= 80) return '#10d98a'
-  if (score >= 60) return '#f5a623'
-  if (score >= 44) return '#f97316'
-  return '#f05060'
+  if (score >= 80) return 'var(--accent)'
+  if (score >= 60) return 'var(--text-muted)'
+  if (score >= 44) return 'var(--text-dim)'
+  return 'var(--red)'
 }
 
 /* ── Registrar badge colors ── */
@@ -83,18 +83,22 @@ const REGISTRAR_STYLES = {
 }
 
 /* ── Main component ── */
-export function DomainModal({ domain, result, livePrices = {}, saved, onSave, onClose }) {
+export function DomainModal({ domain, result, livePrices = {}, saved, onSave, onClose, onPrev, onNext, position }) {
   const status = result?.status ?? 'unknown'
 
   useEffect(() => {
-    function onKey(e) { if (e.key === 'Escape') onClose() }
+    function onKey(e) {
+      if (e.key === 'Escape')      onClose()
+      if (e.key === 'ArrowLeft'  && onPrev) onPrev()
+      if (e.key === 'ArrowRight' && onNext) onNext()
+    }
     window.addEventListener('keydown', onKey)
     document.body.style.overflow = 'hidden'
     return () => {
       window.removeEventListener('keydown', onKey)
       document.body.style.overflow = ''
     }
-  }, [onClose])
+  }, [onClose, onPrev, onNext])
 
   const [name, ...tldParts] = domain.split('.')
   const tld = '.' + tldParts.join('.')
@@ -132,12 +136,31 @@ export function DomainModal({ domain, result, livePrices = {}, saved, onSave, on
             <span className="modal-tld">{tld}</span>
           </div>
           <div className="modal-header-actions">
+            {position && <span className="modal-position">{position}</span>}
+            <button
+              className="modal-nav-btn"
+              onClick={onPrev}
+              disabled={!onPrev}
+              aria-label="Previous domain"
+              title="Previous (←)"
+            >
+              <ChevronLeftIcon />
+            </button>
+            <button
+              className="modal-nav-btn"
+              onClick={onNext}
+              disabled={!onNext}
+              aria-label="Next domain"
+              title="Next (→)"
+            >
+              <ChevronRightIcon />
+            </button>
             <button
               className={`modal-save-btn ${saved ? 'saved' : ''}`}
               onClick={() => onSave(domain)}
               title={saved ? 'Remove from saved' : 'Save domain'}
             >
-              {saved ? '★' : '☆'}
+              <BookmarkIcon filled={saved} />
             </button>
             <button className="modal-close-btn" onClick={onClose} aria-label="Close">
               <CloseIcon />
@@ -223,7 +246,7 @@ export function DomainModal({ domain, result, livePrices = {}, saved, onSave, on
           <div className="modal-section modal-action-section">
             <button
               className="modal-primary-action"
-              onClick={() => window.open(`https://lookup.icann.org/en/lookup?name=${domain}`, '_blank')}
+              onClick={() => window.open(`https://who.is/whois/${domain}`, '_blank')}
             >
               WHOIS Lookup →
             </button>
@@ -251,6 +274,27 @@ export function DomainModal({ domain, result, livePrices = {}, saved, onSave, on
   )
 }
 
+function BookmarkIcon({ filled }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+    </svg>
+  )
+}
+function ChevronLeftIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m15 18-6-6 6-6"/>
+    </svg>
+  )
+}
+function ChevronRightIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="m9 18 6-6-6-6"/>
+    </svg>
+  )
+}
 function CloseIcon() {
   return (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">

@@ -274,7 +274,7 @@ export function DomainsView({ keyword, results }) {
   }, [])
 
   const handleMouseLeave = useCallback(() => {
-    hideTimer.current = setTimeout(() => setTooltip(null), 120)
+    hideTimer.current = setTimeout(() => setTooltip(null), 250)
   }, [])
 
   if (!keyword) return null
@@ -309,7 +309,7 @@ export function DomainsView({ keyword, results }) {
               {tiles.map(({ tld, domain, status, price }) => {
                 const bg   = STATUS_BG[status] ?? STATUS_BG.unknown
                 const href = status === 'taken'
-                  ? `https://lookup.icann.org/en/lookup?name=${domain}`
+                  ? `https://who.is/whois/${domain}`
                   : status === 'available' || status === 'premium'
                   ? `https://www.godaddy.com/domainsearch/find?checkAvail=1&domainToCheck=${domain}`
                   : null
@@ -357,13 +357,16 @@ function DomainTooltip({ tld, domain, status, price, rect, keyword, onMouseEnter
   const href = isAvailable
     ? `https://www.godaddy.com/domainsearch/find?checkAvail=1&domainToCheck=${domain}`
     : isTaken
-    ? `https://lookup.icann.org/en/lookup?name=${domain}`
+    ? `https://who.is/whois/${domain}`
     : null
 
-  // Position above the tile, centered
+  // Position below the tile, centered
   const tooltipWidth = 260
-  const left = Math.max(8, rect.left + rect.width / 2 - tooltipWidth / 2 + window.scrollX)
-  const top  = rect.top + window.scrollY - 8 // will be pushed up by CSS transform
+  const left = Math.max(8, Math.min(
+    window.innerWidth - tooltipWidth - 8,
+    rect.left + rect.width / 2 - tooltipWidth / 2
+  ))
+  const top = rect.bottom + 8
 
   return (
     <div

@@ -660,7 +660,6 @@ body::before {
 /* ── Domain tooltip ── */
 .dv-tooltip {
   position: fixed;
-  transform: translateY(calc(-100% - 12px));
   background: var(--surface2);
   border: 1px solid var(--border-bright);
   border-radius: 12px;
@@ -671,8 +670,8 @@ body::before {
   animation: tooltipIn 0.12s ease both;
 }
 @keyframes tooltipIn {
-  from { opacity: 0; transform: translateY(calc(-100% - 6px)); }
-  to   { opacity: 1; transform: translateY(calc(-100% - 12px)); }
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 .dv-tt-domain {
   font-family: var(--font-mono);
@@ -711,25 +710,27 @@ body::before {
   margin: 0 0 0.7rem;
 }
 .dv-tt-action {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  font-size: 0.75rem;
+  justify-content: center;
+  width: 100%;
+  font-size: 0.78rem;
   font-weight: 600;
   text-decoration: none;
-  padding: 0.3rem 0.65rem;
+  padding: 0.45rem 0.65rem;
   border-radius: 6px;
   transition: opacity 0.15s;
 }
 .dv-tt-action:hover { opacity: 0.85; }
 .dv-tt-action.available {
-  background: rgba(13,138,87,0.2);
+  background: rgba(16,217,138,0.1);
   color: var(--green);
-  border: 1px solid rgba(13,138,87,0.35);
+  border: 1px solid rgba(16,217,138,0.25);
 }
 .dv-tt-action.taken {
-  background: var(--surface3);
-  color: var(--text-muted);
-  border: 1px solid var(--border);
+  background: rgba(240,80,96,0.1);
+  color: var(--red);
+  border: 1px solid rgba(240,80,96,0.25);
 }
 
 /* ── Other Ideas view ── */
@@ -816,9 +817,9 @@ body::before {
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 .ideas-copy-btn:hover {
-  color: var(--accent);
-  border-color: var(--accent);
-  background: rgba(0,229,200,0.06);
+  color: var(--text);
+  border-color: var(--border-hover);
+  background: var(--surface3);
 }
 
 .ideas-refresh-btn {
@@ -837,12 +838,12 @@ body::before {
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
 .ideas-refresh-btn:hover:not(:disabled) {
-  color: var(--accent);
-  border-color: var(--accent);
-  background: rgba(0,229,200,0.06);
+  color: var(--text);
+  border-color: var(--border-hover);
+  background: var(--surface3);
 }
 .ideas-refresh-btn:disabled {
-  opacity: 0.45;
+  opacity: 0.3;
   cursor: default;
 }
 .ideas-title {
@@ -906,7 +907,7 @@ body::before {
   transition: all 0.15s;
   cursor: pointer;
 }
-.ideas-action:hover { opacity: 0.85; transform: translateY(-1px); }
+.ideas-action:hover { opacity: 0.85; }
 .ideas-action.available {
   background: rgba(16,217,138,0.1);
   color: var(--green);
@@ -1075,7 +1076,7 @@ body::before {
   font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 800;
-  color: var(--green);
+  color: var(--text);
   letter-spacing: -0.03em;
   line-height: 1;
 }
@@ -1112,7 +1113,7 @@ body::before {
   transition: background 0.15s;
   display: flex; align-items: center;
 }
-.register-caret:hover { background: #009a86; }
+.register-caret:hover { background: var(--accent-dark); }
 .register-dropdown {
   position: absolute;
   top: calc(100% + 8px);
@@ -1142,7 +1143,7 @@ body::before {
 .dropdown-item:hover { background: var(--surface3); }
 .dropdown-item:first-child:hover { background: rgba(0,229,200,0.04); }
 .registrar-name { flex: 1; font-size: 0.88rem; }
-.registrar-price { color: var(--green); font-weight: 700; font-family: var(--font-mono); font-size: 0.85rem; }
+.registrar-price { color: var(--text); font-weight: 700; font-family: var(--font-mono); font-size: 0.85rem; }
 
 .action-btn {
   display: flex;
@@ -1178,7 +1179,7 @@ body::before {
   color: var(--text-dim);
   font-weight: 500;
 }
-.primary-footer svg { flex-shrink: 0; color: var(--green); opacity: 0.8; }
+.primary-footer svg { flex-shrink: 0; color: var(--text-dim); opacity: 0.8; }
 .primary-footer.footer-taken svg { color: var(--text-dim); opacity: 0.5; }
 
 /* ── Panel containers ── */
@@ -1317,7 +1318,7 @@ body::before {
   font-size: 0.78rem;
   font-weight: 500;
   color: var(--text-muted);
-  background: var(--surface);
+  background: var(--surface2);
   border: 1px solid var(--border-bright);
   border-radius: var(--radius-sm);
   padding: 0.4rem 0.8rem;
@@ -1328,11 +1329,11 @@ body::before {
 .sort-btn:hover:not(:disabled) {
   color: var(--text);
   border-color: var(--border-hover);
-  background: var(--surface2);
+  background: var(--surface3);
 }
 .sort-btn:disabled { opacity: 0.3; cursor: default; }
 .sort-label {
-  color: var(--accent);
+  color: var(--text);
   font-weight: 600;
 }
 .sort-dropdown {
@@ -1365,12 +1366,84 @@ body::before {
 .sort-option:hover { background: var(--surface3); color: var(--text); }
 .sort-option.active { color: var(--accent); background: rgba(0,229,200,0.06); font-weight: 600; }
 
+/* ── Basic header (filters + copy) ── */
+.basic-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: var(--sp-5);
+}
+
 /* ── Quick filters ── */
 .quick-filters {
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
-  margin-bottom: var(--sp-5);
+}
+
+/* ── Copy All button ── */
+.copy-all-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.copy-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface2);
+  border: 1px solid var(--border-bright);
+  border-radius: 8px;
+  padding: 0.35rem 0.65rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.copy-all-btn:hover {
+  color: var(--text);
+  border-color: var(--border-hover);
+  background: var(--surface3);
+}
+.copy-all-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  background: var(--surface2);
+  border: 1px solid var(--border-bright);
+  border-radius: 10px;
+  padding: 0.35rem;
+  z-index: 200;
+  min-width: 210px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.copy-all-opt {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: none;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  text-align: left;
+}
+.copy-all-opt:hover {
+  background: var(--surface3);
+  color: var(--text);
+}
+.copy-all-count {
+  margin-left: auto;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
 }
 .qf-pill {
   display: flex;
@@ -1409,151 +1482,436 @@ body::before {
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
+  gap: 0.85rem;
 }
 
+/* ─────────────────────────────────────────
+   DOMAIN CARD — base
+───────────────────────────────────────── */
 .domain-card {
-  background: linear-gradient(155deg, var(--surface2) 0%, var(--surface) 100%);
+  background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  padding: var(--sp-5) var(--sp-5) var(--sp-4);
-  min-height: 130px;
+  padding: 1rem 1rem 0.75rem;
+  /*
+    Fixed min-height so all cards in the grid stay the same baseline height.
+    The live-strip adds content when unlocked but the bottom row is always
+    pushed to the bottom via margin-top: auto, so the card only grows if
+    the content genuinely needs more space.
+  */
+  min-height: 148px;
   display: flex;
   flex-direction: column;
-  cursor: default;
-  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-  animation: cardFadeIn 0.28s cubic-bezier(0.16,1,0.3,1) both;
+  gap: 0;
+  cursor: pointer;
   position: relative;
+  transition:
+    border-color 0.5s ease,
+    box-shadow 0.5s ease,
+    transform 0.18s cubic-bezier(0.16,1,0.3,1);
+  animation: cardFadeIn 0.3s cubic-bezier(0.16,1,0.3,1) both;
 }
 
 /* Stagger card entrance */
 .domain-card:nth-child(1)  { animation-delay: 0ms }
-.domain-card:nth-child(2)  { animation-delay: 30ms }
-.domain-card:nth-child(3)  { animation-delay: 60ms }
-.domain-card:nth-child(4)  { animation-delay: 90ms }
-.domain-card:nth-child(5)  { animation-delay: 120ms }
-.domain-card:nth-child(6)  { animation-delay: 150ms }
-.domain-card:nth-child(7)  { animation-delay: 180ms }
-.domain-card:nth-child(8)  { animation-delay: 210ms }
-.domain-card:nth-child(n+9){ animation-delay: 240ms }
+.domain-card:nth-child(2)  { animation-delay: 25ms }
+.domain-card:nth-child(3)  { animation-delay: 50ms }
+.domain-card:nth-child(4)  { animation-delay: 75ms }
+.domain-card:nth-child(5)  { animation-delay: 100ms }
+.domain-card:nth-child(6)  { animation-delay: 125ms }
+.domain-card:nth-child(7)  { animation-delay: 150ms }
+.domain-card:nth-child(8)  { animation-delay: 175ms }
+.domain-card:nth-child(n+9){ animation-delay: 200ms }
 
 @keyframes cardFadeIn {
-  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  from { opacity: 0; transform: translateY(8px) scale(0.985); }
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+/* ── Status variants ── */
+/*
+  ONE primary color signal per state:
+  — Available: teal 2px top border only. No teal wash in the bg.
+  — Premium:   yellow 2px top border only.
+  Hover lifts the card and brightens the border subtly — no glow.
+*/
 .card-available {
-  border-top: 2.5px solid var(--accent);
-  background: linear-gradient(158deg, rgba(0,229,200,0.035) 0%, var(--surface2) 40%, var(--surface) 100%);
+  border-top: 2px solid var(--accent);
 }
 .card-available:hover {
-  border-color: rgba(0,229,200,0.35);
+  border-color: var(--border-bright);
   border-top-color: var(--accent);
-  box-shadow: 0 12px 36px rgba(0,0,0,0.38), 0 0 0 1px rgba(0,229,200,0.1);
-  transform: translateY(-3px);
-}
-.card-premium {
-  border-top: 2.5px solid var(--yellow);
-  background: linear-gradient(158deg, rgba(245,166,35,0.04) 0%, var(--surface2) 40%, var(--surface) 100%);
-}
-.card-premium:hover {
-  border-color: rgba(245,166,35,0.3);
-  border-top-color: var(--yellow);
-  box-shadow: 0 12px 36px rgba(0,0,0,0.38), 0 0 0 1px rgba(245,166,35,0.1);
-  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  transform: translateY(-2px);
 }
 
+.card-premium {
+  border-top: 2px solid var(--yellow);
+}
+.card-premium:hover {
+  border-color: var(--border-bright);
+  border-top-color: var(--yellow);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  transform: translateY(-2px);
+}
+
+/* ── UNLOCKED state — intentional, restrained visual shift ── */
+/*
+  The single new signal when live data loads:
+  — A quiet teal inset on the left edge (accent line, not a glow)
+  — Border brightens one step (border-bright → border-hover)
+  — No background wash — the live strip and SEO pill carry the info signal
+*/
+.card-unlocked {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.card-unlocked:hover {
+  border-color: var(--accent) !important;
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 6px 20px rgba(0,0,0,0.3);
+  transform: translateY(-2px);
+}
+
+/* Live strip entrance */
+@keyframes liveStripIn {
+  from { opacity: 0; transform: translateY(-3px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes livePulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+
+/* ─────────────────────────────────────────
+   CARD HEADER — name + bookmark
+───────────────────────────────────────── */
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+/* Domain name — the hero element */
 .card-name {
   font-family: var(--font-display);
-  font-size: 1.25rem;
+  font-size: 1.3rem;
   font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.2;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-bottom: auto;
-  padding-bottom: var(--sp-4);
+  min-width: 0;
+  flex: 1;
+  padding-top: 0.05rem;
 }
 .card-keyword { color: var(--text); }
-.card-tld { color: var(--accent); }
+.card-tld {
+  /* Dimmer than keyword — TLD is subordinate info, not a highlight */
+  color: var(--text-muted);
+  font-size: 0.85em;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+/* Premium TLD matches yellow top border signal */
+.card-premium .card-tld { color: var(--yellow); opacity: 0.8; }
 
+/* ── Bookmark button — ghost until needed ── */
+/*
+  At rest: invisible. On card hover: barely visible ghost.
+  On bookmark hover: shows teal intent. When saved: teal fill matches the site accent.
+*/
+.card-bookmark {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.18s ease,
+    color 0.12s ease,
+    background 0.12s ease,
+    border-color 0.12s ease,
+    transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+}
+.domain-card:hover .card-bookmark { opacity: 0.4; }
+.card-bookmark:hover {
+  opacity: 1 !important;
+  color: var(--accent);
+  background: rgba(0,229,200,0.07);
+  border-color: rgba(0,229,200,0.2);
+  transform: scale(1.08);
+}
+/* Saved — snap to full vibrancy instantly, no opacity fade */
+.card-bookmark.saved {
+  opacity: 1 !important;
+  color: var(--accent);
+  background: rgba(0,229,200,0.12);
+  border-color: rgba(0,229,200,0.35);
+  transition:
+    color 0s,
+    background 0s,
+    border-color 0s,
+    transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+}
+.card-bookmark.saved:hover {
+  background: rgba(0,229,200,0.18);
+  border-color: rgba(0,229,200,0.5);
+  transform: scale(1.06);
+}
+.card-bookmark.bookmark-pop {
+  animation: bookmarkPop 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes bookmarkPop {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.45); }
+  65%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+/* ─────────────────────────────────────────
+   LIVE DATA STRIP (unlocked state only)
+───────────────────────────────────────── */
+/*
+  Single-line indicator: dot + "Live" label + price.
+  Uses text-muted palette — the inset left border on the card is the
+  color signal; the strip is informational, not decorative.
+*/
+.card-live-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.22rem 0;
+  margin-bottom: 0.35rem;
+  animation: liveStripIn 0.28s cubic-bezier(0.16,1,0.3,1) both;
+}
+.card-live-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  flex-shrink: 0;
+  animation: livePulse 2.4s ease-in-out infinite;
+}
+.card-live-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  flex: 1;
+}
+.card-live-price {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: -0.01em;
+}
+.card-live-per {
+  font-size: 0.65rem;
+  opacity: 0.55;
+}
+
+/* ─────────────────────────────────────────
+   BOTTOM ROW — price tier / seo | actions
+───────────────────────────────────────── */
 .card-bottom-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--sp-2);
+  gap: 0.4rem;
   margin-top: auto;
-  padding-top: var(--sp-2);
+  padding-top: 0.5rem;
   border-top: 1px solid var(--border);
 }
+
+/* Estimated price (locked state) */
+.card-est-price {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  line-height: 1;
+}
+.card-est-price strong {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* Dollar tier (locked state) — muted $$$$ indicator */
 .card-price-tier {
-  font-size: 0.9rem;
+  font-size: 0.82rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   line-height: 1;
   flex-shrink: 0;
 }
 
-.card-btns {
+/* SEO pill (unlocked state — replaces badge) */
+.card-seo-pill {
   display: flex;
   align-items: center;
-  gap: 0.35rem;
-  margin-left: auto;
+  gap: 0.28rem;
+  padding: 0.15rem 0.45rem 0.15rem 0.38rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(0,229,200,0.35);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  line-height: 1;
+  background: transparent;
 }
-.card-icon-btn {
-  width: 30px; height: 30px;
+.card-seo-num {
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.card-seo-word {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+/* SEO badge (locked state — no color, just border) */
+/*
+  Locked card already has one color signal (the top border).
+  The SEO badge is purely informational — neutral pill, no colored border.
+*/
+.card-seo-badge {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 6px;
   border: 1px solid var(--border-bright);
-  background: var(--surface3);
   color: var(--text-dim);
-  cursor: pointer;
-  font-size: 0.82rem;
-  transition: border-color 0.15s, color 0.15s, background 0.15s, box-shadow 0.15s;
+  background: transparent;
+  cursor: default;
   flex-shrink: 0;
+  transition: color 0.5s ease, border-color 0.5s ease, background 0.5s ease;
   line-height: 1;
 }
-.card-icon-btn:hover {
-  border-color: rgba(0,229,200,0.35);
-  color: var(--text);
-  background: rgba(0,229,200,0.06);
-}
-.card-icon-btn.saved {
-  color: var(--yellow);
-  border-color: rgba(245,166,35,0.38);
-  background: rgba(245,166,35,0.06);
-}
-.card-icon-btn.saved:hover {
-  background: rgba(245,166,35,0.12);
-  border-color: rgba(245,166,35,0.5);
-}
-.card-seo-btn {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 700;
-  cursor: default;
-  letter-spacing: -0.02em;
-}
-.card-seo-btn:hover { transform: none; background: var(--surface3); border-color: var(--border-bright); color: inherit; }
-
-.card-register { font-size: 0.9rem; font-weight: 700; }
-.card-register:hover {
-  background: rgba(0,229,200,0.1);
-  border-color: rgba(0,229,200,0.45);
+.card-seo-badge.unlocked {
   color: var(--accent);
-  box-shadow: 0 0 10px rgba(0,229,200,0.12);
+  border-color: rgba(0,229,200,0.35);
+  background: rgba(0,229,200,0.08);
+}
+
+/* ─────────────────────────────────────────
+   ACTION BUTTONS — detail + lock
+───────────────────────────────────────── */
+/*
+  These mirror the row-action-btn style from DomainRow — same surface,
+  same border, same text color, same hover. The lock button gets a teal
+  accent ONLY when it transitions to unlocked (confirming the action).
+*/
+.card-btns {
+  display: flex;
+  align-items: center;
+  gap: 0.28rem;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.card-btn-detail,
+.card-btn-lock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-bright);
+  background: var(--surface2);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    color 0.12s ease,
+    background 0.12s ease,
+    transform 0.12s cubic-bezier(0.34,1.56,0.64,1);
+  flex-shrink: 0;
+}
+
+/* Detail hover — matches row-action-btn hover (neutral, no glow) */
+.card-btn-detail:hover {
+  color: var(--text);
+  border-color: var(--border-hover);
+  background: var(--surface3);
+}
+
+/* Lock hover — neutral until unlocked */
+.card-btn-lock:hover {
+  color: var(--text);
+  border-color: var(--border-hover);
+  background: var(--surface3);
+}
+
+/* Lock animating — single moment of teal as feedback */
+.card-btn-lock.lock-unlocking {
+  animation: lockOpen 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  pointer-events: none;
+  border-color: rgba(0,229,200,0.3);
+  color: var(--accent);
+}
+
+/* Lock settled — teal icon confirms the data is live */
+.card-btn-lock.lock-unlocked {
+  color: var(--accent);
+  border-color: rgba(0,229,200,0.28);
+  background: var(--surface2);
+  cursor: default;
+}
+.card-btn-lock.lock-unlocked:hover {
+  transform: none;
+  color: var(--accent);
+  border-color: rgba(0,229,200,0.28);
+  background: var(--surface2);
+}
+
+@keyframes lockOpen {
+  0%   { transform: scale(1)    translateY(0); }
+  25%  { transform: scale(1.28) translateY(-4px); }
+  60%  { transform: scale(1.12) translateY(-2px); }
+  100% { transform: scale(1)    translateY(0); }
+}
+@keyframes lockPop {
+  0%   { transform: scale(1)    rotate(0deg); }
+  18%  { transform: scale(1.32) rotate(-14deg); }
+  48%  { transform: scale(1.18) rotate(7deg); }
+  72%  { transform: scale(1.06) rotate(-2deg); }
+  100% { transform: scale(1)    rotate(0deg); }
 }
 
 /* Ghost card skeleton */
 .ghost-card {
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  height: 130px;
+  height: 128px;
   animation: shimmer 1.6s ease-in-out infinite;
-  background: linear-gradient(90deg, var(--surface) 0%, var(--surface2) 40%, var(--surface3) 50%, var(--surface2) 60%, var(--surface) 100%);
+  background: linear-gradient(90deg,
+    var(--surface) 0%,
+    var(--surface2) 40%,
+    var(--surface3) 50%,
+    var(--surface2) 60%,
+    var(--surface) 100%
+  );
   background-size: 200% 100%;
   background-position: 100% 0;
 }
@@ -1628,7 +1986,7 @@ body::before {
   min-width: 0;
 }
 .domain-label.taken-label { color: var(--text-dim); text-decoration: line-through; text-decoration-color: var(--border-hover); }
-.domain-tld-muted { color: var(--accent); }
+.domain-tld-muted { color: var(--text-muted); }
 
 .data-tier-badge {
   font-family: var(--font-mono);
@@ -1651,7 +2009,7 @@ body::before {
   flex-shrink: 0;
   margin-left: 0.75rem;
 }
-.row-starting-price strong { color: var(--accent); font-weight: 600; }
+.row-starting-price strong { color: var(--text-muted); font-weight: 600; }
 
 .row-actions {
   display: flex;
@@ -1684,13 +2042,13 @@ body::before {
   background: var(--surface3);
 }
 .row-details-btn {
-  color: var(--text-dim);
-  background: transparent;
+  color: var(--text-muted);
+  background: var(--surface2);
 }
 .row-details-btn:hover {
-  color: var(--accent);
-  border-color: rgba(0,229,200,0.3);
-  background: rgba(0,229,200,0.05);
+  color: var(--text);
+  border-color: var(--border-hover);
+  background: var(--surface3);
 }
 
 /* Score rings */
@@ -1734,6 +2092,33 @@ body::before {
 }
 .save-btn:hover, .save-btn.saved { color: var(--yellow); }
 
+/* Row star save button (used in DomainRow) */
+.card-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-bright);
+  background: var(--surface2);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 0.82rem;
+  transition: all 0.12s;
+  flex-shrink: 0;
+}
+.card-icon-btn:hover {
+  color: var(--yellow);
+  border-color: rgba(245,166,35,0.35);
+  background: rgba(245,166,35,0.06);
+}
+.card-icon-btn.saved {
+  color: var(--yellow);
+  border-color: rgba(245,166,35,0.35);
+  background: rgba(245,166,35,0.08);
+}
+
 .lock-btn {
   display: flex;
   align-items: center;
@@ -1776,10 +2161,10 @@ body::before {
   transition: all 0.15s;
   flex-shrink: 0;
 }
-.row-btn.continue { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
-.row-btn.continue:hover { background: rgba(34,197,94,0.25); }
+.row-btn.continue { background: rgba(16,217,138,0.1); color: var(--green); border: 1px solid rgba(16,217,138,0.25); }
+.row-btn.continue:hover { background: rgba(16,217,138,0.18); }
 .row-btn.lookup { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border-bright); }
-.row-btn.lookup:hover { color: var(--text); border-color: #555; }
+.row-btn.lookup:hover { color: var(--text); border-color: var(--border-hover); background: var(--surface3); }
 .row-btn.offer { background: rgba(75,142,240,0.12); color: var(--blue); border: 1px solid rgba(75,142,240,0.3); }
 .row-btn.offer:hover { background: rgba(75,142,240,0.2); }
 
@@ -1826,7 +2211,7 @@ body::before {
   font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--text);
   margin-bottom: 0.5rem;
 }
 
@@ -1973,9 +2358,9 @@ body::before {
   width: 100%;
   font-size: 0.78rem;
   font-weight: 600;
-  color: var(--red);
-  background: rgba(240,80,96,0.06);
-  border: 1px solid rgba(240,80,96,0.22);
+  color: var(--text-muted);
+  background: var(--surface2);
+  border: 1px solid var(--border-bright);
   border-radius: var(--radius-sm);
   padding: 0.45rem 0.75rem;
   cursor: pointer;
@@ -1983,8 +2368,9 @@ body::before {
 }
 
 .adv-clear-btn:hover {
-  background: rgba(240,80,96,0.12);
+  color: var(--red);
   border-color: rgba(240,80,96,0.35);
+  background: rgba(240,80,96,0.06);
 }
 
 .adv-sidebar-title {
@@ -2204,6 +2590,30 @@ body::before {
 }
 .modal-close-btn:hover { border-color: var(--border-hover); color: var(--text); background: var(--surface2); }
 
+.modal-nav-btn {
+  width: 34px; height: 34px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-bright);
+  background: var(--surface3);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.12s;
+}
+.modal-nav-btn:hover:not(:disabled) {
+  border-color: var(--border-hover);
+  color: var(--text);
+  background: var(--surface2);
+}
+.modal-nav-btn:disabled { opacity: 0.25; cursor: default; }
+.modal-position {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-dim);
+  letter-spacing: 0.02em;
+  padding: 0 0.15rem;
+}
+
 /* Status row */
 .modal-status-row { padding-bottom: 0.5rem !important; }
 .modal-status-badge {
@@ -2322,7 +2732,7 @@ body::before {
   transform: translateY(-1px);
 }
 .modal-registrar-row:first-child {
-  border-color: rgba(16,217,138,0.22);
+  border-color: rgba(0,229,200,0.22);
 }
 .modal-reg-badge {
   width: 34px; height: 34px;
@@ -2347,9 +2757,9 @@ body::before {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  background: rgba(16,217,138,0.12);
-  color: var(--green);
-  border: 1px solid rgba(16,217,138,0.25);
+  background: rgba(0,229,200,0.08);
+  color: var(--accent);
+  border: 1px solid rgba(0,229,200,0.22);
   border-radius: var(--radius-pill);
   padding: 0.2rem 0.55rem;
 }
@@ -2364,7 +2774,7 @@ body::before {
   font-family: var(--font-mono);
   font-size: 1rem;
   font-weight: 700;
-  color: var(--green);
+  color: var(--text);
 }
 .modal-reg-per { font-size: 0.72rem; font-weight: 500; color: var(--text-dim); }
 
@@ -2392,7 +2802,7 @@ body::before {
 
 /* Footer */
 .modal-footer {
-  padding: 0.9rem 1.5rem;
+  padding: var(--sp-4) var(--sp-6);
   border-top: 1px solid var(--border);
   display: flex;
   flex-direction: column;
@@ -2503,6 +2913,11 @@ body::before {
   padding: 0.12rem 0.48rem;
   line-height: 1.5;
 }
+.saved-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
 .saved-close-btn {
   width: 34px; height: 34px;
   border-radius: var(--radius-sm);
@@ -2589,7 +3004,7 @@ body::before {
   font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 600;
-  color: var(--green);
+  color: var(--text-muted);
   white-space: nowrap;
 }
 .saved-item-btn {
@@ -2647,6 +3062,20 @@ body::before {
   letter-spacing: 0.01em;
 }
 .saved-clear-btn {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface2);
+  border: 1px solid var(--border-bright);
+  border-radius: var(--radius-sm);
+  padding: 0.28rem 0.65rem;
+  cursor: pointer;
+  transition: color 0.12s, border-color 0.12s;
+}
+.saved-clear-btn:hover { color: var(--red); border-color: rgba(239,68,68,0.35); }
+
+/* legacy override — remove old styles */
+.saved-panel-footer .saved-clear-btn-old {
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--text-dim);
@@ -2731,20 +3160,74 @@ body::before {
   .quick-filters::-webkit-scrollbar { display: none; }
   .qf-pill { flex-shrink: 0; font-size: 0.76rem; padding: 0.38rem 0.8rem; min-height: 34px; }
 
-  /* 7 ── Cards — single column, horizontal row layout ── */
-  .cards-grid { grid-template-columns: 1fr; gap: 0.45rem; width: 100%; }
-  .domain-card { padding: 0.8rem 0.95rem; min-height: unset; flex-direction: row; align-items: center; border-radius: var(--radius-card); }
+  /* 7 ── Cards — single column, horizontal strip layout ── */
+  .cards-grid { grid-template-columns: 1fr; gap: 0.4rem; width: 100%; }
+
+  /* Mobile: horizontal strip — name on left, actions on right */
+  .domain-card {
+    padding: 0.65rem 0.85rem;
+    min-height: unset;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-card);
+  }
   /* Swap top accent → left accent bar for horizontal layout */
-  .card-available { border-top: 1px solid var(--border); border-left: 2.5px solid var(--accent); background: var(--surface2); }
-  .card-premium   { border-top: 1px solid var(--border); border-left: 2.5px solid var(--yellow); background: var(--surface2); }
-  .card-available:hover, .card-premium:hover { transform: none; box-shadow: none; }
-  .card-name { flex: 1; min-width: 0; margin-bottom: 0; padding-bottom: 0; overflow: hidden; }
-  .card-bottom-row { width: auto; margin-top: 0; padding-top: 0; border-top: none; margin-left: 0.6rem; flex-shrink: 0; }
-  .card-keyword { font-size: 0.9rem; font-weight: 700; }
-  .card-tld { font-size: 0.75rem; }
+  .card-available {
+    border-top: 1px solid var(--border);
+    border-left: 2.5px solid var(--accent);
+  }
+  .card-premium {
+    border-top: 1px solid var(--border);
+    border-left: 2.5px solid var(--yellow);
+  }
+  /* Unlocked: full outline on mobile too */
+  .card-unlocked {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 1px var(--accent) !important;
+  }
+  .card-available:hover,
+  .card-premium:hover,
+  .card-unlocked:hover { transform: none; box-shadow: none !important; }
+
+  /* Header fills horizontal space */
+  .card-header { flex: 1; min-width: 0; padding-bottom: 0; align-items: center; }
+  .card-name { font-size: 0.98rem; }
+  .card-keyword { font-size: inherit; font-weight: 700; }
+  .card-tld { font-size: 0.8em; }
+
+  /* Live strip collapses to dot + price only on mobile */
+  .card-live-strip {
+    flex-shrink: 0;
+    padding: 0;
+    margin: 0;
+    order: 2;
+    gap: 0.25rem;
+  }
+  .card-live-label { display: none; }
+  .card-live-price { font-size: 0.7rem; }
+
+  /* Bottom row → right-side action cluster */
+  .card-bottom-row {
+    width: auto;
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+    flex-shrink: 0;
+    gap: 0.22rem;
+  }
   .card-price-tier { display: none; }
-  .card-icon-btn { width: 34px; height: 34px; font-size: 0.78rem; }
-  .ghost-card { height: 52px; border-radius: var(--radius-card); }
+  .card-seo-badge { display: none; }
+
+  /* Larger touch targets on mobile — 40px */
+  .card-btn-detail,
+  .card-btn-lock { width: 40px; height: 40px; border-radius: 9px; }
+
+  /* Bookmark — always slightly visible on mobile (no hover state available) */
+  .card-bookmark { opacity: 0.3; width: 30px; height: 30px; }
+  .card-bookmark.saved { opacity: 1; }
+
+  .ghost-card { height: 56px; border-radius: var(--radius-card); }
 
   /* 8 ── DNS note footer ── */
   .dns-note { align-items: flex-start; flex-wrap: wrap; font-size: 0.7rem; gap: 0.25rem; }
@@ -2884,6 +3367,7 @@ body::before {
   .score-ring svg { width: 30px !important; height: 30px !important; }
   .score-ring-num { font-size: 0.6rem !important; }
   .row-action-btn { font-size: 0.73rem; padding: 0.3rem 0.6rem; min-height: 30px; }
+  .card-icon-btn { width: 34px; height: 34px; }
   .row-details-btn { margin-left: auto; }
 
   /* 11 ── Domain modal — bottom sheet ── */

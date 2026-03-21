@@ -62,7 +62,7 @@ function generateDomains(kw, seed) {
   return domains
 }
 
-const TARGET = 24
+const TARGET = 30
 
 const STATUS_DOT = {
   available:   'var(--green)',
@@ -74,7 +74,7 @@ const STATUS_DOT = {
 }
 
 export function OtherIdeasView({ keyword }) {
-  const [results,    setResults]    = useState({})
+  const [available,  setAvailable]  = useState([])
   const [loading,    setLoading]    = useState(true)
   const [refreshKey, setRefreshKey] = useState(1)
   const [copied,     copy]          = useCopyToClipboard()
@@ -84,18 +84,45 @@ export function OtherIdeasView({ keyword }) {
   const run = useCallback(async (kw, key) => {
     currentKw.current  = kw
     currentKey.current = key
-    const domains = generateDomains(kw, key * 999983)
-    setResults({})
+    setAvailable([])
     setLoading(true)
 
-    // Enforce a minimum 800ms so ghost rows never flash and disappear
-    const [fresh] = await Promise.all([
-      fetchBatch(domains).catch(() => ({})),
-      new Promise(r => setTimeout(r, 800)),
-    ])
+    const found   = []   // accumulates available domains across batches
+    const seenDomains = new Set()
+    let   seedOffset  = 0
+    const MAX_BATCHES = 8  // safety cap — stops after 8 × ~100 candidates
 
+    // Enforce a minimum 800ms so ghost rows never flash
+    const minWait = new Promise(r => setTimeout(r, 800))
+
+    while (found.length < TARGET && seedOffset < MAX_BATCHES) {
+      if (currentKw.current !== kw || currentKey.current !== key) return
+
+      const candidates = generateDomains(kw, (key + seedOffset) * 999983)
+        .filter(d => !seenDomains.has(d))
+      candidates.forEach(d => seenDomains.add(d))
+
+      if (candidates.length === 0) break   // exhausted all unique combinations
+
+      const batch = await fetchBatch(candidates).catch(() => ({}))
+
+      if (currentKw.current !== kw || currentKey.current !== key) return
+
+      Object.entries(batch).forEach(([domain, r]) => {
+        if (found.length < TARGET && (r.status === 'available' || r.status === 'premium')) {
+          found.push({ domain, ...r })
+        }
+      })
+
+      seedOffset++
+    }
+
+    await minWait
     if (currentKw.current !== kw || currentKey.current !== key) return
-    setResults(fresh)
+    // Always trim to a multiple of 3 so the grid has full, symmetric rows
+    const COLS = 3
+    const symmetric = found.slice(0, Math.floor(found.length / COLS) * COLS)
+    setAvailable(symmetric)
     setLoading(false)
   }, [])
 
@@ -110,11 +137,7 @@ export function OtherIdeasView({ keyword }) {
 
   if (!keyword) return null
 
-  const available = Object.entries(results)
-    .filter(([, r]) => r.status === 'available' || r.status === 'premium')
-    .map(([domain, r]) => ({ domain, ...r }))
-    .slice(0, TARGET)
-
+  // TARGET is always a multiple of 3 (30), so cols are always equal-length
   const cols = [[], [], []]
   available.forEach((item, i) => { cols[i % 3].push(item) })
 
@@ -134,7 +157,7 @@ export function OtherIdeasView({ keyword }) {
           {!loading && available.length > 0 && (
             <button
               className="ideas-copy-btn"
-              onClick={() => copy(available.map(d => d.domain).join('\n'))}
+              onClick={() => copy(available.map(d => d.domain).join(', '))}
               title="Copy all domains to clipboard"
             >
               {copied ? <CheckIcon /> : <CopyIcon />}
@@ -158,7 +181,7 @@ export function OtherIdeasView({ keyword }) {
         <div className="ideas-grid">
           {[0, 1, 2].map(ci => (
             <div key={ci} className="ideas-col">
-              {Array.from({ length: 8 }).map((_, i) => (
+              {Array.from({ length: TARGET / 3 }).map((_, i) => (
                 <div key={i} className="ideas-row ideas-ghost-row">
                   <span className="ideas-ghost-dot" />
                   <span className="ideas-ghost-text" style={{ width: `${55 + ((ci * 7 + i * 13) % 30)}%` }} />
@@ -171,7 +194,7 @@ export function OtherIdeasView({ keyword }) {
       )}
 
       {!loading && available.length === 0 && (
-        <div className="tab-empty">Couldn't find 24 available ideas — try refreshing for a different set.</div>
+        <div className="tab-empty">Couldn't find enough available ideas — try refreshing for a different set.</div>
       )}
 
       {!loading && available.length > 0 && (

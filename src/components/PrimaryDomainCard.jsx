@@ -92,7 +92,7 @@ export function PrimaryDomainCard({ domain, result, livePrices, onLiveCheck }) {
           {status === 'taken' && (
             <button
               className="action-btn"
-              onClick={() => window.open(`https://lookup.icann.org/en/lookup?name=${domain}`, '_blank')}
+              onClick={() => window.open(`https://who.is/whois/${domain}`, '_blank')}
             >
               WHOIS lookup →
             </button>

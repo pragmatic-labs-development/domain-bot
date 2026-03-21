@@ -45,7 +45,7 @@ export function SearchBar({ value, onChange, onSearch, loading, variant = 'hero'
                 <span className="nav-status-text taken">✗ Taken</span>
                 <a
                   className="nav-status-link"
-                  href={`https://lookup.icann.org/en/lookup?name=${primaryDomain}`}
+                  href={`https://who.is/whois/${primaryDomain}`}
                   target="_blank"
                   rel="noreferrer"
                 >

@@ -3,9 +3,16 @@
  * Card used in the Basic tab for available/premium domains.
  */
 
+import { useState, useEffect } from 'react'
 import { getLowestPrice, seoScore, scoreColor, getRegistrarPrices } from '../lib/pricing'
 
-export function DomainCard({ domain, result, livePrices = {}, saved, onSave, onDetail }) {
+export function DomainCard({ domain, result, livePrices = {}, saved, onSave, onDetail, onLiveCheck }) {
+  const [lockState,  setLockState]  = useState('locked') // 'locked' | 'unlocking' | 'unlocked'
+  const [isSaved,    setIsSaved]    = useState(saved)
+  const [bookmarkAnim, setBookmarkAnim] = useState(false)
+
+  // Stay in sync if parent removes the save (e.g. from Saved panel)
+  useEffect(() => { setIsSaved(saved) }, [saved])
   const { status } = result
   const [name, ...tldParts] = domain.split('.')
   const tld = '.' + tldParts.join('.')
@@ -21,52 +28,143 @@ export function DomainCard({ domain, result, livePrices = {}, saved, onSave, onD
   else if (price <= 40)  dollarTier = 3
   else if (price < 9999) dollarTier = 4
 
-  const isPremium = status === 'premium'
+  const isPremium  = status === 'premium'
+  const isUnlocked = lockState === 'unlocked'
+
+  // SEO quality label for unlocked state
+  const seoLabel = seo >= 80 ? 'Strong' : seo >= 60 ? 'Good' : seo >= 40 ? 'Fair' : 'Weak'
+
+  function handleSave() {
+    const next = !isSaved
+    setIsSaved(next)           // instant — no round-trip lag
+    if (next) {
+      setBookmarkAnim(true)
+      setTimeout(() => setBookmarkAnim(false), 400)
+    }
+    onSave(domain)             // sync parent in background
+  }
 
   return (
-    <div className={`domain-card ${isPremium ? 'card-premium' : 'card-available'}`}>
-      <div className="card-name">
-        <span className="card-keyword">{name}</span>
-        <span className="card-tld">{tld}</span>
+    <div
+      className={[
+        'domain-card',
+        isPremium ? 'card-premium' : 'card-available',
+        isUnlocked ? 'card-unlocked' : '',
+      ].filter(Boolean).join(' ')}
+      onClick={handleSave}
+      style={{ cursor: 'pointer' }}
+    >
+
+      {/* ── Top row: domain name + bookmark pill ── */}
+      <div className="card-header">
+        <div className="card-name">
+          <span className="card-keyword">{name}</span>
+          <span className="card-tld">{tld}</span>
+        </div>
+
+        {/* Lightweight bookmark — barely visible until hover/saved */}
+        <button
+          className={`card-bookmark ${isSaved ? 'saved' : ''} ${bookmarkAnim ? 'bookmark-pop' : ''}`}
+          onClick={e => { e.stopPropagation(); handleSave() }}
+          title={isSaved ? 'Remove from saved' : 'Save domain'}
+          aria-label={isSaved ? 'Remove from saved' : 'Save domain'}
+        >
+          <BookmarkIcon filled={isSaved} />
+        </button>
       </div>
 
-      {/* Single bottom row: price tier | spacer | [seo] [save] [detail] */}
+      {/* ── Live-data strip (only visible when unlocked) ── */}
+      {isUnlocked && (
+        <div className="card-live-strip">
+          <span className="card-live-dot" />
+          <span className="card-live-label">Live data</span>
+        </div>
+      )}
+
+      {/* ── Bottom row: price tier | SEO | detail | live-check ── */}
       <div className="card-bottom-row">
-        {dollarTier > 0 && (
-          <span className="card-price-tier" title={`~$${price.toFixed(2)}/yr`}>
-            {[1, 2, 3, 4].map(i => (
-              <span key={i} style={{
-                color:   i <= dollarTier ? 'var(--accent)' : 'var(--text-dim)',
-                opacity: i <= dollarTier ? 1 : 0.25,
-              }}>$</span>
-            ))}
+        {/* Estimated price — shown after live check */}
+        {isUnlocked && price < 9999 && (
+          <span className="card-est-price" title="Estimated price from historical registrar data">
+            Starting at <strong>${price.toFixed(2)}</strong>
           </span>
         )}
 
+
         <div className="card-btns">
+          {/* SEO badge — neutral when locked, teal when unlocked */}
           <div
-            className="card-icon-btn card-seo-btn"
-            style={{ color: seoClr, borderColor: `${seoClr}44` }}
+            className={`card-seo-badge ${isUnlocked ? 'unlocked' : ''}`}
             title={`SEO Score: ${seo}/99`}
           >
             {seo}
           </div>
+
+          {/* Detail / info — full 44px touch target */}
           <button
-            className={`card-icon-btn ${saved ? 'saved' : ''}`}
-            onClick={e => { e.stopPropagation(); onSave(domain) }}
-            title={saved ? 'Saved!' : 'Save domain'}
-          >
-            {saved ? '★' : '☆'}
-          </button>
-          <button
-            className="card-icon-btn card-register"
-            onClick={() => onDetail?.(domain)}
+            className="card-btn-detail"
+            onClick={e => { e.stopPropagation(); onDetail?.(domain) }}
             title="View details"
+            aria-label="View domain details"
           >
-            →
+            <InfoIcon />
+          </button>
+
+          {/* Live-check / lock */}
+          <button
+            className={`card-btn-lock lock-${lockState}`}
+            onClick={e => {
+              e.stopPropagation()
+              if (lockState !== 'locked') return
+              setLockState('unlocking')
+              setTimeout(() => setLockState('unlocked'), 500)
+            }}
+            disabled={lockState !== 'locked'}
+            title={lockState === 'unlocked' ? 'Live data loaded' : 'Live check — fetch real-time pricing'}
+            aria-label={lockState === 'unlocked' ? 'Live data loaded' : 'Run live price check'}
+          >
+            {lockState === 'locked' ? <LockIcon /> : <LockOpenIcon />}
           </button>
         </div>
       </div>
     </div>
+  )
+}
+
+/* ── Icons ── */
+
+function BookmarkIcon({ filled }) {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+    </svg>
+  )
+}
+
+function InfoIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <line x1="12" y1="16" x2="12" y2="12"/>
+      <line x1="12" y1="8" x2="12.01" y2="8"/>
+    </svg>
+  )
+}
+
+function LockIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+  )
+}
+
+function LockOpenIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2"/>
+      <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+    </svg>
   )
 }
