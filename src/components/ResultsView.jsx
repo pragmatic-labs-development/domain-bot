@@ -7,6 +7,7 @@ import { useState, useMemo, useEffect } from 'react'
 import { DomainCard }        from './DomainCard'
 import { DomainRow }         from './DomainRow'
 import { DomainModal }       from './DomainModal'
+import { DomainsView }       from './DomainsView'
 import { getLowestPrice, seoScore } from '../lib/pricing'
 // import { botScore } from '../lib/pricing'  // Bot score hidden for now
 
@@ -238,9 +239,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
 
       {/* Domains panel */}
       {mainTab === 'domains' && (
-        <div className="placeholder-panel">
-          <p>Domains view coming soon.</p>
-        </div>
+        <DomainsView keyword={keyword} results={results} />
       )}
 
       {/* Other Ideas panel */}
