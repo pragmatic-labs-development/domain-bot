@@ -70,9 +70,9 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
   const [unlockedDomains, setUnlockedDomains] = useState(new Set())
   const [visibleCount, setVisibleCount] = useState(30)
 
-  function handleLiveCheck(domain) {
+  const handleLiveCheck = useCallback((domain) => {
     setUnlockedDomains(prev => new Set([...prev, domain]))
-  }
+  }, [])
 
   // Reset pagination whenever filter or sort changes
   useEffect(() => { setVisibleCount(30) }, [quickFilter, sortId])
@@ -429,6 +429,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
             saved={saved.includes(detailDomain)}
             isUnlocked={unlockedDomains.has(detailDomain)}
             onSave={toggleSave}
+            onLiveCheck={handleLiveCheck}
             onClose={() => setDetailDomain(null)}
             onPrev={detailIdx > 0 ? () => setDetailDomain(detailList[detailIdx - 1]) : null}
             onNext={detailIdx < detailList.length - 1 ? () => setDetailDomain(detailList[detailIdx + 1]) : null}

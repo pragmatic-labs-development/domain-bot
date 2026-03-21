@@ -83,7 +83,7 @@ const REGISTRAR_STYLES = {
 }
 
 /* ── Main component ── */
-export function DomainModal({ domain, result, livePrices = {}, saved, isUnlocked, onSave, onClose, onPrev, onNext, position }) {
+export function DomainModal({ domain, result, livePrices = {}, saved, isUnlocked, onSave, onLiveCheck, onClose, onPrev, onNext, position }) {
   const status = result?.status ?? 'unknown'
 
   useEffect(() => {
@@ -143,6 +143,17 @@ export function DomainModal({ domain, result, livePrices = {}, saved, isUnlocked
               <span className="modal-tld">{tld}</span>
             </div>
             <div className="modal-name-actions">
+              {(isAvailable || isPremium) && onLiveCheck && (
+                <button
+                  className={`modal-lock-btn ${isUnlocked ? 'unlocked' : ''}`}
+                  onClick={() => !isUnlocked && onLiveCheck(domain)}
+                  title={isUnlocked ? 'Live data loaded' : 'Unlock pricing'}
+                  aria-label={isUnlocked ? 'Live data loaded' : 'Unlock pricing'}
+                  disabled={isUnlocked}
+                >
+                  {isUnlocked ? <LockOpenIcon /> : <LockIcon />}
+                </button>
+              )}
               <button
                 className={`modal-save-btn ${saved ? 'saved' : ''}`}
                 onClick={() => onSave(domain)}
@@ -222,8 +233,8 @@ export function DomainModal({ domain, result, livePrices = {}, saved, isUnlocked
           </div>
         </div>
 
-        {/* Registrar pricing */}
-        {(isAvailable || isPremium) && registrars.length > 0 && (
+        {/* Registrar pricing — only after unlocking */}
+        {(isAvailable || isPremium) && isUnlocked && registrars.length > 0 && (
           <div className="modal-section">
             <div className="modal-section-label">REGISTER AT A REGISTRAR</div>
             <div className="modal-registrar-list">
@@ -287,6 +298,22 @@ export function DomainModal({ domain, result, livePrices = {}, saved, isUnlocked
   )
 }
 
+function LockIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2"/>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+    </svg>
+  )
+}
+function LockOpenIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="11" width="18" height="11" rx="2"/>
+      <path d="M7 11V7a5 5 0 0 1 9.9-1"/>
+    </svg>
+  )
+}
 function BookmarkIcon({ filled }) {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

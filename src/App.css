@@ -1910,6 +1910,19 @@ body::before {
   background: var(--surface3);
 }
 
+/* Unlocked state — all three icons go teal together */
+.card-unlocked .card-btn-detail {
+  color: var(--accent);
+  border-color: rgba(0,229,200,0.28);
+  background: var(--surface2);
+  transition: color 0.5s ease, border-color 0.5s ease;
+}
+.card-unlocked .card-btn-detail:hover {
+  color: var(--accent);
+  border-color: rgba(0,229,200,0.45);
+  background: var(--surface3);
+}
+
 /* Lock hover — neutral until unlocked */
 .card-btn-lock:hover {
   color: var(--text);
@@ -2666,6 +2679,29 @@ body::before {
   gap: 0.45rem;
   flex-shrink: 0;
 }
+.modal-lock-btn {
+  width: 34px; height: 34px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-bright);
+  background: var(--surface3);
+  color: var(--text-dim);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.modal-lock-btn:hover:not(:disabled) {
+  border-color: rgba(0,229,200,0.4);
+  color: var(--accent);
+  background: rgba(0,229,200,0.06);
+}
+.modal-lock-btn.unlocked {
+  color: var(--accent);
+  border-color: rgba(0,229,200,0.35);
+  background: rgba(0,229,200,0.07);
+  cursor: default;
+}
+.modal-lock-btn:focus:not(:focus-visible) { outline: none; box-shadow: none; }
+
 .modal-save-btn {
   width: 34px; height: 34px;
   border-radius: var(--radius-sm);
@@ -2707,6 +2743,9 @@ body::before {
   background: var(--surface2);
 }
 .modal-nav-btn:disabled { opacity: 0.25; cursor: default; }
+.modal-nav-btn:focus:not(:focus-visible),
+.modal-save-btn:focus:not(:focus-visible),
+.modal-close-btn:focus:not(:focus-visible) { outline: none; box-shadow: none; }
 .modal-position {
   font-family: var(--font-mono);
   font-size: 0.68rem;
@@ -3563,10 +3602,11 @@ body::before {
   .modal-title { font-size: 1.45rem; }
   .modal-name-actions { gap: 0.3rem; padding-top: 0.15rem; }
   /* Row 2: status badge left, nav arrows right */
-  .modal-meta-row { flex-wrap: wrap; gap: 0.4rem; }
+  .modal-meta-row { flex-wrap: nowrap; gap: 0.4rem; }
   .modal-nav-cluster { gap: 0.25rem; }
   .modal-position { font-size: 0.65rem; padding: 0 0.2rem; }
   .modal-nav-btn { width: 38px; height: 38px; }
+  .modal-lock-btn,
   .modal-save-btn,
   .modal-close-btn { width: 38px; height: 38px; }
   /* Sections */
