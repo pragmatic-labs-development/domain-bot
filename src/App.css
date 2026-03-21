@@ -3145,16 +3145,42 @@ body::before {
   .register-caret { min-height: 48px; padding: 0 1rem; border-radius: 0 10px 10px 0; }
   .primary-footer { font-size: 0.72rem; padding-top: 0.6rem; }
 
-  /* 5 ── Tab bar ── */
-  .main-tab-bar { margin-bottom: 0.85rem; }
-  .main-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  /* 5 ── Tab bar — tabs take full width, Sort wraps to own row ── */
+  .main-tab-bar {
+    flex-wrap: wrap;
+    gap: 0;
+    margin-bottom: 0.6rem;
+    align-items: center;
+  }
+  .main-tabs {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
   .main-tabs::-webkit-scrollbar { display: none; }
   .main-tab { padding: 0.75rem 0.9rem; font-size: 0.82rem; white-space: nowrap; }
   .tab-checking-hint { display: none; }
   .tab-bar-legend { display: none; }
+  /* Sort sits on its own row below the tabs, left-aligned like a pill */
+  .sort-wrap { padding: 0.5rem 0 0.6rem; width: 100%; }
+  .sort-btn {
+    font-size: 0.76rem;
+    padding: 0.38rem 0.75rem;
+    border-radius: var(--radius-pill);
+    gap: 0.3rem;
+  }
   .sort-label { display: none; }
 
-  /* 6 ── Quick filter pills — horizontal scroll ── */
+  /* 6 ── Quick filter pills + Copy on separate row ── */
+  /* Stack: filters scroll row on top, Copy button below right-aligned */
+  .basic-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+  .copy-all-wrap { align-self: flex-end; }
   .quick-filters {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -3162,7 +3188,7 @@ body::before {
     scrollbar-width: none;
     -ms-overflow-style: none;
     gap: 0.4rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
     padding-bottom: 0.1rem;
   }
   .quick-filters::-webkit-scrollbar { display: none; }
@@ -3425,15 +3451,14 @@ body::before {
     from { transform: translateY(50px); opacity: 0; }
     to   { transform: translateY(0);    opacity: 1; }
   }
-  /* Header — two-row layout: domain name top, actions bottom */
-  .modal-header { padding: 0.6rem 1rem 0.5rem; flex-wrap: wrap; gap: 0.35rem 0; }
-  .modal-title { font-size: 1.5rem; width: 100%; line-height: 1.1; }
-  .modal-header-actions { width: 100%; justify-content: flex-end; gap: 0.3rem; }
-  /* Position counter takes space without helping — hide on mobile */
+  /* Header — single row: domain name truncates, buttons compact on right */
+  .modal-header { padding: 0.75rem 1rem 0.5rem; flex-wrap: nowrap; gap: 0.5rem; align-items: center; }
+  .modal-title { font-size: 1.15rem; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .modal-header-actions { flex-shrink: 0; gap: 0.25rem; }
   .modal-position { display: none; }
-  .modal-nav-btn { width: 40px; height: 40px; }
+  .modal-nav-btn { width: 36px; height: 36px; }
   .modal-save-btn,
-  .modal-close-btn { width: 40px; height: 40px; }
+  .modal-close-btn { width: 36px; height: 36px; }
   /* Sections */
   .modal-section { padding: 0.65rem 1rem; }
   .modal-section-label { font-size: 0.6rem; letter-spacing: 0.1em; margin-bottom: 0.5rem; }
