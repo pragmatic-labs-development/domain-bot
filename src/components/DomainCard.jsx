@@ -6,13 +6,17 @@
 import { useState, useEffect } from 'react'
 import { getLowestPrice, seoScore, scoreColor, getRegistrarPrices } from '../lib/pricing'
 
-export function DomainCard({ domain, result, livePrices = {}, saved, onSave, onDetail, onLiveCheck }) {
-  const [lockState,  setLockState]  = useState('locked') // 'locked' | 'unlocking' | 'unlocked'
+export function DomainCard({ domain, result, livePrices = {}, saved, isUnlocked: unlockedFromParent, onSave, onDetail, onLiveCheck }) {
+  const [lockState,  setLockState]  = useState(() => unlockedFromParent ? 'unlocked' : 'locked')
   const [isSaved,    setIsSaved]    = useState(saved)
   const [bookmarkAnim, setBookmarkAnim] = useState(false)
 
   // Stay in sync if parent removes the save (e.g. from Saved panel)
   useEffect(() => { setIsSaved(saved) }, [saved])
+  // Sync lock state when modal unlocks this domain
+  useEffect(() => {
+    if (unlockedFromParent && lockState === 'locked') setLockState('unlocked')
+  }, [unlockedFromParent])
   const { status } = result
   const [name, ...tldParts] = domain.split('.')
   const tld = '.' + tldParts.join('.')

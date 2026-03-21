@@ -306,6 +306,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
                       result={e}
                       livePrices={livePrices}
                       saved={saved.includes(e.domain)}
+                      isUnlocked={unlockedDomains.has(e.domain)}
                       onSave={toggleSave}
                       onDetail={setDetailDomain}
                       onLiveCheck={handleLiveCheck}

@@ -216,31 +216,33 @@ export function OtherIdeasView({ keyword, onDetail }) {
                     style={{ background: STATUS_DOT[status] ?? STATUS_DOT.unknown }}
                   />
                   <span className="ideas-domain">{domain}</span>
-                  <button
-                    className="ideas-copy-row-btn"
-                    onClick={() => copyDomain(domain)}
-                    title="Copy domain"
-                    aria-label="Copy domain"
-                  >
-                    {copiedDomain === domain ? <CheckIcon /> : <CopyIcon />}
-                  </button>
-                  {onDetail && (
+                  <div className="ideas-row-actions">
                     <button
-                      className="ideas-detail-btn"
-                      onClick={() => onDetail(domain)}
-                      title="View details"
+                      className="ideas-copy-row-btn"
+                      onClick={() => copyDomain(domain)}
+                      title="Copy domain"
+                      aria-label="Copy domain"
                     >
-                      Details
+                      {copiedDomain === domain ? <CheckIcon /> : <CopyIcon />}
                     </button>
-                  )}
-                  <a
-                    className={`ideas-action ${status}`}
-                    href={`https://www.godaddy.com/domainsearch/find?domainToCheck=${domain}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {status === 'premium' && price ? `$${price.toFixed(0)}` : 'Register →'}
-                  </a>
+                    {onDetail && (
+                      <button
+                        className="ideas-detail-btn"
+                        onClick={() => onDetail(domain)}
+                        title="View details"
+                      >
+                        Details
+                      </button>
+                    )}
+                    <a
+                      className={`ideas-action ${status}`}
+                      href={`https://www.godaddy.com/domainsearch/find?domainToCheck=${domain}`}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {status === 'premium' && price ? `$${price.toFixed(0)}` : 'Register →'}
+                    </a>
+                  </div>
                 </div>
               ))}
             </div>
