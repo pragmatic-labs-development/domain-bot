@@ -86,11 +86,19 @@ export function DomainCard({ domain, result, livePrices = {}, saved, onSave, onD
       <div className="card-bottom-row">
         {/* Estimated price — shown after live check */}
         {isUnlocked && (
-          <span className="card-est-price" title="Estimated price from historical registrar data">
-            {price < 9999
-              ? <>Starting at <strong>${price.toFixed(2)}</strong></>
-              : 'Check registrar'}
-          </span>
+          price < 9999
+            ? <span className="card-est-price" title="Estimated price from historical registrar data">
+                Starting at <strong>${price.toFixed(2)}</strong>
+              </span>
+            : <a
+                className="card-check-registrar"
+                href={`https://www.namecheap.com/domains/registration/results/?domain=${domain}`}
+                target="_blank"
+                rel="noreferrer"
+                onClick={e => e.stopPropagation()}
+              >
+                Check registrar →
+              </a>
         )}
 
 

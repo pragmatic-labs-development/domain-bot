@@ -73,13 +73,21 @@ const STATUS_DOT = {
   unknown:     'var(--text-dim)',
 }
 
-export function OtherIdeasView({ keyword }) {
-  const [available,  setAvailable]  = useState([])
-  const [loading,    setLoading]    = useState(true)
-  const [refreshKey, setRefreshKey] = useState(1)
-  const [copied,     copy]          = useCopyToClipboard()
+export function OtherIdeasView({ keyword, onDetail }) {
+  const [available,    setAvailable]    = useState([])
+  const [loading,      setLoading]      = useState(true)
+  const [refreshKey,   setRefreshKey]   = useState(1)
+  const [copied,       copy]            = useCopyToClipboard()
+  const [copiedDomain, setCopiedDomain] = useState(null)
   const currentKw  = useRef('')
   const currentKey = useRef(1)
+
+  function copyDomain(domain) {
+    navigator.clipboard.writeText(domain).then(() => {
+      setCopiedDomain(domain)
+      setTimeout(() => setCopiedDomain(null), 2000)
+    })
+  }
 
   const run = useCallback(async (kw, key) => {
     currentKw.current  = kw
@@ -208,6 +216,23 @@ export function OtherIdeasView({ keyword }) {
                     style={{ background: STATUS_DOT[status] ?? STATUS_DOT.unknown }}
                   />
                   <span className="ideas-domain">{domain}</span>
+                  <button
+                    className="ideas-copy-row-btn"
+                    onClick={() => copyDomain(domain)}
+                    title="Copy domain"
+                    aria-label="Copy domain"
+                  >
+                    {copiedDomain === domain ? <CheckIcon /> : <CopyIcon />}
+                  </button>
+                  {onDetail && (
+                    <button
+                      className="ideas-detail-btn"
+                      onClick={() => onDetail(domain)}
+                      title="View details"
+                    >
+                      Details
+                    </button>
+                  )}
                   <a
                     className={`ideas-action ${status}`}
                     href={`https://www.godaddy.com/domainsearch/find?domainToCheck=${domain}`}
