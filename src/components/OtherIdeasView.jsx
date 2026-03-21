@@ -104,9 +104,6 @@ export function OtherIdeasView({ keyword }) {
 
   return (
     <div className="ideas-view">
-      {/* Progress bar */}
-      <div className={`ideas-progress-bar ${loading ? 'active' : ''}`} />
-
       <div className="ideas-header">
         <span className="ideas-title">
           Available name ideas for <strong>{keyword}</strong>

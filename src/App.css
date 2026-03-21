@@ -659,38 +659,10 @@ body::before {
 
 /* ── Other Ideas view ── */
 .ideas-view {
-  padding: 0 var(--sp-8) var(--sp-16);
+  padding: var(--sp-6) var(--sp-8) var(--sp-16);
   position: relative;
 }
 
-/* Progress bar */
-.ideas-progress-bar {
-  height: 2px;
-  width: 100%;
-  background: var(--border);
-  margin-bottom: var(--sp-6);
-  border-radius: 2px;
-  overflow: hidden;
-  transition: opacity 0.3s;
-}
-.ideas-progress-bar::after {
-  content: '';
-  display: block;
-  height: 100%;
-  width: 40%;
-  background: linear-gradient(90deg, transparent, var(--accent), transparent);
-  border-radius: 2px;
-  animation: none;
-  opacity: 0;
-}
-.ideas-progress-bar.active::after {
-  opacity: 1;
-  animation: progressSlide 1.2s ease-in-out infinite;
-}
-@keyframes progressSlide {
-  0%   { transform: translateX(-150%); }
-  100% { transform: translateX(350%); }
-}
 
 /* Ghost skeleton rows */
 .ideas-ghost-row {
