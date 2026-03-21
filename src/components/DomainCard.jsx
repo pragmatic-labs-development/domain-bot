@@ -49,6 +49,7 @@ export function DomainCard({ domain, result, livePrices = {}, saved, onSave, onD
       className={[
         'domain-card',
         isPremium ? 'card-premium' : 'card-available',
+        isSaved ? 'card-saved' : '',
         isUnlocked ? 'card-unlocked' : '',
       ].filter(Boolean).join(' ')}
       onClick={handleSave}
@@ -84,9 +85,11 @@ export function DomainCard({ domain, result, livePrices = {}, saved, onSave, onD
       {/* ── Bottom row: price tier | SEO | detail | live-check ── */}
       <div className="card-bottom-row">
         {/* Estimated price — shown after live check */}
-        {isUnlocked && price < 9999 && (
+        {isUnlocked && (
           <span className="card-est-price" title="Estimated price from historical registrar data">
-            Starting at <strong>${price.toFixed(2)}</strong>
+            {price < 9999
+              ? <>Starting at <strong>${price.toFixed(2)}</strong></>
+              : 'Check registrar'}
           </span>
         )}
 

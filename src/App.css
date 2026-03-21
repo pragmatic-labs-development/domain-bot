@@ -1536,13 +1536,18 @@ body::before {
   Hover lifts the card and brightens the border subtly — no glow.
 */
 .card-available {
-  border-top: 2px solid var(--accent);
+  border-top: 2px solid var(--border);
+}
+.card-available.card-saved {
+  border-top-color: var(--accent);
 }
 .card-available:hover {
   border-color: var(--border-bright);
-  border-top-color: var(--accent);
   box-shadow: 0 6px 20px rgba(0,0,0,0.3);
   transform: translateY(-2px);
+}
+.card-available.card-saved:hover {
+  border-top-color: var(--accent);
 }
 
 .card-premium {
@@ -2857,15 +2862,15 @@ body::before {
   position: relative;
 }
 .saved-nav-btn.has-saved {
-  color: var(--yellow);
-  border-color: rgba(245,166,35,0.35);
-  background: rgba(245,166,35,0.06);
+  color: var(--accent);
+  border-color: rgba(0,229,200,0.35);
+  background: rgba(0,229,200,0.06);
 }
 .saved-nav-count {
   position: absolute;
   top: -5px;
   right: -5px;
-  background: var(--yellow);
+  background: var(--accent);
   color: #000;
   font-family: var(--font-mono);
   font-size: 0.55rem;
@@ -2931,11 +2936,11 @@ body::before {
   color: var(--text);
   letter-spacing: -0.02em;
 }
-.saved-panel-title svg { color: var(--yellow); }
+.saved-panel-title svg { color: var(--accent); }
 .saved-count-badge {
-  background: rgba(245,166,35,0.12);
-  color: var(--yellow);
-  border: 1px solid rgba(245,166,35,0.28);
+  background: rgba(0,229,200,0.10);
+  color: var(--accent);
+  border: 1px solid rgba(0,229,200,0.28);
   font-family: var(--font-mono);
   font-size: 0.63rem;
   font-weight: 700;
@@ -3063,14 +3068,14 @@ body::before {
   transform: translateY(-1px);
 }
 .saved-unsave {
-  color: var(--yellow);
-  border-color: rgba(245,166,35,0.28);
-  background: rgba(245,166,35,0.06);
+  color: var(--accent);
+  border-color: rgba(0,229,200,0.28);
+  background: rgba(0,229,200,0.06);
   font-size: 0.8rem;
 }
 .saved-unsave:hover {
-  background: rgba(245,166,35,0.14);
-  border-color: rgba(245,166,35,0.42);
+  background: rgba(0,229,200,0.14);
+  border-color: rgba(0,229,200,0.42);
 }
 
 .saved-panel-footer {
@@ -3239,7 +3244,10 @@ body::before {
   /* Left accent bar replaces top accent in horizontal layout */
   .card-available {
     border-top: 1px solid var(--border);
-    border-left: 3px solid var(--accent);
+    border-left: 3px solid var(--border);
+  }
+  .card-available.card-saved {
+    border-left-color: var(--accent);
   }
   .card-premium {
     border-top: 1px solid var(--border);
