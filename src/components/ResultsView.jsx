@@ -186,13 +186,13 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
             className={`main-tab ${mainTab === 'search' ? 'active' : ''}`}
             onClick={() => setMainTab('search')}
           >
-            Search <span className="tab-count">{availableCount}</span>
+            Available <span className="tab-count">{availableCount}</span>
           </button>
           <button
             className={`main-tab ${mainTab === 'domains' ? 'active' : ''}`}
             onClick={() => setMainTab('domains')}
           >
-            Domains
+            All Domains
           </button>
           <button
             className={`main-tab ${mainTab === 'other-ideas' ? 'active' : ''}`}
