@@ -73,7 +73,7 @@ const STATUS_DOT = {
   unknown:     'var(--text-dim)',
 }
 
-export function OtherIdeasView({ keyword, onDetail }) {
+export function OtherIdeasView({ keyword, onDetail, saved = [], onSave }) {
   const [available,    setAvailable]    = useState([])
   const [loading,      setLoading]      = useState(true)
   const [refreshKey,   setRefreshKey]   = useState(1)
@@ -217,6 +217,16 @@ export function OtherIdeasView({ keyword, onDetail }) {
                   />
                   <span className="ideas-domain">{domain}</span>
                   <div className="ideas-row-actions">
+                    {onSave && (
+                      <button
+                        className={`ideas-save-btn ${saved.includes(domain) ? 'saved' : ''}`}
+                        onClick={() => onSave(domain)}
+                        title={saved.includes(domain) ? 'Remove from saved' : 'Save domain'}
+                        aria-label={saved.includes(domain) ? 'Remove from saved' : 'Save domain'}
+                      >
+                        <BookmarkIcon filled={saved.includes(domain)} />
+                      </button>
+                    )}
                     <button
                       className="ideas-copy-row-btn"
                       onClick={() => copyDomain(domain)}
@@ -253,6 +263,13 @@ export function OtherIdeasView({ keyword, onDetail }) {
   )
 }
 
+function BookmarkIcon({ filled }) {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
+    </svg>
+  )
+}
 function CopyIcon() {
   return (
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
