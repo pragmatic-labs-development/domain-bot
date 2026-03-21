@@ -37,8 +37,9 @@ function seededShuffle(arr, seed) {
 }
 
 function generateDomains(kw, seed) {
-  const prefixes = seededShuffle(PREFIXES_POOL, seed).slice(0, 20)
-  const suffixes = seededShuffle(SUFFIXES_POOL, seed + 1).slice(0, 25)
+  // Use full pools shuffled — gives ~100 candidates to find 24 available
+  const prefixes = seededShuffle(PREFIXES_POOL, seed)
+  const suffixes = seededShuffle(SUFFIXES_POOL, seed + 1)
   const seen = new Set()
   const domains = []
   const add = d => { if (!seen.has(d)) { seen.add(d); domains.push(d) } }
@@ -49,6 +50,8 @@ function generateDomains(kw, seed) {
   }
   return domains
 }
+
+const TARGET = 24
 
 const STATUS_DOT = {
   available:   'var(--green)',
@@ -98,6 +101,7 @@ export function OtherIdeasView({ keyword }) {
   const available = Object.entries(results)
     .filter(([, r]) => r.status === 'available' || r.status === 'premium')
     .map(([domain, r]) => ({ domain, ...r }))
+    .slice(0, TARGET)
 
   const cols = [[], [], []]
   available.forEach((item, i) => { cols[i % 3].push(item) })
@@ -148,7 +152,7 @@ export function OtherIdeasView({ keyword }) {
       )}
 
       {!loading && available.length === 0 && (
-        <div className="tab-empty">No available ideas this time — try refreshing for more.</div>
+        <div className="tab-empty">Couldn't find 24 available ideas — try refreshing for a different set.</div>
       )}
 
       {!loading && available.length > 0 && (
