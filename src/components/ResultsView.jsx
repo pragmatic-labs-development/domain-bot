@@ -8,6 +8,7 @@ import { DomainCard }        from './DomainCard'
 import { DomainRow }         from './DomainRow'
 import { DomainModal }       from './DomainModal'
 import { DomainsView }       from './DomainsView'
+import { OtherIdeasView }    from './OtherIdeasView'
 import { getLowestPrice, seoScore } from '../lib/pricing'
 // import { botScore } from '../lib/pricing'  // Bot score hidden for now
 
@@ -244,9 +245,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
 
       {/* Other Ideas panel */}
       {mainTab === 'other-ideas' && (
-        <div className="placeholder-panel">
-          <p>Other Ideas coming soon.</p>
-        </div>
+        <OtherIdeasView keyword={keyword} />
       )}
 
       {/* Search panel */}
