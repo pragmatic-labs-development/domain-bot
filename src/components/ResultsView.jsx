@@ -72,7 +72,6 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
 
   function handleLiveCheck(domain) {
     setUnlockedDomains(prev => new Set([...prev, domain]))
-    onLiveCheck?.(domain)
   }
 
   // Reset pagination whenever filter or sort changes
