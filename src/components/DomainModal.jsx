@@ -83,7 +83,7 @@ const REGISTRAR_STYLES = {
 }
 
 /* ── Main component ── */
-export function DomainModal({ domain, result, livePrices = {}, saved, onSave, onClose, onPrev, onNext, position }) {
+export function DomainModal({ domain, result, livePrices = {}, saved, isUnlocked, onSave, onClose, onPrev, onNext, position }) {
   const status = result?.status ?? 'unknown'
 
   useEffect(() => {
@@ -127,7 +127,11 @@ export function DomainModal({ domain, result, livePrices = {}, saved, onSave, on
   return (
     <>
       <div className="modal-backdrop" onClick={onClose} />
-      <div className="domain-modal" role="dialog" aria-modal="true">
+      <div
+        className={['domain-modal', saved ? 'modal-is-saved' : '', isUnlocked ? 'modal-is-unlocked' : ''].filter(Boolean).join(' ')}
+        role="dialog"
+        aria-modal="true"
+      >
 
         {/* Header — two semantic rows */}
         <div className="modal-header">

@@ -2590,6 +2590,23 @@ body::before {
     inset 0 1px 0 rgba(255,255,255,0.04);
   animation: modalIn 0.22s cubic-bezier(0.16,1,0.3,1);
 }
+/* Saved state — teal top stripe */
+.domain-modal.modal-is-saved {
+  border-top: 3px solid var(--accent);
+}
+/* Unlocked state — full teal outline */
+.domain-modal.modal-is-unlocked {
+  border-color: var(--accent);
+  box-shadow:
+    0 40px 90px rgba(0,0,0,0.75),
+    0 0 0 1px var(--accent),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+}
+/* Both: unlocked wins on the border, stripe still shows as thicker top */
+.domain-modal.modal-is-saved.modal-is-unlocked {
+  border-top-width: 3px;
+}
+
 @keyframes modalIn {
   from { opacity: 0; transform: translate(-50%, -48%) scale(0.96); }
   to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }

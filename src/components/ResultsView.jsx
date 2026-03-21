@@ -66,8 +66,14 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
   const [advMinSeo,     setAdvMinSeo]     = useState(0)
   const [advNameLength, setAdvNameLength] = useState(new Set(['short','medium','long']))
   const [advDrawerOpen, setAdvDrawerOpen] = useState(false)
-  const [detailDomain,  setDetailDomain]  = useState(null)
+  const [detailDomain,    setDetailDomain]    = useState(null)
+  const [unlockedDomains, setUnlockedDomains] = useState(new Set())
   const [visibleCount, setVisibleCount] = useState(30)
+
+  function handleLiveCheck(domain) {
+    setUnlockedDomains(prev => new Set([...prev, domain]))
+    onLiveCheck?.(domain)
+  }
 
   // Reset pagination whenever filter or sort changes
   useEffect(() => { setVisibleCount(30) }, [quickFilter, sortId])
@@ -303,7 +309,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
                       saved={saved.includes(e.domain)}
                       onSave={toggleSave}
                       onDetail={setDetailDomain}
-                      onLiveCheck={onLiveCheck}
+                      onLiveCheck={handleLiveCheck}
                       index={i}
                     />
                   ))}
@@ -373,7 +379,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
                       livePrices={livePrices}
                       saved={saved.includes(e.domain)}
                       onSave={toggleSave}
-                      onLiveCheck={onLiveCheck}
+                      onLiveCheck={handleLiveCheck}
                       onDetail={setDetailDomain}
                       index={i}
                     />
@@ -422,6 +428,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
             result={results[detailDomain]}
             livePrices={livePrices}
             saved={saved.includes(detailDomain)}
+            isUnlocked={unlockedDomains.has(detailDomain)}
             onSave={toggleSave}
             onClose={() => setDetailDomain(null)}
             onPrev={detailIdx > 0 ? () => setDetailDomain(detailList[detailIdx - 1]) : null}

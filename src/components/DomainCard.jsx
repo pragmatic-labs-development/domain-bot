@@ -129,6 +129,7 @@ export function DomainCard({ domain, result, livePrices = {}, saved, onSave, onD
               if (lockState !== 'locked') return
               setLockState('unlocking')
               setTimeout(() => setLockState('unlocked'), 500)
+              onLiveCheck?.(domain)
             }}
             disabled={lockState !== 'locked'}
             title={lockState === 'unlocked' ? 'Live data loaded' : 'Live check — fetch real-time pricing'}
