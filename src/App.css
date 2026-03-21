@@ -669,6 +669,36 @@ body::before {
   padding-bottom: var(--sp-4);
   border-bottom: 1px solid var(--border);
 }
+.ideas-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-left: auto;
+}
+.ideas-refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  background: var(--surface2);
+  border: 1px solid var(--border-bright);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s, background 0.15s;
+}
+.ideas-refresh-btn:hover:not(:disabled) {
+  color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(0,229,200,0.06);
+}
+.ideas-refresh-btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
 .ideas-title {
   font-size: 0.88rem;
   color: var(--text-muted);

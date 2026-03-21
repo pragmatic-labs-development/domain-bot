@@ -1,33 +1,51 @@
 /**
  * src/components/OtherIdeasView.jsx
- * Algorithmically generated domain name variations for the keyword,
- * all checked against .com availability. No AI required.
+ * Algorithmically generated domain name variations for the keyword.
+ * Each refresh picks a different random subset from the full pools.
  */
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { fetchBatch } from '../lib/availability'
 
-const PREFIXES = [
+const PREFIXES_POOL = [
   'get', 'my', 'the', 'go', 'try', 'use', 'hey', 'join', 'we', 'meet',
   're', 'in', 'new', 'pro', 'web', 'find', 'love', 'be', 'on', 'its',
+  'hi', 'hello', 'with', 'for', 'run', 'make', 'build', 'open', 'just',
+  'simple', 'smart', 'super', 'quick', 'fast', 'real', 'true', 'good',
+  'best', 'top', 'one', 'all', 'our', 'your', 'i', 'do', 'lets', 'ask',
 ]
 
-const SUFFIXES = [
+const SUFFIXES_POOL = [
   'team', 'tech', 'app', 'labs', 'studio', 'cloud', 'hub', 'hq', 'site',
   'shop', 'group', 'design', 'online', 'works', 'now', 'plus', 'up',
   'central', 'spot', 'base', 'zone', 'world', 'co', 'ly', 'ing',
+  'ai', 'io', 'ify', 'er', 'ful', 'ness', 'ware', 'desk', 'flow',
+  'stack', 'box', 'kit', 'pad', 'space', 'place', 'point', 'link',
+  'net', 'api', 'platform', 'suite', 'dash', 'pulse', 'core', 'mark',
 ]
 
-function generateDomains(kw) {
+// Seeded shuffle so each refreshKey gives different but reproducible results
+function seededShuffle(arr, seed) {
+  const a = [...arr]
+  let s = seed
+  for (let i = a.length - 1; i > 0; i--) {
+    s = (s * 1664525 + 1013904223) & 0xffffffff
+    const j = Math.abs(s) % (i + 1);
+    [a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
+function generateDomains(kw, seed) {
+  const prefixes = seededShuffle(PREFIXES_POOL, seed).slice(0, 20)
+  const suffixes = seededShuffle(SUFFIXES_POOL, seed + 1).slice(0, 25)
   const seen = new Set()
   const domains = []
   const add = d => { if (!seen.has(d)) { seen.add(d); domains.push(d) } }
-
-  // Interleave prefix and suffix variants so the list feels varied
-  const maxLen = Math.max(PREFIXES.length, SUFFIXES.length)
+  const maxLen = Math.max(prefixes.length, suffixes.length)
   for (let i = 0; i < maxLen; i++) {
-    if (i < PREFIXES.length) add(`${PREFIXES[i]}${kw}.com`)
-    if (i < SUFFIXES.length) add(`${kw}${SUFFIXES[i]}.com`)
+    if (i < prefixes.length) add(`${prefixes[i]}${kw}.com`)
+    if (i < suffixes.length) add(`${kw}${suffixes[i]}.com`)
   }
   return domains
 }
@@ -42,34 +60,40 @@ const STATUS_DOT = {
 }
 
 export function OtherIdeasView({ keyword }) {
-  const [results,  setResults]  = useState({})
-  const [loading,  setLoading]  = useState(true)
-  const currentKw = useRef('')
+  const [results,    setResults]    = useState({})
+  const [loading,    setLoading]    = useState(true)
+  const [refreshKey, setRefreshKey] = useState(1)
+  const currentKw  = useRef('')
+  const currentKey = useRef(1)
 
-  useEffect(() => {
-    if (!keyword) return
-    currentKw.current = keyword
-
-    const domains = generateDomains(keyword)
-    const initial = Object.fromEntries(domains.map(d => [d, { status: 'checking' }]))
-    setResults(initial)
+  const run = useCallback((kw, key) => {
+    currentKw.current  = kw
+    currentKey.current = key
+    const domains = generateDomains(kw, key * 999983)
+    setResults(Object.fromEntries(domains.map(d => [d, { status: 'checking' }])))
     setLoading(true)
-
     fetchBatch(domains).then(fresh => {
-      if (currentKw.current !== keyword) return
+      if (currentKw.current !== kw || currentKey.current !== key) return
       setResults(fresh)
       setLoading(false)
     })
-  }, [keyword])
+  }, [])
+
+  useEffect(() => {
+    if (!keyword) return
+    run(keyword, refreshKey)
+  }, [keyword, refreshKey, run])
+
+  function handleRefresh() {
+    setRefreshKey(k => k + 1)
+  }
 
   if (!keyword) return null
 
-  // Only show available/premium domains — filter out taken/unknown
   const available = Object.entries(results)
     .filter(([, r]) => r.status === 'available' || r.status === 'premium')
     .map(([domain, r]) => ({ domain, ...r }))
 
-  // Split into 3 columns, filling column-first
   const cols = [[], [], []]
   available.forEach((item, i) => { cols[i % 3].push(item) })
 
@@ -82,16 +106,27 @@ export function OtherIdeasView({ keyword }) {
             <span className="ideas-count">{available.length}</span>
           )}
         </span>
-        {loading && (
-          <span className="ideas-checking">
-            <span className="dns-spinner" style={{ width: 10, height: 10, borderWidth: 2 }} />
-            Checking…
-          </span>
-        )}
+        <div className="ideas-header-actions">
+          {loading && (
+            <span className="ideas-checking">
+              <span className="dns-spinner" style={{ width: 10, height: 10, borderWidth: 2 }} />
+              Checking…
+            </span>
+          )}
+          <button
+            className="ideas-refresh-btn"
+            onClick={handleRefresh}
+            disabled={loading}
+            title="Generate new ideas"
+          >
+            <RefreshIcon spinning={loading} />
+            New ideas
+          </button>
+        </div>
       </div>
 
       {!loading && available.length === 0 && (
-        <div className="tab-empty">No available name ideas found. Try a different keyword.</div>
+        <div className="tab-empty">No available ideas this time — try refreshing for more.</div>
       )}
 
       {available.length > 0 && (
@@ -120,5 +155,20 @@ export function OtherIdeasView({ keyword }) {
         </div>
       )}
     </div>
+  )
+}
+
+function RefreshIcon({ spinning }) {
+  return (
+    <svg
+      width="13" height="13" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"
+      style={spinning ? { animation: 'spin 0.8s linear infinite' } : undefined}
+    >
+      <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+      <path d="M21 3v5h-5"/>
+      <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+      <path d="M8 16H3v5"/>
+    </svg>
   )
 }
