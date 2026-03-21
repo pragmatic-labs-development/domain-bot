@@ -33,12 +33,12 @@ function generateDomains(kw) {
 }
 
 const STATUS_DOT = {
-  available:   '#16a34a',
-  premium:     '#b45309',
-  aftermarket: '#1d4ed8',
-  taken:       '#dc2626',
-  checking:    '#374151',
-  unknown:     '#6b7280',
+  available:   'var(--green)',
+  premium:     'var(--yellow)',
+  aftermarket: 'var(--blue)',
+  taken:       'var(--red)',
+  checking:    'var(--border-hover)',
+  unknown:     'var(--text-dim)',
 }
 
 export function OtherIdeasView({ keyword }) {

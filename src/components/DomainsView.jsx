@@ -72,12 +72,12 @@ const TLD_CATEGORIES = [
 ]
 
 const STATUS_BG = {
-  available:   '#16a34a',
-  premium:     '#b45309',
-  aftermarket: '#1d4ed8',
-  taken:       '#dc2626',
-  checking:    '#1f2937',
-  unknown:     '#1f2937',
+  available:   '#0d8a57',
+  premium:     '#8a6010',
+  aftermarket: '#1d4db8',
+  taken:       '#8f2830',
+  checking:    '#1a1f1f',
+  unknown:     '#1a1f1f',
 }
 
 export function DomainsView({ keyword, results }) {
@@ -90,10 +90,10 @@ export function DomainsView({ keyword, results }) {
     <div className="domains-view">
       {/* Legend */}
       <div className="domains-legend">
-        <span className="dv-legend-item available">● Available</span>
-        <span className="dv-legend-item premium">● Premium</span>
-        <span className="dv-legend-item aftermarket">● Aftermarket</span>
-        <span className="dv-legend-item taken">● Taken</span>
+        <span className="dv-legend-item available">Available</span>
+        <span className="dv-legend-item premium">Premium</span>
+        <span className="dv-legend-item aftermarket">Aftermarket</span>
+        <span className="dv-legend-item taken">Taken</span>
       </div>
 
       {TLD_CATEGORIES.map(cat => {

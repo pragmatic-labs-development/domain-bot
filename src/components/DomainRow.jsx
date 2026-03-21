@@ -113,16 +113,16 @@ export function DomainRow({ domain, result, livePrices = {}, saved, onSave, onLi
 }
 
 function ScoreRing({ score, color, label }) {
-  const r    = 15
+  const r    = 14
   const circ = 2 * Math.PI * r
   const offset = circ - (score / 100) * circ
   return (
     <div className="score-ring" title={`${label} Score: ${score}/99`}>
-      <svg width="38" height="38" viewBox="0 0 38 38" style={{ position: 'absolute', top: 0, left: 0, transform: 'rotate(-90deg)' }}>
-        <circle className="score-ring-bg" cx="19" cy="19" r={r} />
+      <svg width="36" height="36" viewBox="0 0 36 36" style={{ position: 'absolute', top: 0, left: 0, transform: 'rotate(-90deg)' }}>
+        <circle className="score-ring-bg" cx="18" cy="18" r={r} />
         <circle
           className="score-ring-fill"
-          cx="19" cy="19" r={r}
+          cx="18" cy="18" r={r}
           stroke={color}
           strokeDasharray={circ.toFixed(2)}
           strokeDashoffset={offset.toFixed(2)}
