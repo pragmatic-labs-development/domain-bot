@@ -62,6 +62,8 @@ export default function App() {
             onSearch={handleSearch}
             loading={loading}
             variant="nav"
+            primaryDomain={primaryDomain}
+            primaryResult={results[primaryDomain]}
           />
         )}
 

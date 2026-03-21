@@ -5,7 +5,7 @@
 
 import { useEffect, useRef } from 'react'
 
-export function SearchBar({ value, onChange, onSearch, loading, variant = 'hero' }) {
+export function SearchBar({ value, onChange, onSearch, loading, variant = 'hero', primaryDomain, primaryResult }) {
   const inputRef = useRef(null)
 
   useEffect(() => { inputRef.current?.focus() }, [])
@@ -16,29 +16,61 @@ export function SearchBar({ value, onChange, onSearch, loading, variant = 'hero'
   }
 
   if (variant === 'nav') {
+    const status = primaryResult?.status
     return (
-      <div className="nav-search-wrap">
-        <NavSearchIcon />
-        <input
-          ref={inputRef}
-          className="nav-search-input"
-          type="text"
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Search domains…"
-          spellCheck={false}
-          autoComplete="off"
-          autoCorrect="off"
-          autoCapitalize="off"
-        />
-        <div className="nav-search-hints">
-          {loading
-            ? <NavSpinner />
-            : <span className="esc-hint">Esc</span>
-          }
-          <NavShieldIcon />
+      <div className="nav-search-container">
+        <div className="nav-search-wrap">
+          <NavSearchIcon />
+          <input
+            ref={inputRef}
+            className="nav-search-input"
+            type="text"
+            value={value}
+            onChange={e => onChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Search domains…"
+            spellCheck={false}
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+          />
+          <div className="nav-search-hints">
+            {loading
+              ? <NavSpinner />
+              : <span className="esc-hint">Esc</span>
+            }
+            <NavShieldIcon />
+          </div>
         </div>
+
+        {primaryDomain && status && (
+          <div className="nav-status-line">
+            <span className="nav-status-domain">{primaryDomain}</span>
+            <span className="nav-status-sep">·</span>
+            {status === 'checking' && (
+              <span className="nav-status-text checking">
+                <NavSpinner />
+                Checking…
+              </span>
+            )}
+            {status === 'available' && (
+              <span className="nav-status-text available">✓ Available</span>
+            )}
+            {status === 'taken' && (
+              <>
+                <span className="nav-status-text taken">✗ Taken</span>
+                <a
+                  className="nav-status-link"
+                  href={`https://lookup.icann.org/en/lookup?name=${primaryDomain}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  WHOIS →
+                </a>
+              </>
+            )}
+          </div>
+        )}
       </div>
     )
   }

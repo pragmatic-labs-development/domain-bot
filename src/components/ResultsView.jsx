@@ -4,7 +4,6 @@
  */
 
 import { useState, useMemo, useEffect } from 'react'
-import { PrimaryDomainCard } from './PrimaryDomainCard'
 import { DomainCard }        from './DomainCard'
 import { DomainRow }         from './DomainRow'
 import { DomainModal }       from './DomainModal'
@@ -179,13 +178,6 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
 
   return (
     <div className="results-view">
-      <PrimaryDomainCard
-        domain={primaryDomain}
-        result={primaryResult}
-        livePrices={livePrices}
-        onLiveCheck={onLiveCheck}
-      />
-
       {/* Main tab bar */}
       <div className="main-tab-bar">
         <div className="main-tabs">
