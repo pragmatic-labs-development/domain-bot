@@ -15,7 +15,9 @@ export default function App() {
   const [ideasOpen,     setIdeasOpen]     = useState(false)
   const [ideasKw,       setIdeasKw]       = useState('')
   const [detailDomain,  setDetailDomain]  = useState(null)
-  const [knownStatuses, setKnownStatuses] = useState({})
+  const [savedStatuses, setSavedStatuses] = useState(() =>
+    JSON.parse(localStorage.getItem('db-saved-statuses') || '{}')
+  )
   const [saved,      setSaved]      = useState(() =>
     JSON.parse(localStorage.getItem('db-saved') || '[]')
   )
@@ -45,12 +47,18 @@ export default function App() {
 
   const hasResults = keyword && Object.keys(results).length > 0
 
-  // Accumulate statuses across all searches so SavedPanel can colour domains
-  // from previous searches (results resets on each new search)
+  // Persist statuses for saved domains whenever results update
   useEffect(() => {
-    if (Object.keys(results).length > 0) {
-      setKnownStatuses(prev => ({ ...prev, ...results }))
-    }
+    const updates = {}
+    saved.forEach(domain => {
+      if (results[domain]) updates[domain] = results[domain]
+    })
+    if (Object.keys(updates).length === 0) return
+    setSavedStatuses(prev => {
+      const next = { ...prev, ...updates }
+      localStorage.setItem('db-saved-statuses', JSON.stringify(next))
+      return next
+    })
   }, [results])
 
   useEffect(() => {
@@ -109,7 +117,7 @@ export default function App() {
       {!hasResults && (
         <section id="hero">
           <p className="hero-eyebrow">Domain Availability Search</p>
-          <h1>Check domain availability<br/>without being tracked</h1>
+          <h1>Check domain availability without being tracked</h1>
 
           <div className="hero-search-group">
             <SearchBar
@@ -176,7 +184,7 @@ export default function App() {
           onUnsave={toggleSave}
           onClose={() => setSavedOpen(false)}
           livePrices={livePrices}
-          results={knownStatuses}
+          results={savedStatuses}
           onLiveCheck={checkLive}
           onDetail={domain => { setSavedOpen(false); setDetailDomain(domain) }}
         />
