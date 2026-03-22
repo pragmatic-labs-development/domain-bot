@@ -256,7 +256,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
 
       {/* Domains panel */}
       {mainTab === 'domains' && (
-        <DomainsView keyword={keyword} results={results} />
+        <DomainsView keyword={keyword} results={results} onDetail={setDetailDomain} />
       )}
 
       {/* Other Ideas panel */}

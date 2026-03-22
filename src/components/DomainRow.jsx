@@ -3,11 +3,13 @@
  * Row used in the Advanced tab — shows all domains with status, scores, actions.
  */
 
+import { useState } from 'react'
 import { getLowestPrice, seoScore, getRegistrarPrices } from '../lib/pricing'
 // import { botScore } from '../lib/pricing'  // Bot score hidden for now
 import { computePrivacyScore, computeStatusTag, healthSummaryLabel } from '../lib/health'
 
 export function DomainRow({ domain, result, livePrices = {}, healthData = {}, saved, onSave, onLiveCheck, onDetail, index = 0 }) {
+  const [isUnlocking, setIsUnlocking] = useState(false)
   const { status, tier } = result
 
   const isChecking    = status === 'checking'
@@ -93,15 +95,20 @@ export function DomainRow({ domain, result, livePrices = {}, healthData = {}, sa
           <BookmarkIcon filled={saved} />
         </button>
 
-        {/* Lock / live check — always visible, disabled when verified */}
+        {/* Lock / live check — always visible, disabled when verified or unlocking */}
         {!isAftermarket && (
           <button
-            className={`row-action-btn row-lock-btn ${isVerified ? 'row-lock-verified' : ''}`}
-            onClick={e => { e.stopPropagation(); if (!isVerified) onLiveCheck(domain) }}
-            title={isVerified ? 'Live data loaded' : 'Get authoritative availability + live price'}
-            disabled={isVerified}
+            className={`row-action-btn row-lock-btn ${isVerified ? 'row-lock-verified' : ''} ${isUnlocking ? 'row-lock-unlocking' : ''}`}
+            onClick={e => {
+              e.stopPropagation()
+              if (isVerified || isUnlocking) return
+              setIsUnlocking(true)
+              onLiveCheck(domain)
+            }}
+            title={isVerified ? 'Live data loaded' : isUnlocking ? 'Checking…' : 'Get authoritative availability + live price'}
+            disabled={isVerified || isUnlocking}
           >
-            {isVerified ? <LockOpenIcon /> : <LockIcon />}
+            {isVerified ? <LockOpenIcon /> : isUnlocking ? <RowSpinner /> : <LockIcon />}
           </button>
         )}
 
@@ -145,6 +152,9 @@ function BookmarkIcon({ filled }) {
       <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
     </svg>
   )
+}
+function RowSpinner() {
+  return <div className="dns-spinner" style={{ width: 9, height: 9, borderWidth: 1.5 }} />
 }
 function LockIcon() {
   return (

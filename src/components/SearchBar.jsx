@@ -34,12 +34,6 @@ export function SearchBar({ value, onChange, onSearch, loading, variant = 'hero'
           autoCapitalize="off"
         />
 
-        {primaryDomain && status === 'available' && (
-          <div className="nav-status-line">
-            <span className="nav-status-sep">·</span>
-            <span className="nav-status-text available">✓ Available</span>
-          </div>
-        )}
 
         <div className="nav-search-hints">
           {loading

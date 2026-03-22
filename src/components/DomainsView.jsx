@@ -263,7 +263,7 @@ const STATUS_COLOR = {
   unknown:     'var(--text-dim)',
 }
 
-export function DomainsView({ keyword, results }) {
+export function DomainsView({ keyword, results, onDetail }) {
   const [tooltip, setTooltip] = useState(null) // { tld, domain, status, price, x, y }
   const hideTimer = useRef(null)
 
@@ -341,13 +341,14 @@ export function DomainsView({ keyword, results }) {
           keyword={keyword}
           onMouseEnter={() => clearTimeout(hideTimer.current)}
           onMouseLeave={handleMouseLeave}
+          onDetail={onDetail}
         />
       )}
     </div>
   )
 }
 
-function DomainTooltip({ tld, domain, status, price, rect, keyword, onMouseEnter, onMouseLeave }) {
+function DomainTooltip({ tld, domain, status, price, rect, keyword, onMouseEnter, onMouseLeave, onDetail }) {
   const desc   = TLD_DESC[tld] ?? `A domain extension for ${tld}-related content.`
   const label  = STATUS_LABEL[status] ?? 'Unknown'
   const color  = STATUS_COLOR[status] ?? 'var(--text-dim)'
@@ -385,14 +386,22 @@ function DomainTooltip({ tld, domain, status, price, rect, keyword, onMouseEnter
 
       <p className="dv-tt-desc">{desc}</p>
 
-      {href && (
+      {isAvailable && onDetail && (
+        <button
+          className="dv-tt-action available"
+          onClick={() => onDetail(domain)}
+        >
+          View Details
+        </button>
+      )}
+      {isTaken && href && (
         <a
-          className={`dv-tt-action ${isAvailable ? 'available' : 'taken'}`}
+          className="dv-tt-action taken"
           href={href}
           target="_blank"
           rel="noreferrer"
         >
-          {isAvailable ? 'Register →' : 'WHOIS lookup →'}
+          WHOIS lookup →
         </a>
       )}
     </div>

@@ -68,13 +68,14 @@ export default function App() {
           )}
 
           <div className="nav-right">
-            <span className="api-status-dot api-dns">
-              <svg width="9" height="9" viewBox="0 0 12 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                <rect x="1.5" y="6" width="9" height="7" rx="1.5"/>
-                <path d="M3.5 6V4a2.5 2.5 0 015 0v2"/>
-              </svg>
-              <span>Private Search</span>
-            </span>
+            <button
+              className="icon-btn"
+              onClick={() => { setInputValue(''); document.querySelector('.hero-input, .nav-search-input')?.focus() }}
+              aria-label="Generate domain ideas"
+              title="Generate ideas"
+            >
+              <WandIcon />
+            </button>
 
             <button
               className={`icon-btn saved-nav-btn ${saved.length > 0 ? 'has-saved' : ''}`}
@@ -160,6 +161,15 @@ export default function App() {
         />
       )}
     </div>
+  )
+}
+
+function WandIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M15 4V2m0 14v-2M8 9h2m10 0h2M17.8 6.2l-1.4 1.4M13.4 10.6l-1.4 1.4M4 20l9-9"/>
+      <path d="M13 4l1.5 3.5L18 9l-3.5 1.5L13 14l-1.5-3.5L8 9l3.5-1.5z"/>
+    </svg>
   )
 }
 
