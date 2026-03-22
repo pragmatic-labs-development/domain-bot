@@ -179,7 +179,6 @@ export function OtherIdeasView({ keyword, onDetail, saved = [], onSave }) {
             title="Generate new ideas"
           >
             <RefreshIcon spinning={loading} />
-            Regenerate
           </button>
         </div>
       </div>
