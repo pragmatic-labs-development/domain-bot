@@ -235,12 +235,12 @@ const TLD_DESC = {
 }
 
 const STATUS_BG = {
-  available:   '#0d8a57',
-  premium:     '#8a6010',
-  aftermarket: '#1d4db8',
-  taken:       '#8f2830',
-  checking:    '#1a1f1f',
-  unknown:     '#1a1f1f',
+  available:   '#0a7a4e',
+  premium:     '#7a5510',
+  aftermarket: '#1a44a8',
+  taken:       '#7a2028',
+  checking:    '#16161c',
+  unknown:     '#16161c',
 }
 
 const STATUS_LABEL = {
