@@ -10,11 +10,12 @@ import { useSearch }   from './hooks/useSearch'
 import './App.css'
 
 export default function App() {
-  const [inputValue,   setInputValue]   = useState('')
-  const [savedOpen,    setSavedOpen]    = useState(false)
-  const [ideasOpen,    setIdeasOpen]    = useState(false)
-  const [ideasKw,      setIdeasKw]      = useState('')
-  const [detailDomain, setDetailDomain] = useState(null)
+  const [inputValue,    setInputValue]    = useState('')
+  const [savedOpen,     setSavedOpen]     = useState(false)
+  const [ideasOpen,     setIdeasOpen]     = useState(false)
+  const [ideasKw,       setIdeasKw]       = useState('')
+  const [detailDomain,  setDetailDomain]  = useState(null)
+  const [knownStatuses, setKnownStatuses] = useState({})
   const [saved,      setSaved]      = useState(() =>
     JSON.parse(localStorage.getItem('db-saved') || '[]')
   )
@@ -43,6 +44,14 @@ export default function App() {
   }
 
   const hasResults = keyword && Object.keys(results).length > 0
+
+  // Accumulate statuses across all searches so SavedPanel can colour domains
+  // from previous searches (results resets on each new search)
+  useEffect(() => {
+    if (Object.keys(results).length > 0) {
+      setKnownStatuses(prev => ({ ...prev, ...results }))
+    }
+  }, [results])
 
   useEffect(() => {
     if (hasResults) window.scrollTo({ top: 0, behavior: 'instant' })
@@ -167,7 +176,8 @@ export default function App() {
           onUnsave={toggleSave}
           onClose={() => setSavedOpen(false)}
           livePrices={livePrices}
-          results={results}
+          results={knownStatuses}
+          onLiveCheck={checkLive}
           onDetail={domain => { setSavedOpen(false); setDetailDomain(domain) }}
         />
       )}

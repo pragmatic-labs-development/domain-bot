@@ -3423,6 +3423,12 @@ body::before {
   border-color: rgba(240,80,96,0.35);
   background: rgba(240,80,96,0.06);
 }
+.saved-lock-verified {
+  color: var(--accent);
+  border-color: rgba(0,229,200,0.3);
+  cursor: default;
+  opacity: 0.7;
+}
 
 .saved-panel-footer {
   display: flex;

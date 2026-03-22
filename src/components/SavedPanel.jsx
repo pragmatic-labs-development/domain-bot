@@ -3,7 +3,7 @@
  * Slide-in drawer showing saved domains.
  */
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { getRegistrarPrices } from '../lib/pricing'
 
 const STATUS_COLOR = {
@@ -22,7 +22,7 @@ const STATUS_LABEL = {
   unknown:     'Unknown',
 }
 
-export function SavedPanel({ saved, onUnsave, onClose, livePrices = {}, results = {}, onDetail }) {
+export function SavedPanel({ saved, onUnsave, onClose, livePrices = {}, results = {}, onDetail, onLiveCheck }) {
   useEffect(() => {
     function onKey(e) { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', onKey)
@@ -68,101 +68,17 @@ export function SavedPanel({ saved, onUnsave, onClose, livePrices = {}, results 
             </div>
           ) : (
             <div className="saved-list">
-              {saved.map(domain => {
-                const [name, ...tldParts] = domain.split('.')
-                const tld = '.' + tldParts.join('.')
-                const result = results[domain]
-                const status = result?.status ?? 'unknown'
-                const isTaken = status === 'taken'
-                const isAvailable = status === 'available' || status === 'premium'
-                const isAftermarket = status === 'aftermarket'
-                const statusColor = STATUS_COLOR[status] ?? STATUS_COLOR.unknown
-                const statusLabel = STATUS_LABEL[status] ?? 'Unknown'
-                const registrars = getRegistrarPrices(domain, livePrices)
-                const cheapest = registrars[0]
-
-                return (
-                  <div key={domain} className="saved-item">
-                    <div className="saved-item-left">
-                      <span
-                        className="saved-item-dot"
-                        style={{ background: statusColor }}
-                        title={statusLabel}
-                      />
-                      <div className="saved-item-name">
-                        <span className="saved-item-keyword">{name}</span>
-                        <span className="saved-item-tld" style={{ color: statusColor }}>{tld}</span>
-                      </div>
-                      {status !== 'unknown' && (
-                        <span className="saved-item-status" style={{ color: statusColor }}>
-                          {statusLabel}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="saved-item-actions">
-                      {cheapest && isAvailable && (
-                        <span className="saved-item-price">${cheapest.price.toFixed(2)}/yr</span>
-                      )}
-
-                      {/* Register CTA — only for available/premium */}
-                      {isAvailable && cheapest && (
-                        <button
-                          className="saved-item-btn saved-register"
-                          onClick={() => window.open(cheapest.url(domain), '_blank')}
-                          title={`Register at ${cheapest.name}`}
-                        >
-                          Register →
-                        </button>
-                      )}
-
-                      {/* WHOIS — for taken */}
-                      {isTaken && (
-                        <button
-                          className="saved-item-btn saved-whois"
-                          onClick={() => window.open(`https://who.is/whois/${domain}`, '_blank')}
-                          title="WHOIS lookup"
-                        >
-                          WHOIS →
-                        </button>
-                      )}
-
-                      {/* GoDaddy — for aftermarket */}
-                      {isAftermarket && (
-                        <button
-                          className="saved-item-btn saved-whois"
-                          onClick={() => window.open(`https://www.godaddy.com/domainsearch/find?domainToCheck=${domain}`, '_blank')}
-                          title="Make offer on GoDaddy"
-                        >
-                          Offer →
-                        </button>
-                      )}
-
-                      {/* Eye — view details */}
-                      {onDetail && (
-                        <button
-                          className="saved-item-icon-btn"
-                          onClick={() => onDetail(domain)}
-                          title="View details"
-                          aria-label="View domain details"
-                        >
-                          <EyeIcon />
-                        </button>
-                      )}
-
-                      {/* Trash — remove */}
-                      <button
-                        className="saved-item-icon-btn saved-trash"
-                        onClick={() => onUnsave(domain)}
-                        title="Remove from saved"
-                        aria-label="Remove from saved"
-                      >
-                        <TrashIcon />
-                      </button>
-                    </div>
-                  </div>
-                )
-              })}
+              {saved.map(domain => (
+                <SavedItem
+                  key={domain}
+                  domain={domain}
+                  result={results[domain]}
+                  livePrices={livePrices}
+                  onDetail={onDetail}
+                  onUnsave={onUnsave}
+                  onLiveCheck={onLiveCheck}
+                />
+              ))}
             </div>
           )}
         </div>
@@ -174,6 +90,87 @@ export function SavedPanel({ saved, onUnsave, onClose, livePrices = {}, results 
         </div>
       </div>
     </>
+  )
+}
+
+function SavedItem({ domain, result, livePrices, onDetail, onUnsave, onLiveCheck }) {
+  const [isUnlocking, setIsUnlocking] = useState(false)
+
+  const [name, ...tldParts] = domain.split('.')
+  const tld = '.' + tldParts.join('.')
+  const status = result?.status ?? 'unknown'
+  const isVerified = result?.tier === 'verified' || result?.tier === 'godaddy'
+  const isTaken = status === 'taken'
+  const isAvailable = status === 'available' || status === 'premium'
+  const isAftermarket = status === 'aftermarket'
+  const statusColor = STATUS_COLOR[status] ?? STATUS_COLOR.unknown
+  const statusLabel = STATUS_LABEL[status] ?? 'Unknown'
+  const registrars = getRegistrarPrices(domain, livePrices)
+  const cheapest = registrars[0]
+
+  function handleLock() {
+    if (isVerified || isUnlocking) return
+    setIsUnlocking(true)
+    onLiveCheck?.(domain)?.finally(() => setIsUnlocking(false))
+  }
+
+  return (
+    <div className="saved-item">
+      <div className="saved-item-left">
+        <span className="saved-item-dot" style={{ background: statusColor }} title={statusLabel} />
+        <div className="saved-item-name">
+          <span className="saved-item-keyword">{name}</span>
+          <span className="saved-item-tld" style={{ color: statusColor }}>{tld}</span>
+        </div>
+        {status !== 'unknown' && (
+          <span className="saved-item-status" style={{ color: statusColor }}>{statusLabel}</span>
+        )}
+      </div>
+
+      <div className="saved-item-actions">
+        {cheapest && isAvailable && (
+          <span className="saved-item-price">${cheapest.price.toFixed(2)}/yr</span>
+        )}
+
+        {isAvailable && cheapest && (
+          <button className="saved-item-btn saved-register" onClick={() => window.open(cheapest.url(domain), '_blank')} title={`Register at ${cheapest.name}`}>
+            Register →
+          </button>
+        )}
+        {isTaken && (
+          <button className="saved-item-btn saved-whois" onClick={() => window.open(`https://who.is/whois/${domain}`, '_blank')} title="WHOIS lookup">
+            WHOIS →
+          </button>
+        )}
+        {isAftermarket && (
+          <button className="saved-item-btn saved-whois" onClick={() => window.open(`https://www.godaddy.com/domainsearch/find?domainToCheck=${domain}`, '_blank')} title="Make offer">
+            Offer →
+          </button>
+        )}
+
+        {/* Lock — live check */}
+        {!isAftermarket && onLiveCheck && (
+          <button
+            className={`saved-item-icon-btn ${isVerified ? 'saved-lock-verified' : ''}`}
+            onClick={handleLock}
+            disabled={isVerified || isUnlocking}
+            title={isVerified ? 'Live data loaded' : isUnlocking ? 'Checking…' : 'Live check — real-time availability + pricing'}
+          >
+            {isVerified ? <LockOpenIcon /> : isUnlocking ? <MiniSpinner /> : <LockIcon />}
+          </button>
+        )}
+
+        {onDetail && (
+          <button className="saved-item-icon-btn" onClick={() => onDetail(domain)} title="View details" aria-label="View domain details">
+            <EyeIcon />
+          </button>
+        )}
+
+        <button className="saved-item-icon-btn saved-trash" onClick={() => onUnsave(domain)} title="Remove from saved" aria-label="Remove from saved">
+          <TrashIcon />
+        </button>
+      </div>
+    </div>
   )
 }
 
@@ -200,11 +197,22 @@ function CloseIcon() {
 }
 function LockIcon() {
   return (
-    <svg width="10" height="10" viewBox="0 0 12 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+    <svg width="12" height="12" viewBox="0 0 12 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
       <rect x="1.5" y="6" width="9" height="7" rx="1.5"/>
       <path d="M3.5 6V4a2.5 2.5 0 015 0v2"/>
     </svg>
   )
+}
+function LockOpenIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+      <rect x="1.5" y="6" width="9" height="7" rx="1.5"/>
+      <path d="M3.5 6V4a2.5 2.5 0 014.95-1"/>
+    </svg>
+  )
+}
+function MiniSpinner() {
+  return <div className="dns-spinner" style={{ width: 11, height: 11, borderWidth: 1.5 }} />
 }
 function EyeIcon() {
   return (
