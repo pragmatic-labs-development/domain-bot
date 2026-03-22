@@ -319,6 +319,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
                       onSave={toggleSave}
                       onDetail={setDetailDomain}
                       onLiveCheck={handleLiveCheck}
+                      onLoadHealth={onLoadHealth}
                       index={i}
                     />
                   ))}

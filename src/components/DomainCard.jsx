@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react'
 import { getLowestPrice, seoScore, scoreColor, getRegistrarPrices } from '../lib/pricing'
 import { computePrivacyScore, computeStatusTag, healthSummaryLabel } from '../lib/health'
 
-export function DomainCard({ domain, result, livePrices = {}, healthData = {}, saved, isUnlocked: unlockedFromParent, onSave, onDetail, onLiveCheck }) {
+export function DomainCard({ domain, result, livePrices = {}, healthData = {}, saved, isUnlocked: unlockedFromParent, onSave, onDetail, onLiveCheck, onLoadHealth }) {
   const [lockState,  setLockState]  = useState(() => unlockedFromParent ? 'unlocked' : 'locked')
   const [isSaved,    setIsSaved]    = useState(saved)
   const [bookmarkAnim, setBookmarkAnim] = useState(false)
@@ -18,6 +18,10 @@ export function DomainCard({ domain, result, livePrices = {}, healthData = {}, s
   useEffect(() => {
     if (unlockedFromParent && lockState === 'locked') setLockState('unlocked')
   }, [unlockedFromParent])
+  // Auto-retry health if unlocked but data missing (e.g. previous fetch failed)
+  useEffect(() => {
+    if (isUnlocked && !healthData[domain]) onLoadHealth?.(domain)
+  }, [isUnlocked, domain])
   const { status } = result
   const [name, ...tldParts] = domain.split('.')
   const tld = '.' + tldParts.join('.')

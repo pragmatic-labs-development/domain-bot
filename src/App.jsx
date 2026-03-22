@@ -71,7 +71,7 @@ export default function App() {
 
           <div className="nav-right">
             <button
-              className="icon-btn"
+              className="icon-btn icon-btn-wand"
               onClick={() => setIdeasOpen(true)}
               aria-label="Generate domain ideas"
               title="Generate ideas"
@@ -167,7 +167,7 @@ export default function App() {
       {ideasOpen && (
         <IdeasModal
           onClose={() => setIdeasOpen(false)}
-          onSubmit={kw => { setIdeasKw(kw); setIdeasOpen(false) }}
+          onSubmit={kw => { setIdeasKw(kw); setInputValue(kw); setIdeasOpen(false) }}
         />
       )}
     </div>

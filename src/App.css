@@ -198,6 +198,18 @@ body::before {
   color: var(--text);
   background: var(--surface2);
 }
+.icon-btn-wand {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+.icon-btn-wand:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+  opacity: 0.85;
+  box-shadow: 0 0 12px rgba(0,229,200,0.35);
+}
 
 /* ── Hero ── */
 #hero {
