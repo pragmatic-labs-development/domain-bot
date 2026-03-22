@@ -55,7 +55,7 @@ function advActiveCount(advFilters, advPriceRange, advTldCats, advMinSeo, advNam
   return n
 }
 
-export function ResultsView({ keyword, primaryDomain, results, livePrices, healthData = {}, loading, wave3Available, onLoadWave3, onLiveCheck, onLoadHealth, saved = [], onSave }) {
+export function ResultsView({ keyword, primaryDomain, results, livePrices, healthData = {}, loading, wave3Available, onLoadWave3, onLiveCheck, onLoadHealth, saved = [], onSave, ideasKw }) {
   const [mainTab,      setMainTab]      = useState('search')
   const [quickFilter,  setQuickFilter]  = useState('all-tlds')
   const [sortId,       setSortId]       = useState('seo-desc')
@@ -83,6 +83,11 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
     setAdvPriceRange([0, 200]); setAdvTldCats(new Set()); setAdvMinSeo(0)
     setAdvNameLength(new Set(['short','medium','long']))
   }, [keyword])
+
+  // Switch to Other Ideas tab when a wand-modal keyword comes in
+  useEffect(() => {
+    if (ideasKw) setMainTab('other-ideas')
+  }, [ideasKw])
 
   function toggleSave(domain) {
     onSave?.(domain)
@@ -261,7 +266,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
 
       {/* Other Ideas panel */}
       {mainTab === 'other-ideas' && (
-        <OtherIdeasView keyword={keyword} onDetail={setDetailDomain} saved={saved} onSave={toggleSave} />
+        <OtherIdeasView keyword={ideasKw || keyword} onDetail={setDetailDomain} saved={saved} onSave={toggleSave} />
       )}
 
       {/* Search panel */}

@@ -2,7 +2,7 @@
  * src/App.jsx
  */
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { SearchBar }   from './components/SearchBar'
 import { ResultsView } from './components/ResultsView'
 import { SavedPanel }  from './components/SavedPanel'
@@ -12,6 +12,8 @@ import './App.css'
 export default function App() {
   const [inputValue, setInputValue] = useState('')
   const [savedOpen,  setSavedOpen]  = useState(false)
+  const [ideasOpen,  setIdeasOpen]  = useState(false)
+  const [ideasKw,    setIdeasKw]    = useState('')
   const [saved,      setSaved]      = useState(() =>
     JSON.parse(localStorage.getItem('db-saved') || '[]')
   )
@@ -70,7 +72,7 @@ export default function App() {
           <div className="nav-right">
             <button
               className="icon-btn"
-              onClick={() => { setInputValue(''); document.querySelector('.hero-input, .nav-search-input')?.focus() }}
+              onClick={() => setIdeasOpen(true)}
               aria-label="Generate domain ideas"
               title="Generate ideas"
             >
@@ -148,6 +150,7 @@ export default function App() {
             onLoadHealth={loadHealth}
             saved={saved}
             onSave={toggleSave}
+            ideasKw={ideasKw}
           />
         </div>
       )}
@@ -160,6 +163,62 @@ export default function App() {
           livePrices={livePrices}
         />
       )}
+
+      {ideasOpen && (
+        <IdeasModal
+          onClose={() => setIdeasOpen(false)}
+          onSubmit={kw => { setIdeasKw(kw); setIdeasOpen(false) }}
+        />
+      )}
+    </div>
+  )
+}
+
+function IdeasModal({ onClose, onSubmit }) {
+  const [value, setValue] = useState('')
+  const inputRef = useRef(null)
+
+  useEffect(() => {
+    inputRef.current?.focus()
+    function onKey(e) { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onClose])
+
+  function handleSubmit() {
+    const kw = value.trim().toLowerCase().replace(/[^a-z0-9-]/g, '')
+    if (kw) onSubmit(kw)
+  }
+
+  return (
+    <div className="ideas-modal-overlay" onClick={e => { if (e.target === e.currentTarget) onClose() }}>
+      <div className="ideas-modal">
+        <div className="ideas-modal-header">
+          <WandIcon />
+          <span>Generate name ideas</span>
+        </div>
+        <p className="ideas-modal-sub">Enter a word or concept — we'll find 20 available domain variations.</p>
+        <div className="ideas-modal-row">
+          <input
+            ref={inputRef}
+            className="ideas-modal-input"
+            type="text"
+            value={value}
+            onChange={e => setValue(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') handleSubmit() }}
+            placeholder="e.g. spark, bloom, atlas…"
+            spellCheck={false}
+            autoComplete="off"
+          />
+          <button
+            className="ideas-modal-btn"
+            onClick={handleSubmit}
+            disabled={!value.trim()}
+          >
+            Generate
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
@@ -167,8 +226,9 @@ export default function App() {
 function WandIcon() {
   return (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M15 4V2m0 14v-2M8 9h2m10 0h2M17.8 6.2l-1.4 1.4M13.4 10.6l-1.4 1.4M4 20l9-9"/>
-      <path d="M13 4l1.5 3.5L18 9l-3.5 1.5L13 14l-1.5-3.5L8 9l3.5-1.5z"/>
+      <path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"/>
+      <path d="m14 7 3 3"/>
+      <path d="M5 6v4M19 14v4M10 2v2M7 8H3M21 16h-4M11 3H9"/>
     </svg>
   )
 }
