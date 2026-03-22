@@ -47,18 +47,32 @@ function seededShuffle(arr, seed) {
   return a
 }
 
+// Primary TLD + supplements — increases hit rate dramatically for popular keywords
+const SUPPLEMENT_TLDS = ['io', 'co', 'app', 'net', 'xyz', 'dev', 'ai']
+
 function generateDomains(kw, seed) {
-  // Use full pools shuffled — gives ~100 candidates to find 24 available
   const prefixes = seededShuffle(PREFIXES_POOL, seed)
   const suffixes = seededShuffle(SUFFIXES_POOL, seed + 1)
   const seen = new Set()
   const domains = []
   const add = d => { if (!seen.has(d)) { seen.add(d); domains.push(d) } }
+
+  // .com first (highest trust / most sought)
   const maxLen = Math.max(prefixes.length, suffixes.length)
   for (let i = 0; i < maxLen; i++) {
     if (i < prefixes.length) add(`${prefixes[i]}${kw}.com`)
     if (i < suffixes.length) add(`${kw}${suffixes[i]}.com`)
   }
+
+  // Supplement TLDs — interleaved so variety is spread evenly
+  const tlds = seededShuffle(SUPPLEMENT_TLDS, seed + 2)
+  for (const tld of tlds) {
+    const sliceP = seededShuffle(prefixes, seed + tld.length).slice(0, 12)
+    const sliceS = seededShuffle(suffixes, seed + tld.length + 1).slice(0, 12)
+    sliceP.forEach(p => add(`${p}${kw}.${tld}`))
+    sliceS.forEach(s => add(`${kw}${s}.${tld}`))
+  }
+
   return domains
 }
 
@@ -98,7 +112,7 @@ export function OtherIdeasView({ keyword, onDetail, saved = [], onSave }) {
     const found   = []   // accumulates available domains across batches
     const seenDomains = new Set()
     let   seedOffset  = 0
-    const MAX_BATCHES = 8  // safety cap — stops after 8 × ~100 candidates
+    const MAX_BATCHES = 15  // safety cap — stops after 15 × ~250 candidates
 
     // Enforce a minimum 800ms so ghost rows never flash
     const minWait = new Promise(r => setTimeout(r, 800))
@@ -127,9 +141,10 @@ export function OtherIdeasView({ keyword, onDetail, saved = [], onSave }) {
 
     await minWait
     if (currentKw.current !== kw || currentKey.current !== key) return
-    // Always trim to a multiple of 2 so the grid has full, symmetric rows
+    // Trim to a multiple of 2 for a symmetric grid, but keep at least 1 column worth
     const COLS = 2
-    const symmetric = found.slice(0, Math.floor(found.length / COLS) * COLS)
+    const trimmed = Math.floor(found.length / COLS) * COLS
+    const symmetric = trimmed > 0 ? found.slice(0, trimmed) : found
     setAvailable(symmetric)
     setLoading(false)
   }, [])

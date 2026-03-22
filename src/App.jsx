@@ -36,6 +36,14 @@ export default function App() {
   }
 
   function toggleSave(domain) {
+    // Capture status at save time so the saved panel has colors immediately
+    if (!savedStatuses[domain] && results[domain]) {
+      setSavedStatuses(prev => {
+        const next = { ...prev, [domain]: results[domain] }
+        localStorage.setItem('db-saved-statuses', JSON.stringify(next))
+        return next
+      })
+    }
     setSaved(prev => {
       const next = prev.includes(domain)
         ? prev.filter(d => d !== domain)
