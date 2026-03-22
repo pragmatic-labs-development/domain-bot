@@ -87,7 +87,7 @@ const STATUS_DOT = {
   unknown:     'var(--text-dim)',
 }
 
-export function OtherIdeasView({ keyword, onDetail, saved = [], onSave }) {
+export function OtherIdeasView({ keyword, onDetail, saved = [], onSave, onLiveCheck }) {
   const [available,    setAvailable]    = useState([])
   const [loading,      setLoading]      = useState(true)
   const [refreshKey,   setRefreshKey]   = useState(1)
@@ -223,56 +223,89 @@ export function OtherIdeasView({ keyword, onDetail, saved = [], onSave }) {
         <div className="ideas-grid ideas-grid-loaded">
           {cols.map((col, ci) => (
             <div key={ci} className="ideas-col">
-              {col.map(({ domain, status, price }, i) => (
-                <div key={domain} className="ideas-row" style={{ animationDelay: `${i * 30}ms` }}>
-                  <span
-                    className="ideas-dot"
-                    style={{ background: STATUS_DOT[status] ?? STATUS_DOT.unknown }}
-                  />
-                  <span className="ideas-domain">{domain}</span>
-                  <div className="ideas-row-actions">
-                    {onSave && (
-                      <button
-                        className={`ideas-save-btn ${saved.includes(domain) ? 'saved' : ''}`}
-                        onClick={() => onSave(domain)}
-                        title={saved.includes(domain) ? 'Remove from saved' : 'Save domain'}
-                        aria-label={saved.includes(domain) ? 'Remove from saved' : 'Save domain'}
-                      >
-                        <BookmarkIcon filled={saved.includes(domain)} />
-                      </button>
-                    )}
-                    <button
-                      className="ideas-copy-row-btn"
-                      onClick={() => copyDomain(domain)}
-                      title="Copy domain"
-                      aria-label="Copy domain"
-                    >
-                      {copiedDomain === domain ? <CheckIcon /> : <CopyIcon />}
-                    </button>
-                    {onDetail && (
-                      <button
-                        className="ideas-detail-btn"
-                        onClick={() => onDetail(domain)}
-                        title="View details"
-                      >
-                        Details
-                      </button>
-                    )}
-                    <a
-                      className={`ideas-action ${status}`}
-                      href={`https://www.godaddy.com/domainsearch/find?domainToCheck=${domain}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {status === 'premium' && price ? `$${price.toFixed(0)}` : 'Register →'}
-                    </a>
-                  </div>
-                </div>
+              {col.map(({ domain, status }, i) => (
+                <IdeasRow
+                  key={domain}
+                  domain={domain}
+                  status={status}
+                  index={i}
+                  saved={saved}
+                  onSave={onSave}
+                  onDetail={onDetail}
+                  onLiveCheck={onLiveCheck}
+                  copiedDomain={copiedDomain}
+                  copyDomain={copyDomain}
+                />
               ))}
             </div>
           ))}
         </div>
       )}
+    </div>
+  )
+}
+
+function IdeasRow({ domain, status, index, saved, onSave, onDetail, onLiveCheck, copiedDomain, copyDomain }) {
+  const [isUnlocking, setIsUnlocking] = useState(false)
+  const [isVerified,  setIsVerified]  = useState(false)
+
+  function handleLock() {
+    if (isVerified || isUnlocking || !onLiveCheck) return
+    setIsUnlocking(true)
+    onLiveCheck(domain)?.finally(() => {
+      setIsUnlocking(false)
+      setIsVerified(true)
+    })
+  }
+
+  return (
+    <div className="ideas-row" style={{ animationDelay: `${index * 30}ms` }}>
+      <span
+        className="ideas-dot"
+        style={{ background: STATUS_DOT[status] ?? STATUS_DOT.unknown }}
+      />
+      <span className="ideas-domain">{domain}</span>
+      <div className="ideas-row-actions">
+        {onSave && (
+          <button
+            className={`ideas-save-btn ${saved.includes(domain) ? 'saved' : ''}`}
+            onClick={() => onSave(domain)}
+            title={saved.includes(domain) ? 'Remove from saved' : 'Save domain'}
+            aria-label={saved.includes(domain) ? 'Remove from saved' : 'Save domain'}
+          >
+            <BookmarkIcon filled={saved.includes(domain)} />
+          </button>
+        )}
+        <button
+          className="ideas-copy-row-btn"
+          onClick={() => copyDomain(domain)}
+          title="Copy domain"
+          aria-label="Copy domain"
+        >
+          {copiedDomain === domain ? <CheckIcon /> : <CopyIcon />}
+        </button>
+        {onLiveCheck && (
+          <button
+            className={`ideas-lock-btn ${isVerified ? 'ideas-lock-verified' : ''}`}
+            onClick={handleLock}
+            disabled={isVerified || isUnlocking}
+            title={isVerified ? 'Live data loaded' : isUnlocking ? 'Checking…' : 'Live check'}
+            aria-label="Live check"
+          >
+            {isVerified ? <LockOpenIcon /> : isUnlocking ? <IdeasSpinner /> : <LockIcon />}
+          </button>
+        )}
+        {onDetail && (
+          <button
+            className="ideas-eye-btn"
+            onClick={() => onDetail(domain)}
+            title="View details"
+            aria-label="View details"
+          >
+            <EyeIcon />
+          </button>
+        )}
+      </div>
     </div>
   )
 }
@@ -311,6 +344,33 @@ function RefreshIcon({ spinning }) {
       <path d="M21 3v5h-5"/>
       <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
       <path d="M8 16H3v5"/>
+    </svg>
+  )
+}
+function LockIcon() {
+  return (
+    <svg width="9" height="9" viewBox="0 0 12 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <rect x="1.5" y="6" width="9" height="7" rx="1.5"/>
+      <path d="M3.5 6V4a2.5 2.5 0 015 0v2"/>
+    </svg>
+  )
+}
+function LockOpenIcon() {
+  return (
+    <svg width="9" height="9" viewBox="0 0 12 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <rect x="1.5" y="6" width="9" height="7" rx="1.5"/>
+      <path d="M3.5 6V4a2.5 2.5 0 014.95-1"/>
+    </svg>
+  )
+}
+function IdeasSpinner() {
+  return <div className="dns-spinner" style={{ width: 9, height: 9, borderWidth: 1.5 }} />
+}
+function EyeIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
     </svg>
   )
 }

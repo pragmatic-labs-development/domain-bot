@@ -267,7 +267,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
 
       {/* Other Ideas panel */}
       {mainTab === 'other-ideas' && (
-        <OtherIdeasView keyword={ideasKw || keyword} onDetail={setDetailDomain} saved={saved} onSave={toggleSave} />
+        <OtherIdeasView keyword={ideasKw || keyword} onDetail={setDetailDomain} saved={saved} onSave={toggleSave} onLiveCheck={onLiveCheck} />
       )}
 
       {/* Search panel */}

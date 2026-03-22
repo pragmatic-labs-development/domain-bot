@@ -1084,24 +1084,33 @@ body::before {
   border-color: rgba(0,229,200,0.3);
   background: rgba(0,229,200,0.06);
 }
-.ideas-detail-btn {
+.ideas-lock-btn,
+.ideas-eye-btn {
   flex-shrink: 0;
-  padding: 0.2rem 0.55rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
   background: transparent;
-  border: 1px solid var(--border-bright);
-  border-radius: 6px;
-  color: var(--text-muted);
-  font-family: var(--font-body);
-  font-size: 0.72rem;
-  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
   cursor: pointer;
   transition: color 0.15s, border-color 0.15s, background 0.15s;
 }
-.ideas-detail-btn:hover {
+.ideas-lock-btn:hover,
+.ideas-eye-btn:hover {
   color: var(--text);
   border-color: var(--border-hover);
   background: var(--surface3);
 }
+.ideas-lock-btn.ideas-lock-verified {
+  color: var(--accent);
+  border-color: rgba(0,229,200,0.3);
+}
+.ideas-lock-btn:disabled { opacity: 0.6; cursor: default; }
 .ideas-action {
   font-family: var(--font-body);
   font-size: 0.72rem;
