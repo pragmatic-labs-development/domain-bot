@@ -221,13 +221,15 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
           )}
         </div>
 
-        {/* Status legend */}
-        <div className="tab-bar-legend">
-          <span className="tbl-item available">Available</span>
-          <span className="tbl-item premium">Premium</span>
-          <span className="tbl-item aftermarket">Aftermarket</span>
-          <span className="tbl-item taken">Taken</span>
-        </div>
+        {/* Status legend — only on tabs where multiple statuses appear */}
+        {(mainTab === 'advanced' || mainTab === 'domains') && (
+          <div className="tab-bar-legend">
+            <span className="tbl-item available">Available</span>
+            <span className="tbl-item premium">Premium</span>
+            <span className="tbl-item aftermarket">Aftermarket</span>
+            <span className="tbl-item taken">Taken</span>
+          </div>
+        )}
 
         {/* Sort dropdown */}
         <div className="sort-wrap">

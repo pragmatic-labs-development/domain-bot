@@ -44,8 +44,12 @@ export function DomainRow({ domain, result, livePrices = {}, healthData = {}, sa
 
   return (
     <div
-      className={`domain-row row-${isAftermarket ? 'aftermarket' : status}`}
+      className={`domain-row row-${isAftermarket ? 'aftermarket' : status} row-clickable`}
       style={{ '--row-accent': statusColor, animationDelay: `${index * 35}ms` }}
+      onClick={() => onDetail?.(domain)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onDetail?.(domain) }}
     >
       <div className={`status-dot ${isVerified ? 'verified' : status}`} />
 
@@ -74,8 +78,8 @@ export function DomainRow({ domain, result, livePrices = {}, healthData = {}, sa
 
       <div className="row-actions">
         <ScoreRing score={seo} color={scoreColor(seo, 'seo')} label="SEO" />
-        {/* <ScoreRing score={bot} color={scoreColor(bot, 'bot')} label="Bot" /> */}
 
+        {/* Bookmark — always visible */}
         <button
           className={`card-icon-btn ${saved ? 'saved' : ''}`}
           onClick={e => { e.stopPropagation(); onSave(domain) }}
@@ -84,21 +88,22 @@ export function DomainRow({ domain, result, livePrices = {}, healthData = {}, sa
           <BookmarkIcon filled={saved} />
         </button>
 
-        {!isVerified && (isAvailable || isTaken || isUnknown) && (
+        {/* Lock / live check — always visible, disabled when verified */}
+        {!isAftermarket && (
           <button
-            className="row-action-btn"
-            onClick={e => { e.stopPropagation(); onLiveCheck(domain) }}
-            title="Get authoritative availability + live price"
+            className={`row-action-btn row-lock-btn ${isVerified ? 'row-lock-verified' : ''}`}
+            onClick={e => { e.stopPropagation(); if (!isVerified) onLiveCheck(domain) }}
+            title={isVerified ? 'Live data loaded' : 'Get authoritative availability + live price'}
+            disabled={isVerified}
           >
-            <LockIcon /> {isTaken ? 'Check status' : 'Live check'}
+            {isVerified ? <LockOpenIcon /> : <LockIcon />}
           </button>
         )}
-        {isVerified && <span className="verified-badge">Verified</span>}
 
         {isTaken && (
           <button
             className="row-action-btn"
-            onClick={() => window.open(`https://who.is/whois/${domain}`, '_blank')}
+            onClick={e => { e.stopPropagation(); window.open(`https://who.is/whois/${domain}`, '_blank') }}
           >
             WHOIS
           </button>
@@ -107,17 +112,20 @@ export function DomainRow({ domain, result, livePrices = {}, healthData = {}, sa
         {isAftermarket && (
           <button
             className="row-action-btn"
-            onClick={() => window.open(`https://www.godaddy.com/domainsearch/find?domainToCheck=${domain}`, '_blank')}
+            onClick={e => { e.stopPropagation(); window.open(`https://www.godaddy.com/domainsearch/find?domainToCheck=${domain}`, '_blank') }}
           >
             Make offer
           </button>
         )}
 
+        {/* Eye / details button */}
         <button
-          className="row-action-btn row-details-btn"
-          onClick={() => onDetail?.(domain)}
+          className="row-action-btn row-eye-btn"
+          onClick={e => { e.stopPropagation(); onDetail?.(domain) }}
+          title="View details"
+          aria-label="View domain details"
         >
-          View Details
+          <EyeIcon />
         </button>
       </div>
     </div>
@@ -157,6 +165,22 @@ function LockIcon() {
     <svg width="9" height="9" viewBox="0 0 12 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
       <rect x="1.5" y="6" width="9" height="7" rx="1.5"/>
       <path d="M3.5 6V4a2.5 2.5 0 015 0v2"/>
+    </svg>
+  )
+}
+function LockOpenIcon() {
+  return (
+    <svg width="9" height="9" viewBox="0 0 12 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <rect x="1.5" y="6" width="9" height="7" rx="1.5"/>
+      <path d="M3.5 6V4a2.5 2.5 0 014.95-1"/>
+    </svg>
+  )
+}
+function EyeIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
     </svg>
   )
 }

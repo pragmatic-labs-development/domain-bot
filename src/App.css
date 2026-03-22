@@ -846,6 +846,23 @@ body::before {
   opacity: 0.3;
   cursor: default;
 }
+.ideas-refresh-btn.ideas-refresh-prominent {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+  padding: 0.4rem 1rem;
+  box-shadow: 0 0 12px rgba(0, 229, 200, 0.3);
+}
+.ideas-refresh-btn.ideas-refresh-prominent:hover:not(:disabled) {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+  color: var(--bg);
+  box-shadow: 0 0 18px rgba(0, 229, 200, 0.45);
+}
+.ideas-refresh-btn.ideas-refresh-prominent:disabled {
+  opacity: 0.45;
+}
 .ideas-title {
   font-size: 0.88rem;
   color: var(--text-muted);
@@ -861,7 +878,7 @@ body::before {
 }
 .ideas-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 0 var(--sp-8);
 }
 .ideas-col {
@@ -2232,6 +2249,31 @@ body::before {
   white-space: nowrap;
 }
 .lock-btn:hover { color: var(--accent); border-color: rgba(0,229,200,0.4); }
+
+.row-clickable {
+  cursor: pointer;
+}
+.row-lock-btn {
+  padding: 0.3rem 0.5rem;
+  min-width: 28px;
+  justify-content: center;
+}
+.row-lock-btn.row-lock-verified {
+  color: var(--accent);
+  border-color: rgba(0, 229, 200, 0.25);
+  opacity: 0.7;
+  cursor: default;
+}
+.row-eye-btn {
+  padding: 0.3rem 0.5rem;
+  min-width: 28px;
+  justify-content: center;
+  color: var(--text-muted);
+}
+.row-eye-btn:hover {
+  color: var(--accent);
+  border-color: rgba(0, 229, 200, 0.35);
+}
 
 .verified-badge {
   font-family: var(--font-mono);

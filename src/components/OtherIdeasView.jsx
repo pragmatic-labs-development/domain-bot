@@ -62,7 +62,7 @@ function generateDomains(kw, seed) {
   return domains
 }
 
-const TARGET = 30
+const TARGET = 20
 
 const STATUS_DOT = {
   available:   'var(--green)',
@@ -127,8 +127,8 @@ export function OtherIdeasView({ keyword, onDetail, saved = [], onSave }) {
 
     await minWait
     if (currentKw.current !== kw || currentKey.current !== key) return
-    // Always trim to a multiple of 3 so the grid has full, symmetric rows
-    const COLS = 3
+    // Always trim to a multiple of 2 so the grid has full, symmetric rows
+    const COLS = 2
     const symmetric = found.slice(0, Math.floor(found.length / COLS) * COLS)
     setAvailable(symmetric)
     setLoading(false)
@@ -145,9 +145,9 @@ export function OtherIdeasView({ keyword, onDetail, saved = [], onSave }) {
 
   if (!keyword) return null
 
-  // TARGET is always a multiple of 3 (30), so cols are always equal-length
-  const cols = [[], [], []]
-  available.forEach((item, i) => { cols[i % 3].push(item) })
+  // TARGET is always a multiple of 2 (20), so cols are always equal-length
+  const cols = [[], []]
+  available.forEach((item, i) => { cols[i % 2].push(item) })
 
   return (
     <div className="ideas-view">
@@ -173,13 +173,13 @@ export function OtherIdeasView({ keyword, onDetail, saved = [], onSave }) {
             </button>
           )}
           <button
-            className="ideas-refresh-btn"
+            className="ideas-refresh-btn ideas-refresh-prominent"
             onClick={handleRefresh}
             disabled={loading}
-            title="Generate more ideas"
+            title="Generate new ideas"
           >
             <RefreshIcon spinning={loading} />
-            Generate More Ideas
+            Regenerate
           </button>
         </div>
       </div>
@@ -187,9 +187,9 @@ export function OtherIdeasView({ keyword, onDetail, saved = [], onSave }) {
       {/* Ghost rows while loading */}
       {loading && (
         <div className="ideas-grid">
-          {[0, 1, 2].map(ci => (
+          {[0, 1].map(ci => (
             <div key={ci} className="ideas-col">
-              {Array.from({ length: TARGET / 3 }).map((_, i) => (
+              {Array.from({ length: TARGET / 2 }).map((_, i) => (
                 <div key={i} className="ideas-row ideas-ghost-row">
                   <span className="ideas-ghost-dot" />
                   <span className="ideas-ghost-text" style={{ width: `${55 + ((ci * 7 + i * 13) % 30)}%` }} />

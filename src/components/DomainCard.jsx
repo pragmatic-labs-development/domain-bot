@@ -129,14 +129,14 @@ export function DomainCard({ domain, result, livePrices = {}, healthData = {}, s
             {seo}
           </div>
 
-          {/* Detail / info — full 44px touch target */}
+          {/* Detail / eye — full 44px touch target */}
           <button
             className="card-btn-detail"
             onClick={e => { e.stopPropagation(); onDetail?.(domain) }}
             title="View details"
             aria-label="View domain details"
           >
-            <InfoIcon />
+            <EyeIcon />
           </button>
 
           {/* Live-check / lock */}
@@ -171,12 +171,11 @@ function BookmarkIcon({ filled }) {
   )
 }
 
-function InfoIcon() {
+function EyeIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10"/>
-      <line x1="12" y1="16" x2="12" y2="12"/>
-      <line x1="12" y1="8" x2="12.01" y2="8"/>
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
     </svg>
   )
 }

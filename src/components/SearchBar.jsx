@@ -34,25 +34,10 @@ export function SearchBar({ value, onChange, onSearch, loading, variant = 'hero'
           autoCapitalize="off"
         />
 
-        {primaryDomain && status && status !== 'checking' && (
+        {primaryDomain && status === 'available' && (
           <div className="nav-status-line">
             <span className="nav-status-sep">·</span>
-            {status === 'available' && (
-              <span className="nav-status-text available">✓ Available</span>
-            )}
-            {status === 'taken' && (
-              <>
-                <span className="nav-status-text taken">✗ Taken</span>
-                <a
-                  className="nav-status-link"
-                  href={`https://who.is/whois/${primaryDomain}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  WHOIS →
-                </a>
-              </>
-            )}
+            <span className="nav-status-text available">✓ Available</span>
           </div>
         )}
 
