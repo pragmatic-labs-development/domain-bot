@@ -18,10 +18,6 @@ export function DomainCard({ domain, result, livePrices = {}, healthData = {}, s
   useEffect(() => {
     if (unlockedFromParent && lockState === 'locked') setLockState('unlocked')
   }, [unlockedFromParent])
-  // Auto-retry health if unlocked but data missing (e.g. previous fetch failed)
-  useEffect(() => {
-    if (isUnlocked && !healthData[domain]) onLoadHealth?.(domain)
-  }, [isUnlocked, domain])
   const { status } = result
   const [name, ...tldParts] = domain.split('.')
   const tld = '.' + tldParts.join('.')
@@ -39,6 +35,11 @@ export function DomainCard({ domain, result, livePrices = {}, healthData = {}, s
 
   const isPremium  = status === 'premium'
   const isUnlocked = lockState === 'unlocked'
+
+  // Auto-retry health if unlocked but data missing (e.g. previous fetch failed)
+  useEffect(() => {
+    if (isUnlocked && !healthData[domain]) onLoadHealth?.(domain)
+  }, [isUnlocked, domain])
 
   // SEO quality label for unlocked state
   const seoLabel = seo >= 80 ? 'Strong' : seo >= 60 ? 'Good' : seo >= 40 ? 'Fair' : 'Weak'
