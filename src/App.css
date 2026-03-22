@@ -2205,7 +2205,7 @@ body::before {
 }
 .save-btn:hover, .save-btn.saved { color: var(--yellow); }
 
-/* Row star save button (used in DomainRow) */
+/* Row bookmark button (used in DomainRow) */
 .card-icon-btn {
   display: flex;
   align-items: center;
@@ -2222,14 +2222,14 @@ body::before {
   flex-shrink: 0;
 }
 .card-icon-btn:hover {
-  color: var(--yellow);
-  border-color: rgba(245,166,35,0.35);
-  background: rgba(245,166,35,0.06);
+  color: var(--green);
+  border-color: rgba(16,217,138,0.35);
+  background: rgba(16,217,138,0.06);
 }
 .card-icon-btn.saved {
-  color: var(--yellow);
-  border-color: rgba(245,166,35,0.35);
-  background: rgba(245,166,35,0.08);
+  color: var(--green);
+  border-color: rgba(16,217,138,0.35);
+  background: rgba(16,217,138,0.08);
 }
 
 .lock-btn {

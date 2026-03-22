@@ -46,10 +46,10 @@ export function DomainRow({ domain, result, livePrices = {}, healthData = {}, sa
     <div
       className={`domain-row row-${isAftermarket ? 'aftermarket' : status} row-clickable`}
       style={{ '--row-accent': statusColor, animationDelay: `${index * 35}ms` }}
-      onClick={() => onDetail?.(domain)}
+      onClick={() => onSave(domain)}
       role="button"
       tabIndex={0}
-      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onDetail?.(domain) }}
+      onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') onSave(domain) }}
     >
       <div className={`status-dot ${isVerified ? 'verified' : status}`} />
 
