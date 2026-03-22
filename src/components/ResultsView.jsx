@@ -211,7 +211,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
             className={`main-tab ${mainTab === 'other-ideas' ? 'active' : ''}`}
             onClick={() => setMainTab('other-ideas')}
           >
-            Other Ideas
+            Ideas
           </button>
           <button
             className={`main-tab ${mainTab === 'advanced' ? 'active' : ''}`}
