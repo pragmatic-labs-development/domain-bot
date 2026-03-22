@@ -80,6 +80,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
   // Also reset when new search fires
   useEffect(() => {
     setVisibleCount(30)
+    setMainTab('search')
     setAdvPriceRange([0, 200]); setAdvTldCats(new Set()); setAdvMinSeo(0)
     setAdvNameLength(new Set(['short','medium','long']))
   }, [keyword])

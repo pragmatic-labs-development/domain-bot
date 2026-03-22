@@ -25,7 +25,10 @@ export default function App() {
   } = useSearch()
 
   function handleSearch() {
-    if (inputValue.trim()) triggerSearch(inputValue.trim())
+    if (inputValue.trim()) {
+      setIdeasKw('')
+      triggerSearch(inputValue.trim())
+    }
   }
 
   function toggleSave(domain) {
