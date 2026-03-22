@@ -198,16 +198,23 @@ body::before {
   color: var(--text);
   background: var(--surface2);
 }
-.icon-btn-wand {
+.nav-wand-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   background: var(--accent);
-  border-color: var(--accent);
+  border: none;
+  border-radius: var(--radius-sm);
   color: var(--bg);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s, box-shadow 0.15s;
 }
-.icon-btn-wand:hover {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: var(--bg);
-  opacity: 0.85;
+.nav-wand-btn:hover {
+  opacity: 0.88;
   box-shadow: 0 0 12px rgba(0,229,200,0.35);
 }
 

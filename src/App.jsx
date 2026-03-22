@@ -75,12 +75,12 @@ export default function App() {
 
           <div className="nav-right">
             <button
-              className="icon-btn icon-btn-wand"
+              className="nav-wand-btn"
               onClick={() => setIdeasOpen(true)}
-              aria-label="Generate domain ideas"
-              title="Generate ideas"
+              aria-label="Generate new idea"
             >
               <WandIcon />
+              Generate New Idea
             </button>
 
             <button
