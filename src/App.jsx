@@ -125,7 +125,7 @@ export default function App() {
       {!hasResults && (
         <section id="hero">
           <p className="hero-eyebrow">Domain Availability Search</p>
-          <h1>Check domain availability without being tracked</h1>
+          <h1>Check domain availability<br />without being tracked</h1>
 
           <div className="hero-search-group">
             <SearchBar
