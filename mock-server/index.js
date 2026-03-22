@@ -102,6 +102,57 @@ const server = http.createServer(async (req, res) => {
     const tlds  = (url.searchParams.get('tlds')  || 'com,net,org,io,ai,app,co,dev,xyz,tech').split(',')
     domains = tlds.map(t => `${query}.${t.trim()}`)
 
+  } else if (url.pathname === '/health') {
+    const domain = (url.searchParams.get('domain') || '').trim().toLowerCase()
+    if (!domain) { res.writeHead(400); res.end(JSON.stringify({ error: 'No domain supplied.' })); return }
+
+    const h = hashDomain(domain)
+    const scenario = h % 5
+
+    // 5 deterministic mock scenarios keyed by hash
+    const SCENARIOS = [
+      // 0: clean / available — no DNS, no MX, privacy protected
+      {
+        status: { website: 'inactive', email: 'not_configured', age: 'new', registrar: null, privacy_protected: null },
+        signals: { dns_present: false, mx_records: false, resolves: false },
+        risk_flags: [],
+        summary: 'Available domain with no existing website or email setup.',
+      },
+      // 1: parked — A record but parked nameserver, no MX
+      {
+        status: { website: 'inactive', email: 'not_configured', age: 'established', registrar: 'GoDaddy', privacy_protected: true },
+        signals: { dns_present: true, mx_records: false, resolves: true },
+        risk_flags: ['parked_domain'],
+        summary: 'Domain is registered but currently parked — no active content.',
+      },
+      // 2: active business — A + MX, established age
+      {
+        status: { website: 'active', email: 'configured', age: 'established', registrar: 'Namecheap', privacy_protected: false },
+        signals: { dns_present: true, mx_records: true, resolves: true },
+        risk_flags: ['heavily_used'],
+        summary: 'Taken domain with an active website and email — likely in use.',
+      },
+      // 3: inactive registered — no A, no MX, privacy protected
+      {
+        status: { website: 'inactive', email: 'not_configured', age: 'new', registrar: 'Cloudflare', privacy_protected: true },
+        signals: { dns_present: false, mx_records: false, resolves: false },
+        risk_flags: [],
+        summary: 'Registered but inactive — potential resale or parked domain.',
+      },
+      // 4: suspicious — A present, old age, no privacy
+      {
+        status: { website: 'active', email: 'not_configured', age: 'old', registrar: 'Unknown', privacy_protected: false },
+        signals: { dns_present: true, mx_records: false, resolves: true },
+        risk_flags: ['suspicious_dns'],
+        summary: 'Domain has unusual DNS setup and no privacy protection — review carefully.',
+      },
+    ]
+
+    await new Promise(r => setTimeout(r, 150 + Math.random() * 100))
+    res.writeHead(200)
+    res.end(JSON.stringify({ domain, ...SCENARIOS[scenario] }))
+    return
+
   } else {
     res.writeHead(404)
     res.end(JSON.stringify({ error: 'Unknown endpoint. Use /check or /suggest.' }))

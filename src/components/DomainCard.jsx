@@ -5,8 +5,9 @@
 
 import { useState, useEffect } from 'react'
 import { getLowestPrice, seoScore, scoreColor, getRegistrarPrices } from '../lib/pricing'
+import { computePrivacyScore, computeStatusTag, healthSummaryLabel } from '../lib/health'
 
-export function DomainCard({ domain, result, livePrices = {}, saved, isUnlocked: unlockedFromParent, onSave, onDetail, onLiveCheck }) {
+export function DomainCard({ domain, result, livePrices = {}, healthData = {}, saved, isUnlocked: unlockedFromParent, onSave, onDetail, onLiveCheck }) {
   const [lockState,  setLockState]  = useState(() => unlockedFromParent ? 'unlocked' : 'locked')
   const [isSaved,    setIsSaved]    = useState(saved)
   const [bookmarkAnim, setBookmarkAnim] = useState(false)
@@ -79,12 +80,25 @@ export function DomainCard({ domain, result, livePrices = {}, saved, isUnlocked:
       </div>
 
       {/* ── Live-data strip (only visible when unlocked) ── */}
-      {isUnlocked && (
-        <div className="card-live-strip">
-          <span className="card-live-dot" />
-          <span className="card-live-label">Live data</span>
-        </div>
-      )}
+      {isUnlocked && (() => {
+        const health = healthData[domain]
+        const tag    = health ? computeStatusTag(health) : null
+        const score  = health ? computePrivacyScore(health) : null
+        return (
+          <div className="card-live-strip">
+            <span className="card-live-dot" />
+            <span className="card-live-label">Live data</span>
+            {health ? (
+              <span className="card-health-compact">
+                <span className="card-health-tag">{healthSummaryLabel(tag)}</span>
+                <span className="card-health-score">{score} priv</span>
+              </span>
+            ) : (
+              <span className="card-health-skeleton" />
+            )}
+          </div>
+        )
+      })()}
 
       {/* ── Bottom row: price tier | SEO | detail | live-check ── */}
       <div className="card-bottom-row">

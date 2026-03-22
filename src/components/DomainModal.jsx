@@ -5,6 +5,7 @@
 
 import { useEffect } from 'react'
 import { getRegistrarPrices, seoScore } from '../lib/pricing'
+import { computePrivacyScore, computeStatusTag, healthSummaryLabel, healthTagColor, privacyScoreColor } from '../lib/health'
 
 /* ── Score computation ── */
 function computeScores(domain) {
@@ -83,7 +84,7 @@ const REGISTRAR_STYLES = {
 }
 
 /* ── Main component ── */
-export function DomainModal({ domain, result, livePrices = {}, saved, isUnlocked, onSave, onLiveCheck, onClose, onPrev, onNext, position }) {
+export function DomainModal({ domain, result, livePrices = {}, healthData = {}, onLoadHealth, saved, isUnlocked, onSave, onLiveCheck, onClose, onPrev, onNext, position }) {
   const status = result?.status ?? 'unknown'
 
   useEffect(() => {
@@ -99,6 +100,13 @@ export function DomainModal({ domain, result, livePrices = {}, saved, isUnlocked
       document.body.style.overflow = ''
     }
   }, [onClose, onPrev, onNext])
+
+  // Auto-load health for taken/unknown domains (no lock button to click)
+  useEffect(() => {
+    if (!isUnlocked && (status === 'taken' || status === 'unknown') && onLoadHealth) {
+      onLoadHealth(domain)
+    }
+  }, [domain])
 
   const [name, ...tldParts] = domain.split('.')
   const tld = '.' + tldParts.join('.')
@@ -233,6 +241,11 @@ export function DomainModal({ domain, result, livePrices = {}, saved, isUnlocked
           </div>
         </div>
 
+        {/* Domain Health Snapshot */}
+        {(isUnlocked || isTaken || status === 'unknown') && (
+          <HealthSection health={healthData[domain]} />
+        )}
+
         {/* Registrar pricing — only after unlocking */}
         {(isAvailable || isPremium) && isUnlocked && registrars.length > 0 && (
           <div className="modal-section">
@@ -297,6 +310,107 @@ export function DomainModal({ domain, result, livePrices = {}, saved, isUnlocked
     </>
   )
 }
+
+/* ── Domain Health Section ── */
+function HealthSection({ health }) {
+  if (!health) {
+    return (
+      <div className="modal-section health-section">
+        <div className="modal-section-label">DOMAIN HEALTH</div>
+        <div className="health-skeleton-block">
+          <div className="health-skeleton-row" />
+          <div className="health-skeleton-row short" />
+          <div className="health-skeleton-row" />
+          <div className="health-skeleton-row short" />
+        </div>
+      </div>
+    )
+  }
+
+  const tag   = computeStatusTag(health)
+  const score = computePrivacyScore(health)
+  const color = healthTagColor(tag)
+  const scoreClr = privacyScoreColor(score)
+
+  const { website, email, age, registrar, privacy_protected } = health.status ?? {}
+  const flags = (health.risk_flags ?? []).filter(f => f !== 'none')
+
+  const websiteLabel = website === 'active' ? 'Active' : website === 'inactive' ? 'Inactive' : 'Unknown'
+  const emailLabel   = email === 'configured' ? 'Configured' : email === 'not_configured' ? 'Not configured' : 'Unknown'
+  const ageLabel     = age === 'new' ? 'New (<1 yr)' : age === 'established' ? 'Established' : age === 'old' ? 'Old (5+ yrs)' : 'Unknown'
+  const privLabel    = privacy_protected === true ? 'Protected ✓' : privacy_protected === false ? 'Not protected' : 'Unknown'
+
+  return (
+    <div className="modal-section health-section">
+      <div className="modal-section-label">DOMAIN HEALTH</div>
+
+      {/* Status tag + privacy score */}
+      <div className="health-header-row">
+        <span className="health-tag-pill" style={{ color, borderColor: color }}>{healthSummaryLabel(tag)}</span>
+        <div className="health-privacy-score">
+          <span className="health-privacy-label">Privacy</span>
+          <div className="health-score-track">
+            <div className="health-score-fill" style={{ width: `${score}%`, background: scoreClr }} />
+          </div>
+          <span className="health-score-num" style={{ color: scoreClr }}>{score}</span>
+        </div>
+      </div>
+
+      {/* Signal rows */}
+      <div className="health-rows">
+        <div className="health-row">
+          <WebsiteIcon />
+          <span className="health-row-label">Website</span>
+          <span className={`health-row-value ${website === 'active' ? 'hval-active' : website === 'inactive' ? 'hval-inactive' : 'hval-unknown'}`}>{websiteLabel}</span>
+        </div>
+        <div className="health-row">
+          <EmailIcon />
+          <span className="health-row-label">Email</span>
+          <span className={`health-row-value ${email === 'configured' ? 'hval-active' : 'hval-inactive'}`}>{emailLabel}</span>
+        </div>
+        <div className="health-row">
+          <CalendarIcon />
+          <span className="health-row-label">Age</span>
+          <span className="health-row-value hval-neutral">{ageLabel}</span>
+        </div>
+        <div className="health-row">
+          <ShieldIcon />
+          <span className="health-row-label">Privacy</span>
+          <span className={`health-row-value ${privacy_protected === true ? 'hval-active' : privacy_protected === false ? 'hval-inactive' : 'hval-unknown'}`}>{privLabel}</span>
+        </div>
+        {registrar && (
+          <div className="health-row">
+            <RegistrarIcon />
+            <span className="health-row-label">Registrar</span>
+            <span className="health-row-value hval-neutral">{registrar}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Risk flags */}
+      {flags.length > 0 && (
+        <div className="health-flags">
+          {flags.map(f => (
+            <span key={f} className="health-flag-chip">
+              {f === 'parked_domain' ? '🅿 Parked' : f === 'heavily_used' ? '🔴 Heavily used' : f === 'suspicious_dns' ? '⚠️ Suspicious DNS' : f}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Summary */}
+      {health.summary && (
+        <p className="health-summary">{health.summary}</p>
+      )}
+    </div>
+  )
+}
+
+function WebsiteIcon()   { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> }
+function EmailIcon()     { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg> }
+function CalendarIcon()  { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> }
+function ShieldIcon()    { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> }
+function RegistrarIcon() { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> }
 
 function LockIcon() {
   return (

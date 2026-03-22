@@ -55,7 +55,7 @@ function advActiveCount(advFilters, advPriceRange, advTldCats, advMinSeo, advNam
   return n
 }
 
-export function ResultsView({ keyword, primaryDomain, results, livePrices, loading, wave3Available, onLoadWave3, onLiveCheck, saved = [], onSave }) {
+export function ResultsView({ keyword, primaryDomain, results, livePrices, healthData = {}, loading, wave3Available, onLoadWave3, onLiveCheck, onLoadHealth, saved = [], onSave }) {
   const [mainTab,      setMainTab]      = useState('search')
   const [quickFilter,  setQuickFilter]  = useState('all-tlds')
   const [sortId,       setSortId]       = useState('seo-desc')
@@ -72,7 +72,8 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
 
   const handleLiveCheck = useCallback((domain) => {
     setUnlockedDomains(prev => new Set([...prev, domain]))
-  }, [])
+    onLiveCheck?.(domain)
+  }, [onLiveCheck])
 
   // Reset pagination whenever filter or sort changes
   useEffect(() => { setVisibleCount(30) }, [quickFilter, sortId])
@@ -305,6 +306,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
                       domain={e.domain}
                       result={e}
                       livePrices={livePrices}
+                      healthData={healthData}
                       saved={saved.includes(e.domain)}
                       isUnlocked={unlockedDomains.has(e.domain)}
                       onSave={toggleSave}
@@ -377,6 +379,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
                       domain={e.domain}
                       result={e}
                       livePrices={livePrices}
+                      healthData={healthData}
                       saved={saved.includes(e.domain)}
                       onSave={toggleSave}
                       onLiveCheck={handleLiveCheck}
@@ -427,6 +430,8 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, loadi
             domain={detailDomain}
             result={results[detailDomain]}
             livePrices={livePrices}
+            healthData={healthData}
+            onLoadHealth={onLoadHealth}
             saved={saved.includes(detailDomain)}
             isUnlocked={unlockedDomains.has(detailDomain)}
             onSave={toggleSave}

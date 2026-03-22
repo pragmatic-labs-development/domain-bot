@@ -3712,3 +3712,183 @@ body::before {
   .dv-tile-ext { font-size: 0.78rem; }
 
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   DOMAIN HEALTH SNAPSHOT
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Modal health section ── */
+.health-section { padding-top: 0.1rem; }
+
+.health-header-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.health-tag-pill {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid currentColor;
+  background: transparent;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.health-privacy-score {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex: 1;
+  min-width: 120px;
+}
+.health-privacy-label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.health-score-track {
+  flex: 1;
+  height: 4px;
+  background: var(--surface3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.health-score-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+.health-score-num {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  min-width: 22px;
+  text-align: right;
+}
+
+/* ── Signal rows ── */
+.health-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0.65rem;
+}
+.health-row {
+  display: grid;
+  grid-template-columns: 16px 90px 1fr;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  color: var(--text-muted);
+}
+.health-row svg { color: var(--text-dim); flex-shrink: 0; }
+.health-row-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.health-row-value {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+.hval-active   { color: var(--green); }
+.hval-inactive { color: var(--text-muted); }
+.hval-unknown  { color: var(--text-dim); }
+.hval-neutral  { color: var(--text); }
+
+/* ── Risk flag chips ── */
+.health-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.65rem;
+}
+.health-flag-chip {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-pill);
+  background: rgba(240, 80, 96, 0.1);
+  border: 1px solid rgba(240, 80, 96, 0.25);
+  color: var(--red);
+}
+
+/* ── Plain-English summary ── */
+.health-summary {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border-left: 2px solid var(--border-bright);
+}
+
+/* ── Skeleton loading state (modal) ── */
+.health-skeleton-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+}
+.health-skeleton-row {
+  height: 12px;
+  border-radius: 6px;
+  background: var(--surface3);
+  animation: shimmer 1.4s ease-in-out infinite;
+  width: 100%;
+}
+.health-skeleton-row.short { width: 60%; }
+
+/* ── Card compact health strip ── */
+.card-health-compact {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-left: auto;
+}
+.card-health-tag {
+  font-family: var(--font-mono);
+  font-size: 0.64rem;
+  font-weight: 500;
+  color: var(--text);
+}
+.card-health-score {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--text-muted);
+}
+.card-health-skeleton {
+  display: inline-block;
+  width: 60px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--surface3);
+  animation: shimmer 1.4s ease-in-out infinite;
+  margin-left: auto;
+}
+
+/* ── DomainRow health badges ── */
+.data-tier-badge.tier-health {
+  background: rgba(16, 217, 138, 0.08);
+  border-color: rgba(16, 217, 138, 0.2);
+  color: var(--text);
+}
+.data-tier-badge.tier-privacy {
+  background: rgba(110, 126, 126, 0.1);
+  border-color: var(--border);
+  color: var(--text-muted);
+}

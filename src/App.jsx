@@ -17,9 +17,9 @@ export default function App() {
   )
 
   const {
-    keyword, primaryDomain, results, livePrices,
+    keyword, primaryDomain, results, livePrices, healthData,
     loading, wave3Available,
-    triggerSearch, loadWave3, checkLive,
+    triggerSearch, loadWave3, checkLive, loadHealth,
   } = useSearch()
 
   function handleSearch() {
@@ -139,10 +139,12 @@ export default function App() {
             primaryDomain={primaryDomain}
             results={results}
             livePrices={livePrices}
+            healthData={healthData}
             loading={loading}
             wave3Available={wave3Available}
             onLoadWave3={loadWave3}
             onLiveCheck={checkLive}
+            onLoadHealth={loadHealth}
             saved={saved}
             onSave={toggleSave}
           />

@@ -60,6 +60,21 @@ export function formatPrice(microPrice, currency = 'USD') {
 }
 
 /**
+ * Fetch the Domain Health Snapshot for a single domain.
+ * @param {string} domain  e.g. 'example.com'
+ * @returns {Promise<DomainHealth>}
+ */
+export async function checkHealth(domain) {
+  const url = `${BASE}/health?domain=${encodeURIComponent(domain)}`
+  const res = await fetch(url)
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    throw new Error(err.error || `HTTP ${res.status}`)
+  }
+  return res.json()
+}
+
+/**
  * @typedef {Object} DomainResult
  * @property {string}       domain
  * @property {boolean}      available

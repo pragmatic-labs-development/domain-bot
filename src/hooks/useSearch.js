@@ -12,9 +12,12 @@
 import { useState, useRef, useCallback } from 'react'
 import { TLDS_W1, TLDS_W2, TLDS_W3, AFTERMARKET_WORDS } from '../lib/tlds'
 import { fetchBatch, liveCheck } from '../lib/availability'
+import { checkHealth } from '../lib/api'
 
 // Session-level cache — persists across searches, avoids re-checking known domains
 const sessionCache = {}
+// Health cache — keyed by domain, same lifetime as session
+const healthCache = {}
 
 function generateAftermarket(kw) {
   return AFTERMARKET_WORDS
@@ -30,6 +33,7 @@ export function useSearch() {
   const [loading, setLoading]             = useState(false)
   const [wave3Available, setWave3Available] = useState(false)
   const [livePrices, setLivePrices]       = useState({}) // { [domain]: priceUSD } from GoDaddy
+  const [healthData, setHealthData]       = useState({}) // { [domain]: DomainHealth }
 
   const currentKw = useRef('')
 
@@ -120,9 +124,27 @@ export function useSearch() {
     setLoading(false)
   }, [mergeResults])
 
+  // ── Per-domain health snapshot ─────────────────────────────────────────────
+  const loadHealth = useCallback(async (domain) => {
+    if (healthCache[domain]) {
+      setHealthData(prev => ({ ...prev, [domain]: healthCache[domain] }))
+      return
+    }
+    try {
+      const data = await checkHealth(domain)
+      healthCache[domain] = data
+      setHealthData(prev => ({ ...prev, [domain]: data }))
+    } catch (e) {
+      console.warn('[DomainBot] Health check failed for', domain, e.message)
+    }
+  }, [])
+
   // ── Per-domain live check (GoDaddy authoritative) ──────────────────────────
   const checkLive = useCallback(async (domain) => {
-    mergeResults({ [domain]: { ...results[domain], status: 'checking' } })
+    // Don't set status:'checking' — that removes available cards from the tab.
+    // The card's lock button already shows a loading animation.
+    // Fire health check in parallel — don't await
+    loadHealth(domain)
     try {
       const result = await liveCheck(domain)
       sessionCache[domain] = result
@@ -130,17 +152,19 @@ export function useSearch() {
     } catch (e) {
       console.warn('[DomainBot] Live check failed for', domain, e.message)
     }
-  }, [results, mergeResults])
+  }, [mergeResults, loadHealth])
 
   return {
     keyword,
     primaryDomain,
     results,
     livePrices,
+    healthData,
     loading,
     wave3Available,
     triggerSearch,
     loadWave3,
     checkLive,
+    loadHealth,
   }
 }

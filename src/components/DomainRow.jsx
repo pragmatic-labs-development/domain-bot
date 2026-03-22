@@ -5,8 +5,9 @@
 
 import { getLowestPrice, seoScore, scoreColor, getRegistrarPrices } from '../lib/pricing'
 // import { botScore } from '../lib/pricing'  // Bot score hidden for now
+import { computePrivacyScore, computeStatusTag, healthSummaryLabel } from '../lib/health'
 
-export function DomainRow({ domain, result, livePrices = {}, saved, onSave, onLiveCheck, onDetail, index = 0 }) {
+export function DomainRow({ domain, result, livePrices = {}, healthData = {}, saved, onSave, onLiveCheck, onDetail, index = 0 }) {
   const { status, tier } = result
 
   const isChecking    = status === 'checking'
@@ -52,6 +53,17 @@ export function DomainRow({ domain, result, livePrices = {}, saved, onSave, onLi
         {name}<span className="domain-tld-muted">{tld}</span>
         {isVerified && <span className="data-tier-badge tier-live">Live</span>}
         {tier === 'dns' && <span className="data-tier-badge tier-dns">DNS</span>}
+        {isVerified && healthData[domain] && (() => {
+          const h     = healthData[domain]
+          const tag   = computeStatusTag(h)
+          const score = computePrivacyScore(h)
+          return (
+            <>
+              <span className="data-tier-badge tier-health">{healthSummaryLabel(tag)}</span>
+              <span className="data-tier-badge tier-privacy">{score} priv</span>
+            </>
+          )
+        })()}
       </div>
 
       {isAvailable && cheapest && (
