@@ -3,7 +3,7 @@
  * Row used in the Advanced tab — shows all domains with status, scores, actions.
  */
 
-import { getLowestPrice, seoScore, scoreColor, getRegistrarPrices } from '../lib/pricing'
+import { getLowestPrice, seoScore, getRegistrarPrices } from '../lib/pricing'
 // import { botScore } from '../lib/pricing'  // Bot score hidden for now
 import { computePrivacyScore, computeStatusTag, healthSummaryLabel } from '../lib/health'
 
@@ -77,7 +77,12 @@ export function DomainRow({ domain, result, livePrices = {}, healthData = {}, sa
       )}
 
       <div className="row-actions">
-        <ScoreRing score={seo} color={scoreColor(seo, 'seo')} label="SEO" />
+        <div
+          className={`card-seo-badge ${isVerified ? 'unlocked' : ''}`}
+          title={`SEO Score: ${seo}/99`}
+        >
+          {seo}
+        </div>
 
         {/* Bookmark — always visible */}
         <button
@@ -132,26 +137,7 @@ export function DomainRow({ domain, result, livePrices = {}, healthData = {}, sa
   )
 }
 
-function ScoreRing({ score, color, label }) {
-  const r    = 14
-  const circ = 2 * Math.PI * r
-  const offset = circ - (score / 100) * circ
-  return (
-    <div className="score-ring" title={`${label} Score: ${score}/99`}>
-      <svg width="36" height="36" viewBox="0 0 36 36" style={{ position: 'absolute', top: 0, left: 0, transform: 'rotate(-90deg)' }}>
-        <circle className="score-ring-bg" cx="18" cy="18" r={r} />
-        <circle
-          className="score-ring-fill"
-          cx="18" cy="18" r={r}
-          stroke={color}
-          strokeDasharray={circ.toFixed(2)}
-          strokeDashoffset={offset.toFixed(2)}
-        />
-      </svg>
-      <div className="score-ring-num" style={{ color }}>{score}</div>
-    </div>
-  )
-}
+
 
 function BookmarkIcon({ filled }) {
   return (
