@@ -6,10 +6,9 @@
  */
 
 // In dev, Vite proxies /api/* → localhost:3001
-// In production, set VITE_WORKER_URL to your Cloudflare Worker URL
-const BASE = import.meta.env.VITE_WORKER_URL
-  ? import.meta.env.VITE_WORKER_URL
-  : '/api'
+// In production, falls back to the known worker URL (same as availability.js)
+const BASE = import.meta.env.VITE_WORKER_URL ||
+  'https://domain-bot-proxy.dave-pragmatic-labs.workers.dev'
 
 /**
  * Check availability for a list of domain strings.
