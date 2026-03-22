@@ -55,7 +55,7 @@ function advActiveCount(advFilters, advPriceRange, advTldCats, advMinSeo, advNam
   return n
 }
 
-export function ResultsView({ keyword, primaryDomain, results, livePrices, healthData = {}, loading, wave3Available, onLoadWave3, onLiveCheck, onLoadHealth, saved = [], onSave, ideasKw }) {
+export function ResultsView({ keyword, primaryDomain, results, livePrices, healthData = {}, loading, wave3Available, onLoadWave3, onLiveCheck, onLoadHealth, saved = [], onSave, ideasKw, detailDomain, onDetail: setDetailDomain }) {
   const [mainTab,      setMainTab]      = useState('search')
   const [quickFilter,  setQuickFilter]  = useState('all-tlds')
   const [sortId,       setSortId]       = useState('seo-desc')
@@ -66,7 +66,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
   const [advMinSeo,     setAdvMinSeo]     = useState(0)
   const [advNameLength, setAdvNameLength] = useState(new Set(['short','medium','long']))
   const [advDrawerOpen, setAdvDrawerOpen] = useState(false)
-  const [detailDomain,    setDetailDomain]    = useState(null)
+  // detailDomain is lifted to App.jsx (passed as prop)
   const [unlockedDomains, setUnlockedDomains] = useState(new Set())
   const [visibleCount, setVisibleCount] = useState(30)
 

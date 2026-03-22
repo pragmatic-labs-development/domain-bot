@@ -10,10 +10,11 @@ import { useSearch }   from './hooks/useSearch'
 import './App.css'
 
 export default function App() {
-  const [inputValue, setInputValue] = useState('')
-  const [savedOpen,  setSavedOpen]  = useState(false)
-  const [ideasOpen,  setIdeasOpen]  = useState(false)
-  const [ideasKw,    setIdeasKw]    = useState('')
+  const [inputValue,   setInputValue]   = useState('')
+  const [savedOpen,    setSavedOpen]    = useState(false)
+  const [ideasOpen,    setIdeasOpen]    = useState(false)
+  const [ideasKw,      setIdeasKw]      = useState('')
+  const [detailDomain, setDetailDomain] = useState(null)
   const [saved,      setSaved]      = useState(() =>
     JSON.parse(localStorage.getItem('db-saved') || '[]')
   )
@@ -154,6 +155,8 @@ export default function App() {
             saved={saved}
             onSave={toggleSave}
             ideasKw={ideasKw}
+            detailDomain={detailDomain}
+            onDetail={setDetailDomain}
           />
         </div>
       )}
@@ -164,6 +167,8 @@ export default function App() {
           onUnsave={toggleSave}
           onClose={() => setSavedOpen(false)}
           livePrices={livePrices}
+          results={results}
+          onDetail={domain => { setSavedOpen(false); setDetailDomain(domain) }}
         />
       )}
 
