@@ -175,7 +175,12 @@ export default function App() {
       {ideasOpen && (
         <IdeasModal
           onClose={() => setIdeasOpen(false)}
-          onSubmit={kw => { setIdeasKw(kw); setInputValue(kw); setIdeasOpen(false) }}
+          onSubmit={kw => {
+            setIdeasKw(kw)
+            setInputValue(kw)
+            setIdeasOpen(false)
+            triggerSearch(kw)
+          }}
         />
       )}
     </div>

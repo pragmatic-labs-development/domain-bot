@@ -80,12 +80,12 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
   // Also reset when new search fires
   useEffect(() => {
     setVisibleCount(30)
-    setMainTab('search')
+    if (!ideasKw) setMainTab('search')
     setAdvPriceRange([0, 200]); setAdvTldCats(new Set()); setAdvMinSeo(0)
     setAdvNameLength(new Set(['short','medium','long']))
   }, [keyword])
 
-  // Switch to Other Ideas tab when a wand-modal keyword comes in
+  // Switch to Ideas tab when a wand-modal keyword comes in
   useEffect(() => {
     if (ideasKw) setMainTab('other-ideas')
   }, [ideasKw])
