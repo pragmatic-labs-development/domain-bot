@@ -1111,24 +1111,14 @@ body::before {
   cursor: pointer;
   transition: var(--t-base);
 }
-/* Save — transparent border at rest, shows on hover/saved */
-.ideas-save-btn { border-color: transparent; }
+.ideas-save-btn.saved,
 .ideas-save-btn:hover,
-.ideas-save-btn.saved {
-  color: var(--accent);
-  border-color: var(--accent-border);
-  background: var(--accent-dim);
-}
-.ideas-copy-row-btn:hover {
-  color: var(--accent);
-  border-color: var(--accent-border);
-  background: var(--accent-dim);
-}
+.ideas-copy-row-btn:hover,
 .ideas-lock-btn:hover,
 .ideas-eye-btn:hover {
-  color: var(--text-sub);
-  border-color: var(--border-hover);
-  background: rgba(255,255,255,0.05);
+  color: var(--accent);
+  border-color: var(--accent-border);
+  background: var(--accent-dim);
 }
 .ideas-lock-btn.ideas-lock-verified {
   color: var(--accent);
