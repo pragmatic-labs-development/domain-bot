@@ -103,7 +103,7 @@ export function DomainRow({ domain, result, livePrices = {}, healthData = {}, sa
               e.stopPropagation()
               if (isVerified || isUnlocking) return
               setIsUnlocking(true)
-              onLiveCheck(domain)
+              onLiveCheck(domain)?.finally(() => setIsUnlocking(false))
             }}
             title={isVerified ? 'Live data loaded' : isUnlocking ? 'Checking…' : 'Get authoritative availability + live price'}
             disabled={isVerified || isUnlocking}
