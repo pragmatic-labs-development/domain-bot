@@ -81,52 +81,6 @@ export function seoScore(domain) {
   return Math.min(100, Math.max(18, score))
 }
 
-export function botScore(domain, livePrices = {}) {
-  const name = domain.split('.')[0]
-  const ext  = domain.split('.').slice(1).join('.')
-  const len  = name.length
-
-  let h = 0
-  for (let i = 0; i < domain.length; i++) h = (h * 31 + domain.charCodeAt(i)) >>> 0
-
-  const tldPop = { com:95, net:72, org:68, io:65, ai:72, app:60, co:58, dev:58, xyz:28, info:25, shop:38, tech:42, store:35, site:28, online:30, pro:45, lol:18, live:38, cloud:42, media:45 }
-  let popularity = tldPop[ext] || 20
-  if      (len <= 4)  popularity = Math.min(100, popularity + 15)
-  else if (len <= 6)  popularity = Math.min(100, popularity + 8)
-  else if (len > 12)  popularity = Math.max(0, popularity - 10)
-  popularity = Math.min(100, Math.max(5, popularity + (h % 8)))
-
-  const seoTrust = seoScore(domain)
-
-  const lowestPrice = getLowestPrice(domain, livePrices)
-  let priceAfford
-  if      (lowestPrice <= 2)  priceAfford = 100
-  else if (lowestPrice <= 5)  priceAfford = 90
-  else if (lowestPrice <= 10) priceAfford = 78
-  else if (lowestPrice <= 15) priceAfford = 65
-  else if (lowestPrice <= 25) priceAfford = 50
-  else if (lowestPrice <= 40) priceAfford = 35
-  else if (lowestPrice <= 80) priceAfford = 20
-  else                        priceAfford = 10
-
-  const vowels = (name.match(/[aeiou]/gi) || []).length
-  const vratio = vowels / name.length
-  let memorability = 0
-  if      (len <= 4)  memorability += 50
-  else if (len <= 6)  memorability += 40
-  else if (len <= 8)  memorability += 28
-  else if (len <= 11) memorability += 16
-  else                memorability += 5
-  if (!/[-0-9]/.test(name)) memorability += 25
-  if (vratio >= 0.25 && vratio <= 0.65) memorability += 22
-  else if (vratio > 0) memorability += 8
-  memorability += ((h * 13) % 13)
-  memorability = Math.min(100, Math.max(5, memorability))
-
-  const raw = (popularity * 0.4) + (seoTrust * 0.3) + (priceAfford * 0.2) + (memorability * 0.1)
-  return Math.round(Math.min(99, Math.max(10, raw)))
-}
-
 /** Score ring color thresholds used across components */
 export function scoreColor(score, type = 'bot') {
   if (type === 'seo') {

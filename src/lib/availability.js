@@ -43,7 +43,6 @@ export async function fetchBatch(domains) {
           tier:   'godaddy',
         }
       })
-      console.info('[DomainBot] Tier 1: GoDaddy ✓', domains.length, 'domains')
       return batch
     } catch (e) {
       godaddyReachable = false
@@ -74,7 +73,6 @@ export async function fetchBatch(domains) {
       }
     })
   )
-  console.info('[DomainBot] Tier 2: DNS-over-HTTPS ✓', domains.length, 'domains')
   return batch
 }
 
