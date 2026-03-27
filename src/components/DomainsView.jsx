@@ -277,8 +277,69 @@ export function DomainsView({ keyword, results, onDetail }) {
 
   if (!keyword) return null
 
+  /* ── Featured TLDs ── */
+  const FEATURED_TLDS = ['com', 'io', 'ai', 'co', 'app', 'dev', 'xyz', 'tech']
+
+  const featuredData = FEATURED_TLDS.map(tld => {
+    const domain = `${keyword}.${tld}`
+    const r = results[domain]
+    const status = r?.status ?? 'checking'
+    const price  = r?.price  ?? null
+    const label  = STATUS_LABEL[status] ?? 'Checking…'
+    const color  = STATUS_COLOR[status] ?? 'var(--text-dim)'
+    const href   = status === 'available' || status === 'premium'
+      ? `https://www.godaddy.com/domainsearch/find?checkAvail=1&domainToCheck=${domain}`
+      : status === 'taken'
+      ? `https://who.is/whois/${domain}`
+      : null
+    return { tld, domain, status, price, label, color, href }
+  })
+
+  const comData = featuredData[0]
+  const secondaryData = featuredData.slice(1)
+
   return (
     <div className="domains-view">
+      {/* Featured .com result */}
+      <a
+        className={`dv-com-hero status-${comData.status}`}
+        style={{ background: STATUS_BG[comData.status] ?? STATUS_BG.unknown }}
+        href={comData.href ?? undefined}
+        target={comData.href ? '_blank' : undefined}
+        rel="noreferrer"
+      >
+        <div className="dv-com-left">
+          <span className="dv-com-domain">{comData.domain}</span>
+        </div>
+        <div className="dv-com-right">
+          {comData.price && <span className="dv-com-price">${comData.price.toFixed(2)}/yr</span>}
+          <span className="dv-com-badge" style={{ background: `${comData.color}20`, color: comData.color, borderColor: `${comData.color}48` }}>
+            <span className="dv-com-dot" style={{ background: comData.color }} />
+            {comData.label}
+          </span>
+        </div>
+      </a>
+
+      {/* Secondary startup TLDs */}
+      <div className="dv-featured-row">
+        {secondaryData.map(({ tld, domain, status, price, label, color, href }) => (
+          <a
+            key={tld}
+            className={`dv-featured-tile status-${status}`}
+            style={{ background: STATUS_BG[status] ?? STATUS_BG.unknown }}
+            href={href ?? undefined}
+            target={href ? '_blank' : undefined}
+            rel="noreferrer"
+          >
+            <span className="dv-featured-ext">.{tld}</span>
+            <span className="dv-featured-badge" style={{ color }}>
+              <span className="dv-featured-dot" style={{ background: color }} />
+              {label}
+            </span>
+          </a>
+        ))}
+      </div>
+
       {TLD_CATEGORIES.map(cat => {
         const tiles = cat.tlds
           .filter((tld, i, arr) => arr.indexOf(tld) === i)

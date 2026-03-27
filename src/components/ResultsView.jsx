@@ -12,17 +12,6 @@ import { OtherIdeasView }    from './OtherIdeasView'
 import { getLowestPrice, seoScore } from '../lib/pricing'
 // import { botScore } from '../lib/pricing'  // Bot score hidden for now
 
-const QUICK_FILTERS = [
-  { id: 'all-tlds', label: 'All',      icon: <GlobeIcon /> },
-  { id: 'popular',  label: 'Popular',  icon: <StarIcon /> },
-  { id: 'business', label: 'Business', icon: <BriefcaseIcon /> },
-  { id: 'tech',     label: 'Tech',     icon: <CodeIcon /> },
-  { id: 'startup',  label: 'Startup',  icon: <LightningIcon /> },
-  { id: 'creative', label: 'Creative', icon: <PencilIcon /> },
-  { id: 'short',    label: 'Short',    icon: <ArrowIcon /> },
-  { id: 'cheap',    label: 'Cheap',    icon: <DollarIcon /> },
-]
-
 const SORT_OPTIONS = [
   { id: 'seo-desc',   label: 'SEO Score' },
   // { id: 'bot-desc',   label: 'Bot Score' },
@@ -55,9 +44,7 @@ function advActiveCount(advFilters, advPriceRange, advTldCats, advMinSeo, advNam
   return n
 }
 
-export function ResultsView({ keyword, primaryDomain, results, livePrices, healthData = {}, loading, wave3Available, onLoadWave3, onLiveCheck, onLoadHealth, saved = [], onSave, ideasKw, detailDomain, onDetail: setDetailDomain }) {
-  const [mainTab,      setMainTab]      = useState('search')
-  const [quickFilter,  setQuickFilter]  = useState('all-tlds')
+export function ResultsView({ keyword, primaryDomain, results, livePrices, healthData = {}, loading, wave3Available, onLoadWave3, onLiveCheck, onLoadHealth, saved = [], onSave, ideasKw, detailDomain, onDetail: setDetailDomain, mainTab, onTabChange: setMainTab }) {
   const [sortId,       setSortId]       = useState('seo-desc')
   const [sortOpen,     setSortOpen]     = useState(false)
   const [advFilters,    setAdvFilters]    = useState(new Set(ADV_STATUSES))
@@ -66,6 +53,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
   const [advMinSeo,     setAdvMinSeo]     = useState(0)
   const [advNameLength, setAdvNameLength] = useState(new Set(['short','medium','long']))
   const [advDrawerOpen, setAdvDrawerOpen] = useState(false)
+  const [viewMode,      setViewMode]      = useState('cards')
   // detailDomain is lifted to App.jsx (passed as prop)
   const [unlockedDomains, setUnlockedDomains] = useState(new Set())
   const [visibleCount, setVisibleCount] = useState(30)
@@ -75,12 +63,12 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
     return onLiveCheck?.(domain)
   }, [onLiveCheck])
 
-  // Reset pagination whenever filter or sort changes
-  useEffect(() => { setVisibleCount(30) }, [quickFilter, sortId])
+  // Reset pagination whenever sort or view changes
+  useEffect(() => { setVisibleCount(30) }, [sortId, viewMode])
   // Also reset when new search fires
   useEffect(() => {
     setVisibleCount(30)
-    if (!ideasKw) setMainTab('search')
+    if (!ideasKw) setMainTab('domains')
     setAdvPriceRange([0, 200]); setAdvTldCats(new Set()); setAdvMinSeo(0)
     setAdvNameLength(new Set(['short','medium','long']))
   }, [keyword])
@@ -109,28 +97,6 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
       default:           return sorted
     }
   }
-
-  // Basic tab: available + premium, filtered + sorted
-  const availableEntries = useMemo(() =>
-    allEntries.filter(e => e.status === 'available' || e.status === 'premium'),
-    [allEntries]
-  )
-
-  const basicItems = useMemo(() => {
-    const tld = d => d.domain.split('.').slice(1).join('.')
-    const kw  = d => d.domain.split('.')[0]
-    let items = availableEntries
-    switch (quickFilter) {
-      case 'popular':  items = [...items].sort((a, b) => seoScore(b.domain) - seoScore(a.domain)).slice(0, 18); break
-      case 'business': items = items.filter(d => BUSINESS_TLDS.includes(tld(d))); break
-      case 'tech':     items = items.filter(d => TECH_TLDS.includes(tld(d))); break
-      case 'startup':  items = items.filter(d => STARTUP_TLDS.includes(tld(d)) || kw(d).length <= 7); break
-      case 'creative': items = items.filter(d => CREATIVE_TLDS.includes(tld(d))); break
-      case 'short':    items = items.filter(d => kw(d).length <= 6); break
-      case 'cheap':    break // sort handles it
-    }
-    return quickFilter === 'popular' ? items : applySort(items)
-  }, [availableEntries, quickFilter, sortId, livePrices])
 
   // Advanced tab: all statuses, filtered + sorted
   const advItems = useMemo(() => {
@@ -184,7 +150,6 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
   }
 
   const checkingCount  = allEntries.filter(e => e.status === 'checking').length
-  const availableCount = availableEntries.length
   const advCount       = advItems.length
   const currentSort    = SORT_OPTIONS.find(s => s.id === sortId)
 
@@ -192,26 +157,14 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
 
   return (
     <div className="results-view">
-      {/* Main tab bar */}
-      <div className="main-tab-bar">
+      {/* Main tab bar — hidden on Ideas page */}
+      {mainTab !== 'other-ideas' && <div className="main-tab-bar">
         <div className="main-tabs">
-          <button
-            className={`main-tab ${mainTab === 'search' ? 'active' : ''}`}
-            onClick={() => setMainTab('search')}
-          >
-            Available <span className="tab-count">{availableCount}</span>
-          </button>
           <button
             className={`main-tab ${mainTab === 'domains' ? 'active' : ''}`}
             onClick={() => setMainTab('domains')}
           >
-            All Domains
-          </button>
-          <button
-            className={`main-tab ${mainTab === 'other-ideas' ? 'active' : ''}`}
-            onClick={() => setMainTab('other-ideas')}
-          >
-            Ideas
+            Search
           </button>
           <button
             className={`main-tab ${mainTab === 'advanced' ? 'active' : ''}`}
@@ -237,6 +190,26 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
           </div>
         )}
 
+        {/* View toggle — cards vs rows */}
+        {mainTab === 'advanced' && (
+          <div className="view-toggle">
+            <button
+              className={`view-toggle-btn ${viewMode === 'cards' ? 'active' : ''}`}
+              onClick={() => setViewMode('cards')}
+              title="Card view"
+            >
+              <GridIcon />
+            </button>
+            <button
+              className={`view-toggle-btn ${viewMode === 'rows' ? 'active' : ''}`}
+              onClick={() => setViewMode('rows')}
+              title="Row view"
+            >
+              <ListIcon />
+            </button>
+          </div>
+        )}
+
         {/* Sort dropdown */}
         <div className="sort-wrap">
           <button className="sort-btn" onClick={() => setSortOpen(o => !o)} disabled={mainTab === 'domains'}>
@@ -258,7 +231,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
             </div>
           )}
         </div>
-      </div>
+      </div>}
 
       {/* Domains panel */}
       {mainTab === 'domains' && (
@@ -268,86 +241,6 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
       {/* Other Ideas panel */}
       {mainTab === 'other-ideas' && (
         <OtherIdeasView keyword={ideasKw || keyword} onDetail={setDetailDomain} saved={saved} onSave={toggleSave} onLiveCheck={onLiveCheck} />
-      )}
-
-      {/* Search panel */}
-      {mainTab === 'search' && (
-        <div className="basic-panel">
-          <div className="basic-header">
-            <div className="quick-filters">
-              {QUICK_FILTERS.map(f => (
-                <button
-                  key={f.id}
-                  className={`qf-pill ${quickFilter === f.id ? 'active' : ''}`}
-                  onClick={() => setQuickFilter(f.id)}
-                >
-                  {f.icon}{f.label}
-                </button>
-              ))}
-            </div>
-            {basicItems.length > 0 && (
-              <CopyAllButton
-                visibleDomains={basicItems.slice(0, visibleCount).map(e => e.domain)}
-                allDomains={basicItems.map(e => e.domain)}
-              />
-            )}
-          </div>
-
-          {basicItems.length === 0 && !loading && (
-            <div className="tab-empty">No available domains match this filter yet.</div>
-          )}
-          {basicItems.length === 0 && loading && (
-            <div className="cards-grid">
-              {Array.from({ length: 30 }).map((_, i) => <div key={i} className="ghost-card" />)}
-            </div>
-          )}
-          {basicItems.length > 0 && (() => {
-            const visible   = basicItems.slice(0, visibleCount)
-            const remaining = basicItems.length - visibleCount
-            const nextBatch = Math.min(remaining, 30)
-            return (
-              <>
-                <div className="cards-grid">
-                  {visible.map((e, i) => (
-                    <DomainCard
-                      key={e.domain}
-                      domain={e.domain}
-                      result={e}
-                      livePrices={livePrices}
-                      healthData={healthData}
-                      saved={saved.includes(e.domain)}
-                      isUnlocked={unlockedDomains.has(e.domain)}
-                      onSave={toggleSave}
-                      onDetail={setDetailDomain}
-                      onLiveCheck={handleLiveCheck}
-                      onLoadHealth={onLoadHealth}
-                      index={i}
-                    />
-                  ))}
-                </div>
-
-                {(remaining > 0 || wave3Available) && (
-                  <div className="load-more-wrap">
-                    {remaining > 0 && (
-                      <button
-                        className="load-more-btn"
-                        onClick={() => setVisibleCount(v => v + 30)}
-                      >
-                        <PlusCircleIcon /> Show {nextBatch} more
-                        <span className="load-more-total">{remaining} remaining</span>
-                      </button>
-                    )}
-                    {remaining === 0 && wave3Available && (
-                      <button className="load-more-btn" onClick={onLoadWave3}>
-                        <PlusCircleIcon /> Load more TLDs
-                      </button>
-                    )}
-                  </div>
-                )}
-              </>
-            )
-          })()}
-        </div>
       )}
 
       {/* Advanced panel */}
@@ -361,6 +254,9 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
           advNameLength, toggleAdvNameLength,
           activeCount, onClear: clearAdvFilters,
         }
+        const visible   = advItems.slice(0, visibleCount)
+        const remaining = advItems.length - visibleCount
+        const nextBatch = Math.min(remaining, 30)
         return (
           <div className="advanced-panel">
             {/* Mobile top bar */}
@@ -381,28 +277,72 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
                 {advItems.length === 0 && (
                   <div className="tab-empty">No results match the selected filters.</div>
                 )}
-                <div className="rows-list">
-                  {advItems.map((e, i) => (
-                    <DomainRow
-                      key={e.domain}
-                      domain={e.domain}
-                      result={e}
-                      livePrices={livePrices}
-                      healthData={healthData}
-                      saved={saved.includes(e.domain)}
-                      onSave={toggleSave}
-                      onLiveCheck={handleLiveCheck}
-                      onDetail={setDetailDomain}
-                      index={i}
-                    />
-                  ))}
-                </div>
-                {wave3Available && (
-                  <div className="load-more-wrap">
-                    <button className="load-more-btn" onClick={onLoadWave3}>
-                      <PlusCircleIcon /> Load more TLDs
-                    </button>
-                  </div>
+                {viewMode === 'cards' && advItems.length > 0 && (
+                  <>
+                    <div className="cards-grid">
+                      {visible.map((e, i) => (
+                        <DomainCard
+                          key={e.domain}
+                          domain={e.domain}
+                          result={e}
+                          livePrices={livePrices}
+                          healthData={healthData}
+                          saved={saved.includes(e.domain)}
+                          isUnlocked={unlockedDomains.has(e.domain)}
+                          onSave={toggleSave}
+                          onDetail={setDetailDomain}
+                          onLiveCheck={handleLiveCheck}
+                          onLoadHealth={onLoadHealth}
+                          index={i}
+                        />
+                      ))}
+                    </div>
+                    {(remaining > 0 || wave3Available) && (
+                      <div className="load-more-wrap">
+                        {remaining > 0 && (
+                          <button
+                            className="load-more-btn"
+                            onClick={() => setVisibleCount(v => v + 30)}
+                          >
+                            <PlusCircleIcon /> Show {nextBatch} more
+                            <span className="load-more-total">{remaining} remaining</span>
+                          </button>
+                        )}
+                        {remaining === 0 && wave3Available && (
+                          <button className="load-more-btn" onClick={onLoadWave3}>
+                            <PlusCircleIcon /> Load more TLDs
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+                {viewMode === 'rows' && (
+                  <>
+                    <div className="rows-list">
+                      {advItems.map((e, i) => (
+                        <DomainRow
+                          key={e.domain}
+                          domain={e.domain}
+                          result={e}
+                          livePrices={livePrices}
+                          healthData={healthData}
+                          saved={saved.includes(e.domain)}
+                          onSave={toggleSave}
+                          onLiveCheck={handleLiveCheck}
+                          onDetail={setDetailDomain}
+                          index={i}
+                        />
+                      ))}
+                    </div>
+                    {wave3Available && (
+                      <div className="load-more-wrap">
+                        <button className="load-more-btn" onClick={onLoadWave3}>
+                          <PlusCircleIcon /> Load more TLDs
+                        </button>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -432,7 +372,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
       </p>
 
       {detailDomain && (() => {
-        const detailList = (mainTab === 'advanced' ? advItems : basicItems).map(e => e.domain)
+        const detailList = advItems.map(e => e.domain)
         const detailIdx  = detailList.indexOf(detailDomain)
         return (
           <DomainModal
@@ -456,57 +396,14 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
   )
 }
 
-/* ── Copy All Button ── */
-function CopyAllButton({ visibleDomains, allDomains }) {
-  const [copied, setCopied] = useState(null)
-  const [open,   setOpen]   = useState(false)
-
-  const copy = useCallback((domains, type) => {
-    navigator.clipboard.writeText(domains.join(', ')).then(() => {
-      setCopied(type)
-      setOpen(false)
-      setTimeout(() => setCopied(null), 2000)
-    })
-  }, [])
-
-  return (
-    <div className="copy-all-wrap">
-      <button className="copy-all-btn" onClick={() => setOpen(o => !o)}>
-        {copied ? <CheckIconSm /> : <CopyIconSm />}
-        {copied ? 'Copied!' : 'Copy'}
-        <ChevronIcon />
-      </button>
-      {open && (
-        <div className="copy-all-dropdown">
-          <button className="copy-all-opt" onClick={() => copy(visibleDomains, 'visible')}>
-            <CopyIconSm /> Copy all on screen <span className="copy-all-count">{visibleDomains.length}</span>
-          </button>
-          <button className="copy-all-opt" onClick={() => copy(allDomains, 'all')}>
-            <CopyIconSm /> Copy all results <span className="copy-all-count">{allDomains.length}</span>
-          </button>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function CopyIconSm()  { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> }
-function CheckIconSm() { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg> }
-
 /* ── Icons ── */
-function GlobeIcon()     { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> }
-function StarIcon()      { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> }
-function BriefcaseIcon() { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg> }
-function CodeIcon()      { return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> }
-function LightningIcon() { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> }
-function PencilIcon()    { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg> }
-function ArrowIcon()     { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg> }
-function DollarIcon()    { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> }
 function SortIcon()      { return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><line x1="21" y1="10" x2="7" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="7" y2="18"/></svg> }
 function ChevronIcon()   { return <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m6 9 6 6 6-6"/></svg> }
 function PlusCircleIcon(){ return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> }
 function InfoIcon()      { return <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg> }
 function FilterIcon()    { return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg> }
+function GridIcon()      { return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> }
+function ListIcon()      { return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg> }
 
 /* ── Advanced Sidebar ── */
 const STATUS_OPTS = [

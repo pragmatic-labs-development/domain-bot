@@ -15,6 +15,7 @@ export default function App() {
   const [ideasOpen,     setIdeasOpen]     = useState(false)
   const [ideasKw,       setIdeasKw]       = useState('')
   const [detailDomain,  setDetailDomain]  = useState(null)
+  const [mainTab,       setMainTab]       = useState('domains')
   const [savedStatuses, setSavedStatuses] = useState(() =>
     JSON.parse(localStorage.getItem('db-saved-statuses') || '{}')
   )
@@ -96,6 +97,23 @@ export default function App() {
               primaryDomain={primaryDomain}
               primaryResult={results[primaryDomain]}
             />
+          )}
+
+          {hasResults && (
+            <div className="nav-links">
+              <button
+                className={`nav-link ${mainTab === 'domains' || mainTab === 'advanced' ? 'active' : ''}`}
+                onClick={() => setMainTab('domains')}
+              >
+                Search
+              </button>
+              <button
+                className={`nav-link ${mainTab === 'other-ideas' ? 'active' : ''}`}
+                onClick={() => setMainTab('other-ideas')}
+              >
+                Ideas
+              </button>
+            </div>
           )}
 
           <div className="nav-right">
@@ -182,6 +200,8 @@ export default function App() {
             ideasKw={ideasKw}
             detailDomain={detailDomain}
             onDetail={setDetailDomain}
+            mainTab={mainTab}
+            onTabChange={setMainTab}
           />
         </div>
       )}
