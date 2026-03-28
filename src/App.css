@@ -3518,7 +3518,8 @@ body::before {
 
   /* 1 ── Root overflow containment ── */
   .app { overflow-x: hidden; width: 100%; max-width: 100vw; }
-  .results-wrapper { overflow-x: hidden; padding: 1rem 1rem 4rem; }
+  .results-wrapper { overflow-x: hidden; padding: 0.4rem 1rem 3rem; }
+  .main-tab-bar { margin-bottom: 0.35rem; }
 
 
   /* 2 ── Hero ── */
@@ -3543,7 +3544,8 @@ body::before {
 
   /* 3 ── Nav ── */
   .app-header { width: 100%; box-sizing: border-box; }
-  .nav-top-row { padding: 0 1rem; height: 54px; width: 100%; }
+  .nav-top-row { padding: 0 1rem; height: 54px; width: 100%; gap: 0.5rem; }
+  .nav-right { margin-left: 0; gap: 0.4rem; }
   .api-status-dot { display: none; }
   .nav-logo { flex-shrink: 0; overflow: visible; }
   .nav-logo img { width: 32px; height: 27px; display: block; }
@@ -3568,15 +3570,16 @@ body::before {
   .register-caret { min-height: 48px; padding: 0 1rem; border-radius: 0 10px 10px 0; }
   .primary-footer { font-size: 0.72rem; padding-top: 0.6rem; }
 
-  /* 5 ── Tab bar — tabs take full width, Sort wraps to own row ── */
+  /* 5 ── Tab bar — tabs left, view toggle + sort right, single row ── */
   .main-tab-bar {
-    flex-wrap: wrap;
-    gap: 0;
+    flex-wrap: nowrap;
+    gap: 0.4rem;
     margin-bottom: 0.6rem;
     align-items: center;
   }
   .main-tabs {
-    width: 100%;
+    flex: 1;
+    min-width: 0;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -3585,48 +3588,40 @@ body::before {
   .main-tab { padding: 0.75rem 0.9rem; font-size: 0.82rem; white-space: nowrap; }
   .tab-checking-hint { display: none; }
   .tab-bar-legend { display: none; }
-  /* Sort sits on its own row below the tabs, left-aligned like a pill */
-  .sort-wrap { padding: 0.5rem 0 0.6rem; width: 100%; }
+  .sort-wrap { padding: 0; width: auto; flex-shrink: 0; }
   .sort-btn {
     font-size: 0.76rem;
-    padding: 0.38rem 0.75rem;
+    padding: 0.38rem 0.65rem;
     border-radius: var(--radius-pill);
     gap: 0.3rem;
   }
   .sort-label { display: none; }
+  .view-toggle { flex-shrink: 0; }
 
-  /* 6 ── Cards — single column, horizontal strip layout ── */
-  .cards-grid { grid-template-columns: 1fr; gap: 0.4rem; width: 100%; }
+  /* 6 ── Cards — flat list, no boxy cards ── */
+  .view-toggle { display: none; }
+  .cards-grid { grid-template-columns: 1fr; gap: 0; width: 100%; }
 
-  /* Mobile: horizontal strip — name on left, actions on right */
+  /* Flat list rows with left accent bar */
   .domain-card {
-    padding: 0.75rem 1rem;
+    padding: 0.7rem 1rem;
     min-height: unset;
     flex-direction: row;
     align-items: center;
     gap: 0.5rem;
-    border-radius: var(--radius-card);
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid var(--border);
+    border-left: 3px solid transparent;
+    background: transparent;
+    box-shadow: none;
   }
-  /* Left accent bar replaces top accent in horizontal layout */
-  .card-available {
-    border-top: 1px solid var(--border);
-    border-left: 3px solid var(--border);
-  }
-  .card-available.card-saved {
-    border-left-color: var(--accent);
-  }
-  .card-premium {
-    border-top: 1px solid var(--border);
-    border-left: 3px solid var(--yellow);
-  }
-  /* Unlocked: full teal outline */
-  .card-unlocked {
-    border-color: rgba(0,229,200,0.55);
-    box-shadow: 0 0 0 1px rgba(0,229,200,0.22);
-  }
-  /* No hover lift on touch — don't strip unlocked outline */
-  .card-available:hover,
-  .card-premium:hover { transform: none; box-shadow: none; }
+  .domain-card:first-child { border-top: 1px solid var(--border); }
+  .card-available { border-left-color: var(--border-bright); }
+  .card-available.card-saved { border-left-color: var(--accent); }
+  .card-premium { border-left-color: var(--yellow); }
+  .card-unlocked { border-left-color: rgba(0,229,200,0.7); background: rgba(0,229,200,0.03); }
+  .card-available:hover, .card-premium:hover { transform: none; box-shadow: none; background: rgba(255,255,255,0.02); }
   .card-unlocked:hover { transform: none; }
 
   /* Domain name fills available space, ellipsis if too long */
