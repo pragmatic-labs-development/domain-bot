@@ -3597,30 +3597,40 @@ body::before {
   }
   .sort-label { display: none; }
   .view-toggle { flex-shrink: 0; }
+  .sort-wrap { margin-left: 0.5rem; }
 
-  /* 6 ── Cards — flat list, no boxy cards ── */
-  .cards-grid { grid-template-columns: 1fr; gap: 0; width: 100%; }
+  /* 6 ── Cards — single column, horizontal strip layout ── */
+  .cards-grid { grid-template-columns: 1fr; gap: 0.4rem; width: 100%; }
 
-  /* Flat list rows with left accent bar */
+  /* Mobile: horizontal strip — name on left, actions on right */
   .domain-card {
-    padding: 0.65rem 0.75rem;
+    padding: 0.75rem 1rem;
     min-height: unset;
     flex-direction: row;
     align-items: center;
     gap: 0.5rem;
-    border-radius: 0;
-    border: none;
-    border-bottom: 1px solid var(--border);
-    border-left: 3px solid transparent;
-    background: transparent;
-    box-shadow: none;
+    border-radius: var(--radius-card);
   }
-  .domain-card:first-child { border-top: 1px solid var(--border); }
-  .card-available { border-left-color: var(--border-bright); }
-  .card-available.card-saved { border-left-color: var(--accent); }
-  .card-premium { border-left-color: var(--yellow); }
-  .card-unlocked { border-left-color: rgba(0,229,200,0.7); background: rgba(0,229,200,0.03); }
-  .card-available:hover, .card-premium:hover { transform: none; box-shadow: none; background: rgba(255,255,255,0.02); }
+  /* Left accent bar replaces top accent in horizontal layout */
+  .card-available {
+    border-top: 1px solid var(--border);
+    border-left: 3px solid var(--border);
+  }
+  .card-available.card-saved {
+    border-left-color: var(--accent);
+  }
+  .card-premium {
+    border-top: 1px solid var(--border);
+    border-left: 3px solid var(--yellow);
+  }
+  /* Unlocked: full teal outline */
+  .card-unlocked {
+    border-color: rgba(0,229,200,0.55);
+    box-shadow: 0 0 0 1px rgba(0,229,200,0.22);
+  }
+  /* No hover lift on touch — don't strip unlocked outline */
+  .card-available:hover,
+  .card-premium:hover { transform: none; box-shadow: none; }
   .card-unlocked:hover { transform: none; }
 
   /* Domain name fills available space, ellipsis if too long */
@@ -3639,15 +3649,14 @@ body::before {
   }
   .card-live-label { display: none; }
 
-  /* Action cluster — force to right edge */
+  /* Action cluster — right side, no top border */
   .card-bottom-row {
     width: auto;
     margin-top: 0;
-    margin-left: auto;
     padding-top: 0;
     border-top: none;
     flex-shrink: 0;
-    gap: 0.25rem;
+    gap: 0.28rem;
     align-items: center;
   }
 
@@ -3663,10 +3672,9 @@ body::before {
     border-radius: 5px;
   }
 
-  /* Touch targets — 36px, borderless on mobile */
+  /* 44px touch targets */
   .card-btn-detail,
-  .card-btn-lock { width: 36px; height: 36px; border-radius: 8px; border-color: transparent; background: transparent; }
-  .card-btn-lock.lock-unlocked { border-color: transparent; }
+  .card-btn-lock { width: 44px; height: 44px; border-radius: 10px; }
 
   /* Bookmark — 45% opacity always visible (no hover on mobile), snaps to full when saved */
   .card-bookmark { opacity: 0.45; width: 32px; height: 32px; }
@@ -3915,7 +3923,7 @@ body::before {
   .ideas-domain { font-size: 0.85rem; }
 
   /* 14 ── All Domains — accessible tile size ── */
-  .domains-view { padding: 0 1rem 3rem; }
+  .domains-view { padding: 1rem 1rem 3rem; }
   .dv-category { grid-template-columns: 1fr; gap: 0.5rem; }
   .dv-tile-grid { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 0.35rem; }
   /* 44px minimum touch target */
