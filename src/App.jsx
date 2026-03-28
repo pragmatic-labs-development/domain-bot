@@ -183,7 +183,7 @@ export default function App() {
       )}
 
       {hasResults && (
-        <div className="results-wrapper">
+        <div id="main-content" className="results-wrapper">
           <ResultsView
             keyword={keyword}
             primaryDomain={primaryDomain}

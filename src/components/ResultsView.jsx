@@ -173,7 +173,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
             Advanced <span className="tab-count">{advCount}</span>
           </button>
           {loading && checkingCount > 0 && (
-            <span className="tab-checking-hint">
+            <span className="tab-checking-hint" aria-live="polite" aria-atomic="true">
               <span className="dns-spinner" style={{ width: 10, height: 10, borderWidth: 2 }} />
               Checking {checkingCount} more…
             </span>
@@ -212,7 +212,7 @@ export function ResultsView({ keyword, primaryDomain, results, livePrices, healt
 
         {/* Sort dropdown */}
         <div className="sort-wrap">
-          <button className="sort-btn" onClick={() => setSortOpen(o => !o)} disabled={mainTab === 'domains'}>
+          <button className="sort-btn" onClick={() => setSortOpen(o => !o)} disabled={mainTab === 'domains'} aria-expanded={sortOpen} aria-haspopup="listbox" aria-label={`Sort by ${currentSort?.label}`}>
             <SortIcon />
             Sort <span className="sort-label">{currentSort?.label}</span>
             <ChevronIcon />

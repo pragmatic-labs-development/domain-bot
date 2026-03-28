@@ -105,6 +105,25 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: rgba(0,229,200,0.45); }
 
 /* ─────────────────────────────────────────
+   SKIP LINK
+───────────────────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  background: var(--accent);
+  color: rgba(0,0,0,0.85);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 0.875rem;
+  z-index: 9999;
+  text-decoration: none;
+  transition: top 0.12s;
+}
+.skip-link:focus { top: 1rem; }
+
+/* ─────────────────────────────────────────
    GLOBAL FOCUS RING
 ───────────────────────────────────────── */
 :focus-visible {
@@ -112,6 +131,17 @@ body {
   outline-offset: 2px;
 }
 :focus:not(:focus-visible) { outline: none; }
+
+/* ─────────────────────────────────────────
+   REDUCED MOTION
+───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 
 /* ─────────────────────────────────────────
    UNIFIED ICON BUTTON BASE
@@ -506,6 +536,13 @@ body::before {
   transition: color 0.1s;
 }
 .clear-hint:hover { color: var(--text-muted); }
+
+.search-error {
+  font-size: 0.72rem;
+  color: var(--red);
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
 
 /* Search spinner */
 .search-spinner {
@@ -3413,6 +3450,31 @@ body::before {
   transition: color 0.12s, border-color 0.12s;
 }
 .saved-clear-btn:hover { color: var(--red); border-color: rgba(239,68,68,0.35); }
+
+.saved-clear-confirm {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.saved-clear-confirm-text {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+.saved-clear-yes {
+  color: var(--red) !important;
+  border-color: rgba(255,77,77,0.35) !important;
+}
+.saved-clear-cancel {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0.25rem;
+}
+.saved-clear-cancel:hover { color: var(--text-muted); }
 
 
 

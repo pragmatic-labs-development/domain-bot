@@ -3,16 +3,25 @@
  * Supports variant="hero" (default) and variant="nav" (results page).
  */
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 export function SearchBar({ value, onChange, onSearch, loading, variant = 'hero', primaryDomain, primaryResult }) {
   const inputRef = useRef(null)
+  const [showError, setShowError] = useState(false)
 
   useEffect(() => { inputRef.current?.focus() }, [])
 
   function handleKeyDown(e) {
-    if (e.key === 'Enter' && value.trim()) onSearch()
+    if (e.key === 'Enter') {
+      if (value.trim()) { setShowError(false); onSearch() }
+      else setShowError(true)
+    }
     if (e.key === 'Escape') onChange('')
+  }
+
+  function handleSearch() {
+    if (value.trim()) { setShowError(false); onSearch() }
+    else setShowError(true)
   }
 
   if (variant === 'nav') {
@@ -27,14 +36,13 @@ export function SearchBar({ value, onChange, onSearch, loading, variant = 'hero'
           value={value}
           onChange={e => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Search domains…"
+          placeholder="yourname.com"
+          aria-label="Search for a domain name"
           spellCheck={false}
           autoComplete="off"
           autoCorrect="off"
           autoCapitalize="off"
         />
-
-
         <div className="nav-search-hints">
           {loading
             ? <NavSpinner />
@@ -54,9 +62,12 @@ export function SearchBar({ value, onChange, onSearch, loading, variant = 'hero'
           className="hero-input"
           type="text"
           value={value}
-          onChange={e => onChange(e.target.value)}
+          onChange={e => { onChange(e.target.value); if (showError) setShowError(false) }}
           onKeyDown={handleKeyDown}
           placeholder="yourname.com"
+          aria-label="Search for a domain name"
+          aria-describedby={showError ? 'search-error' : undefined}
+          aria-invalid={showError || undefined}
           spellCheck={false}
           autoComplete="off"
           autoCorrect="off"
@@ -64,18 +75,23 @@ export function SearchBar({ value, onChange, onSearch, loading, variant = 'hero'
         />
         <button
           className="hero-search-btn"
-          onClick={() => value.trim() && onSearch()}
+          onClick={handleSearch}
           aria-label="Search"
         >
           {loading ? <Spinner /> : <SearchIcon />}
           Search
         </button>
       </div>
-      {value && (
-        <div className="hero-search-bottom">
+      <div className="hero-search-bottom">
+        {showError && (
+          <span id="search-error" className="search-error" role="alert">
+            Please enter a domain name
+          </span>
+        )}
+        {!showError && value && (
           <button className="clear-hint" onClick={() => onChange('')}>✕ Clear</button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

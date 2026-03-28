@@ -23,6 +23,8 @@ const STATUS_LABEL = {
 }
 
 export function SavedPanel({ saved, onUnsave, onClose, livePrices = {}, results = {}, onDetail, onLiveCheck }) {
+  const [confirmClear, setConfirmClear] = useState(false)
+
   useEffect(() => {
     function onKey(e) { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', onKey)
@@ -43,13 +45,20 @@ export function SavedPanel({ saved, onUnsave, onClose, livePrices = {}, results 
             )}
           </div>
           <div className="saved-header-actions">
-            {saved.length > 0 && (
+            {saved.length > 0 && !confirmClear && (
               <button
                 className="saved-clear-btn"
-                onClick={() => saved.forEach(d => onUnsave(d))}
+                onClick={() => setConfirmClear(true)}
               >
                 Clear all
               </button>
+            )}
+            {confirmClear && (
+              <div className="saved-clear-confirm">
+                <span className="saved-clear-confirm-text">Remove all {saved.length}?</span>
+                <button className="saved-clear-btn saved-clear-yes" onClick={() => { saved.forEach(d => onUnsave(d)); setConfirmClear(false) }}>Yes, clear</button>
+                <button className="saved-clear-cancel" onClick={() => setConfirmClear(false)}>Cancel</button>
+              </div>
             )}
             <button className="saved-close-btn" onClick={onClose} aria-label="Close">
               <CloseIcon />
