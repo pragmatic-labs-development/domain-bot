@@ -261,6 +261,9 @@ const STATUS_COLOR = {
   unknown:     'var(--text-dim)',
 }
 
+const isTouch = () => typeof window !== 'undefined' &&
+  (navigator.maxTouchPoints > 0 || window.matchMedia('(pointer: coarse)').matches)
+
 export function DomainsView({ keyword, results, onDetail }) {
   const [tooltip, setTooltip] = useState(null) // { tld, domain, status, price, x, y }
   const hideTimer = useRef(null)
@@ -274,6 +277,14 @@ export function DomainsView({ keyword, results, onDetail }) {
   const handleMouseLeave = useCallback(() => {
     hideTimer.current = setTimeout(() => setTooltip(null), 250)
   }, [])
+
+  // On touch devices, intercept available/premium tile taps → open detail modal
+  const handleTileClick = useCallback((e, domain, status) => {
+    if ((status === 'available' || status === 'premium') && onDetail && isTouch()) {
+      e.preventDefault()
+      onDetail(domain)
+    }
+  }, [onDetail])
 
   if (!keyword) return null
 
@@ -307,6 +318,7 @@ export function DomainsView({ keyword, results, onDetail }) {
         href={comData.href ?? undefined}
         target={comData.href ? '_blank' : undefined}
         rel="noreferrer"
+        onClick={e => handleTileClick(e, comData.domain, comData.status)}
       >
         <div className="dv-com-left">
           <span className="dv-com-domain">{comData.domain}</span>
@@ -330,6 +342,7 @@ export function DomainsView({ keyword, results, onDetail }) {
             href={href ?? undefined}
             target={href ? '_blank' : undefined}
             rel="noreferrer"
+            onClick={e => handleTileClick(e, domain, status)}
           >
             <span className="dv-featured-ext">.{tld}</span>
             <span className="dv-featured-badge" style={{ color }}>
@@ -380,6 +393,7 @@ export function DomainsView({ keyword, results, onDetail }) {
                     href={href ?? undefined}
                     target={href ? '_blank' : undefined}
                     rel="noreferrer"
+                    onClick={e => handleTileClick(e, domain, status)}
                     onMouseEnter={e => handleMouseEnter(e, tld, domain, status, price)}
                     onMouseLeave={handleMouseLeave}
                   >

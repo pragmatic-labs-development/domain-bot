@@ -3925,6 +3925,34 @@ body::before {
   /* 44px minimum touch target */
   .dv-tile { min-height: 44px; height: auto; padding: 0.35rem 0.5rem; }
   .dv-tile-ext { font-size: 0.78rem; }
+  /* Featured row: 4 columns on mobile (7 is too cramped) */
+  .dv-featured-row { grid-template-columns: repeat(4, 1fr); }
+  /* Primary .com hero card — tighten padding, stack if needed */
+  .dv-com-hero { padding: 0.85rem 1rem; }
+  .dv-com-domain { font-size: 1.1rem; }
+  .dv-com-price { font-size: 0.8rem; }
+
+  /* 15 ── Sort dropdown — anchor left on mobile (sort-wrap is full-width so right:0 goes off) ── */
+  .sort-dropdown { right: auto; left: 0; }
+
+  /* 16 ── Ideas modal — compact on mobile ── */
+  .ideas-modal { padding: 1.5rem 1.25rem; gap: 1rem; }
+  .ideas-modal-header { font-size: 1.2rem; }
+  .ideas-modal-sub { font-size: 0.88rem; }
+  .ideas-modal-row { flex-direction: column; gap: 0.6rem; margin-top: 0; }
+  .ideas-modal-input { font-size: 1rem; padding: 0.8rem 1rem; }
+  .ideas-modal-btn { padding: 0.85rem 1rem; width: 100%; font-size: 0.9rem; }
+
+  /* 17 ── Nav — icon-only wand button on mobile ── */
+  .nav-wand-label { display: none; }
+  .nav-wand-btn {
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    justify-content: center;
+    border-radius: 10px;
+  }
 
 }
 

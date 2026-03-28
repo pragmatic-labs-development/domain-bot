@@ -123,7 +123,7 @@ export default function App() {
               aria-label="Generate new idea"
             >
               <WandIcon />
-              Generate New Idea
+              <span className="nav-wand-label">Generate New Idea</span>
             </button>
 
             <button
